@@ -6,6 +6,7 @@ declare module "next-auth" {
     id: string;
     email: string;
     fullName: string;
+    token: string;
   }
   interface Session {
     user: User;
@@ -55,6 +56,7 @@ export const authOptions: NextAuthOptions = {
           id: token.id,
           fullName: token.fullName,
           email: token.email,
+          token: token.token,
         },
       };
     },
@@ -65,6 +67,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           fullName: user.fullName,
           email: user.email,
+          token: user.token,
         };
       }
       return token;
