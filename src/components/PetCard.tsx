@@ -8,6 +8,7 @@ interface Pet {
   weight: number;
   type: string;
   breed: string;
+  image?: string;
 }
 
 interface PetCardProps {
@@ -36,7 +37,18 @@ export default function PetCard({ pet, onEdit }: PetCardProps) {
       >
         <Pencil className="w-4 h-4" />
       </button>
-      <h3 className="text-xl font-semibold mb-2 pr-6">{pet.name}</h3>
+      {pet.image && (
+        <div className="mb-4">
+          <img
+            src={pet.image}
+            alt={`${pet.name}'s photo`}
+            className="w-full h-48 object-cover rounded-lg"
+          />
+        </div>
+      )}
+      <h3 className="text-xl font-semibold mb-2 pr-6 text-gray-700">
+        {pet.name}
+      </h3>
       <div className="space-y-1">
         <p className="text-gray-600">
           <span className="font-medium">Type:</span> {pet.type}

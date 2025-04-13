@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useSession } from "next-auth/react";
-import { Pencil } from "lucide-react";
+import { Pencil, Upload } from "lucide-react";
+import { uploadImage } from "@/lib/storage/client";
 
 interface PetFormData {
   name: string;
@@ -11,6 +12,7 @@ interface PetFormData {
   weight: number;
   type: "DOG" | "CAT" | "OTHER";
   breed: string;
+  image?: string;
 }
 
 interface PetModalProps {
@@ -23,8 +25,20 @@ interface PetModalProps {
     weight: number;
     type: string;
     breed: string;
+    image?: string;
   };
   onSuccess: () => void;
+}
+
+async function convertBlobUrlToFile(blobUrl: string) {
+  const response = await fetch(blobUrl);
+  const blob = await response.blob();
+  const fileName = Math.random().toString(36).slice(2, 9);
+  const mimeType = blob.type || "application/octet-stream";
+  const file = new File([blob], `${fileName}.${mimeType.split("/")[1]}`, {
+    type: mimeType,
+  });
+  return file;
 }
 
 export default function PetModal({
@@ -36,6 +50,10 @@ export default function PetModal({
   const { data: session } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -55,6 +73,7 @@ export default function PetModal({
               weight: pet.weight,
               type: pet.type as "DOG" | "CAT" | "OTHER",
               breed: pet.breed,
+              image: pet.image,
             }
           : {
               name: "",
@@ -62,32 +81,64 @@ export default function PetModal({
               weight: 0,
               type: "DOG",
               breed: "",
+              image: "",
             }
       );
+      setSelectedImage(null);
+      setPreviewUrl(pet?.image || null);
     }
   }, [isOpen, pet, reset]);
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const imageUrl = URL.createObjectURL(file);
+      setSelectedImage(imageUrl);
+      setPreviewUrl(imageUrl);
+      e.target.value = "";
+    }
+  };
 
   const onSubmit = async (data: PetFormData) => {
     if (!session?.user?.token) {
       setError("Authentication required");
       return;
     }
-
     setIsSubmitting(true);
     setError(null);
 
     try {
-      const url = pet
-        ? `http://localhost:3000/api/pets/${pet.id}`
-        : "http://localhost:3000/api/pets";
+      let imageUrl = data.image;
 
+      if (selectedImage) {
+        const imageFile = await convertBlobUrlToFile(selectedImage);
+        const { imageUrl: uploadedUrl, error } = await uploadImage({
+          file: imageFile,
+          bucket: "pets-images",
+        });
+
+        if (error) {
+          console.error(error);
+          return;
+        }
+        imageUrl = uploadedUrl;
+      }
+
+      const url = pet
+        ? `${process.env.NEXT_PUBLIC_API_URL}/pets/${pet.id}`
+        : `${process.env.NEXT_PUBLIC_API_URL}/pets`;
+
+      console.log(url);
       const response = await fetch(url, {
         method: pet ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session.user.token}`,
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          image: imageUrl,
+        }),
       });
 
       if (!response.ok) {
@@ -128,6 +179,39 @@ export default function PetModal({
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Pet Image
+            </label>
+            <div className="flex items-center justify-center w-full">
+              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                {previewUrl ? (
+                  <img
+                    src={previewUrl}
+                    alt="Pet preview"
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <Upload className="w-8 h-8 mb-2 text-gray-500" />
+                    <p className="mb-2 text-sm text-gray-500">
+                      <span className="font-semibold">Click to upload</span> or
+                      drag and drop
+                    </p>
+                    <p className="text-xs text-gray-500">PNG, JPG or JPEG</p>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  ref={imageInputRef}
+                />
+              </label>
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Name
