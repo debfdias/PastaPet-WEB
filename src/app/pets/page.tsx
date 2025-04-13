@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import PetCard from "@/components/PetCard";
+import PetModal from "@/components/PetModal";
 
 interface Pet {
   id: string;
@@ -18,37 +19,53 @@ export default function PetsPage() {
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPet, setSelectedPet] = useState<Pet | undefined>();
+
+  const fetchPets = async () => {
+    if (!session?.user?.token) {
+      setError("Authentication required");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:3000/api/pets", {
+        headers: {
+          Authorization: `Bearer ${session.user.token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch pets");
+      }
+      const data = await response.json();
+      setPets(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchPets = async () => {
-      if (status === "loading") return;
-
-      if (!session?.user?.token) {
-        setError("Authentication required");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await fetch("http://localhost:3000/api/pets", {
-          headers: {
-            Authorization: `Bearer ${session.user.token}`,
-          },
-        });
-        if (!response.ok) {
-          throw new Error("Failed to fetch pets");
-        }
-        const data = await response.json();
-        setPets(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    if (status === "loading") return;
     fetchPets();
   }, [session, status]);
+
+  const handleEdit = (pet: Pet) => {
+    setSelectedPet(pet);
+    setIsModalOpen(true);
+  };
+
+  const handleAdd = () => {
+    setSelectedPet(undefined);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedPet(undefined);
+  };
 
   if (status === "loading" || loading) {
     return (
@@ -76,12 +93,42 @@ export default function PetsPage() {
 
   return (
     <div className="min-h-screen p-8">
-      <h1 className="text-3xl font-bold mb-8">My Pets</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {pets.map((pet) => (
-          <PetCard key={pet.id} pet={pet} />
-        ))}
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">My Pets</h1>
+        <button
+          onClick={handleAdd}
+          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
+        >
+          Add Pet
+        </button>
       </div>
+
+      {pets.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-[50vh]">
+          <p className="text-xl text-gray-600 mb-4">
+            You don&apos;t have any pets yet
+          </p>
+          <button
+            onClick={handleAdd}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors"
+          >
+            Add a Pet
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {pets.map((pet) => (
+            <PetCard key={pet.id} pet={pet} onEdit={handleEdit} />
+          ))}
+        </div>
+      )}
+
+      <PetModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        pet={selectedPet}
+        onSuccess={fetchPets}
+      />
     </div>
   );
 }
