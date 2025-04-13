@@ -22,7 +22,11 @@ export default function LoginPage() {
     });
 
     if (result?.error) {
-      setError(result.error);
+      if (result.status === 401) {
+        setError("Invalid credentials.");
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
     } else {
       router.push("/dashboard");
     }
