@@ -1,10 +1,32 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
 @theme {
-  --color-avocado-100: oklch(0.99 0 0);
   --color-avocado-200: oklch(0.98 0.04 113.22);
   --color-avocado-300: oklch(0.94 0.11 115.03);
-  --color-avocado-400: oklch(0.92 0.19 114.08);
-  --color-avocado-500: oklch(0.84 0.18 117.33);
-  --color-avocado-600: oklch(0.53 0.12 118.34);
+  --color-avocado-400: hsl(148 91% 65%);
+  --color-avocado-500: hsl(148 91% 45%);
+  --color-card: hsl(160 61% 91%);
+  --color-background-light: hsl(150 61% 91%);
+  --color-background-dark: hsl(207 95% 8%);
+}
+
+@layer base {
+  [data-theme="light"] {
+    --color-card: hsl(148 91% 96%);
+    --color-avocado-500: hsl(148 91% 45%);
+  }
+  [data-theme="dark"] {
+    --color-card: hsl(220 42.9% 14%);
+    --color-avocado-500: hsl(148 91% 45%);
+  }
+}
+
+:root[data-theme="light"] {
+  background-color: var(--color-background-light);
+}
+
+:root[data-theme="dark"] {
+  background-color: var(--color-background-dark);
 }

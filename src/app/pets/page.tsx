@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import PetCard from "@/components/PetCard";
 import PetModal from "@/components/PetModal";
@@ -22,7 +22,7 @@ export default function PetsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPet, setSelectedPet] = useState<Pet | undefined>();
 
-  const fetchPets = async () => {
+  const fetchPets = useCallback(async () => {
     if (!session?.user?.token) {
       setError("Authentication required");
       setLoading(false);
@@ -45,12 +45,12 @@ export default function PetsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [session?.user?.token]);
 
   useEffect(() => {
     if (status === "loading") return;
     fetchPets();
-  }, [session, status]);
+  }, [session, status, fetchPets]);
 
   const handleEdit = (pet: Pet) => {
     setSelectedPet(pet);
