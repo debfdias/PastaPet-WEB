@@ -1,0 +1,24 @@
+{
+  "HomePage": {
+    "title": "Hello world!"
+  },
+  "login": {
+    "title": "Welcome back!",
+    "email": {
+      "label": "Email address",
+      "placeholder": "Enter your email"
+    },
+    "password": {
+      "label": "Password",
+      "placeholder": "Enter your password"
+    },
+    "forgotPassword": "Forgot your password?",
+    "signIn": "Sign in",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up",
+    "errors": {
+      "invalidCredentials": "Invalid credentials.",
+      "somethingWentWrong": "Something went wrong. Please try again."
+    }
+  }
+}

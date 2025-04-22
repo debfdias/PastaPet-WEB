@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "./providers/AuthProvider";
 import { Header } from "@/components/Header";
 import { ThemeProvider } from "next-themes";
+import { NextIntlClientProvider } from "next-intl";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,22 +21,24 @@ export const metadata: Metadata = {
   description: "O histórico médico do seu pet.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased text-gray-700 dark:text-gray-300`}
       >
-        <ThemeProvider enableSystem={true} defaultTheme="system">
-          <AuthProvider>
-            <Header />
-            <main className="px-4 md:px-12">{children}</main>
-          </AuthProvider>
-        </ThemeProvider>
+        <NextIntlClientProvider>
+          <ThemeProvider enableSystem={true} defaultTheme="system">
+            <AuthProvider>
+              <Header />
+              <main className="px-4 md:px-12">{children}</main>
+            </AuthProvider>
+          </ThemeProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

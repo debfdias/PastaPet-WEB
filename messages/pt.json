@@ -1,0 +1,24 @@
+{
+  "HomePage": {
+    "title": "ola mundo!"
+  },
+  "login": {
+    "title": "Bem-vindo de volta!",
+    "email": {
+      "label": "Endereço de e-mail",
+      "placeholder": "Digite seu e-mail"
+    },
+    "password": {
+      "label": "Senha",
+      "placeholder": "Digite sua senha"
+    },
+    "forgotPassword": "Esqueceu sua senha?",
+    "signIn": "Entrar",
+    "noAccount": "Não tem uma conta?",
+    "signUp": "Cadastre-se",
+    "errors": {
+      "invalidCredentials": "Credenciais inválidas.",
+      "somethingWentWrong": "Algo deu errado. Por favor, tente novamente."
+    }
+  }
+}
