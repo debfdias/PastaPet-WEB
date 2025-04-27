@@ -7,6 +7,7 @@ import { Pencil, Upload } from "lucide-react";
 import { uploadImage } from "@/lib/storage/client";
 import Image from "next/image";
 import { CgCloseR } from "react-icons/cg";
+import { useTranslations } from "next-intl";
 
 interface PetFormData {
   name: string;
@@ -57,15 +58,12 @@ export default function PetModal({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const t = useTranslations("petModal");
+  const commonT = useTranslations("common");
 
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<PetFormData>();
+  const { register, handleSubmit, reset } = useForm<PetFormData>();
 
   // Add click outside handler
   useEffect(() => {
@@ -128,7 +126,7 @@ export default function PetModal({
 
   const onSubmit = async (data: PetFormData) => {
     if (!session?.user?.token) {
-      setError("Authentication required");
+      setError(t("errors.authenticationRequired"));
       return;
     }
     setIsSubmitting(true);
@@ -169,13 +167,15 @@ export default function PetModal({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save pet");
+        throw new Error(t("errors.failedToSave"));
       }
 
       onSuccess();
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(
+        err instanceof Error ? err.message : t("errors.anErrorOccurred")
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -194,10 +194,10 @@ export default function PetModal({
             {pet ? (
               <div className="flex items-center gap-2">
                 <Pencil className="w-5 h-5" />
-                Edit Pet
+                {t("editPet")}
               </div>
             ) : (
-              "Add New Pet"
+              t("addNewPet")
             )}
           </h2>
           <button
@@ -227,11 +227,15 @@ export default function PetModal({
                 ) : (
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     <Upload className="w-8 h-8 mb-2 text-gray-500" />
-                    <p className="mb-2 text-sm text-gray-500">
-                      <span className="font-semibold">Click to upload</span> or
-                      drag and drop
+                    <p className="mb-2 text-sm text-gray-500 ">
+                      <span className="font-semibold">
+                        {t("imageUpload.clickToUpload")}
+                      </span>{" "}
+                      {t("imageUpload.dragAndDrop")}
                     </p>
-                    <p className="text-xs text-gray-500">PNG, JPG or JPEG</p>
+                    <p className="text-xs text-gray-500">
+                      {t("imageUpload.fileTypes")}
+                    </p>
                   </div>
                 )}
                 <input
@@ -248,114 +252,73 @@ export default function PetModal({
           {/* Form fields - Full width on mobile, 2/3 on desktop */}
           <div className="w-full lg:w-2/3">
             <div className="grid grid-cols-2 gap-4">
-              {/* First column */}
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Name</label>
-                  <input
-                    {...register("name", { required: "Name is required" })}
-                    className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
-                    type="text"
-                  />
-                  {errors.name && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.name.message}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Date of Birth
-                  </label>
-                  <input
-                    {...register("dob", {
-                      required: "Date of birth is required",
-                    })}
-                    className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
-                    type="date"
-                  />
-                  {errors.dob && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.dob.message}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Weight (kg)
-                  </label>
-                  <input
-                    {...register("weight", {
-                      required: "Weight is required",
-                      min: { value: 0, message: "Weight must be positive" },
-                      valueAsNumber: true,
-                    })}
-                    className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
-                    type="number"
-                    step="0.1"
-                  />
-                  {errors.weight && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.weight.message}
-                    </p>
-                  )}
-                </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  {t("form.name")}
+                </label>
+                <input
+                  type="text"
+                  {...register("name", { required: true })}
+                  placeholder={t("form.namePlaceholder")}
+                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                />
               </div>
-
-              {/* Second column */}
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Type</label>
-                  <select
-                    {...register("type", { required: "Type is required" })}
-                    className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
-                  >
-                    <option value="DOG">Dog</option>
-                    <option value="CAT">Cat</option>
-                    <option value="OTHER">Other</option>
-                  </select>
-                  {errors.type && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.type.message}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Breed
-                  </label>
-                  <input
-                    {...register("breed", { required: "Breed is required" })}
-                    className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
-                    type="text"
-                  />
-                  {errors.breed && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.breed.message}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Gender
-                  </label>
-                  <select
-                    {...register("gender", { required: "Gender is required" })}
-                    className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
-                  >
-                    <option value="FEMALE">Female</option>
-                    <option value="MALE">Male</option>
-                  </select>
-                  {errors.gender && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.gender.message}
-                    </p>
-                  )}
-                </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  {t("form.dateOfBirth")}
+                </label>
+                <input
+                  type="date"
+                  {...register("dob", { required: true })}
+                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  {t("form.weight")}
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  {...register("weight", { required: true })}
+                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  {t("form.type")}
+                </label>
+                <select
+                  {...register("type", { required: true })}
+                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                >
+                  <option value="DOG">{t("form.dog")}</option>
+                  <option value="CAT">{t("form.cat")}</option>
+                  <option value="OTHER">{t("form.other")}</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  {t("form.breed")}
+                </label>
+                <input
+                  type="text"
+                  {...register("breed", { required: true })}
+                  placeholder={t("form.breedPlaceholder")}
+                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  {t("form.gender")}
+                </label>
+                <select
+                  {...register("gender", { required: true })}
+                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                >
+                  <option value="FEMALE">{t("form.female")}</option>
+                  <option value="MALE">{t("form.male")}</option>
+                </select>
               </div>
             </div>
 
@@ -367,14 +330,18 @@ export default function PetModal({
                 onClick={onClose}
                 className="px-4 py-2 cursor-pointer bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
               >
-                <div className="">Cancel</div>
+                <div className="">{commonT("cancel")}</div>
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className="px-4 py-2 bg-avocado-500 text-avocado-800 rounded-lg hover:bg-avocado-300 disabled:opacity-50 cursor-pointer font-semibold transition-colors duration-200"
               >
-                {isSubmitting ? "Saving..." : pet ? "Update" : "Add Pet"}
+                {isSubmitting
+                  ? commonT("loading")
+                  : pet
+                  ? commonT("update")
+                  : commonT("save")}
               </button>
             </div>
           </div>

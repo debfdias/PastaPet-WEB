@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { CgCloseR } from "react-icons/cg";
+import { useTranslations } from "next-intl";
 
 interface EventModalProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export default function EventModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const t = useTranslations("eventModal");
 
   // Add click outside handler
   useEffect(() => {
@@ -50,7 +52,7 @@ export default function EventModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!session?.user?.token) {
-      setError("Authentication required");
+      setError(t("errors.authenticationRequired"));
       return;
     }
 
@@ -76,7 +78,7 @@ export default function EventModal({
       );
 
       if (!response.ok) {
-        throw new Error("Failed to create event");
+        throw new Error(t("errors.failedToCreate"));
       }
 
       onSuccess();
@@ -85,7 +87,9 @@ export default function EventModal({
       setType("normal");
       setDate(new Date().toISOString().split("T")[0]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(
+        err instanceof Error ? err.message : t("errors.anErrorOccurred")
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -100,7 +104,7 @@ export default function EventModal({
         className="bg-pet-card rounded-lg p-6 w-full max-w-xl"
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Add Event</h2>
+          <h2 className="text-2xl font-bold">{t("title")}</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 cursor-pointer"
@@ -113,37 +117,37 @@ export default function EventModal({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">
-                Event Title
+                {t("form.eventTitle")}
               </label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
-                placeholder="Enter event title"
+                placeholder={t("form.eventTitlePlaceholder")}
                 required
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">
-                Event Type
+                {t("form.eventType")}
               </label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as EventType)}
                 className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
               >
-                <option value="normal">Normal</option>
-                <option value="medical">Medical</option>
-                <option value="grooming">Grooming</option>
-                <option value="training">Training</option>
+                <option value="normal">{t("form.types.normal")}</option>
+                <option value="medical">{t("form.types.medical")}</option>
+                <option value="grooming">{t("form.types.grooming")}</option>
+                <option value="training">{t("form.types.training")}</option>
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">
-                Event Date
+                {t("form.eventDate")}
               </label>
               <input
                 type="date"
@@ -163,14 +167,14 @@ export default function EventModal({
               onClick={onClose}
               className="px-4 py-2 cursor-pointer bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
             >
-              <div className="">Cancel</div>
+              <div className="">{t("buttons.cancel")}</div>
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
               className="px-4 py-2 bg-avocado-500 text-avocado-800 rounded-lg hover:bg-avocado-300 disabled:opacity-50 cursor-pointer font-semibold transition-colors duration-200"
             >
-              {isSubmitting ? "Adding..." : "Add Event"}
+              {isSubmitting ? t("buttons.adding") : t("buttons.addEvent")}
             </button>
           </div>
         </form>

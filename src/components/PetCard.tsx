@@ -2,6 +2,7 @@ import { differenceInYears, differenceInMonths } from "date-fns";
 import { Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface Pet {
   id: string;
@@ -21,6 +22,7 @@ interface PetCardProps {
 
 export default function PetCard({ pet, onEdit }: PetCardProps) {
   const router = useRouter();
+  const t = useTranslations("petCard");
 
   const calculateAge = (dob: string) => {
     const birthDate = new Date(dob);
@@ -28,9 +30,9 @@ export default function PetCard({ pet, onEdit }: PetCardProps) {
     const months = differenceInMonths(new Date(), birthDate) % 12;
 
     if (years === 0) {
-      return `${months} months`;
+      return `${months} ${t("months")}`;
     }
-    return `${years} years ${months} months`;
+    return `${years} ${t("years")} ${months} ${t("months")}`;
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
@@ -52,7 +54,7 @@ export default function PetCard({ pet, onEdit }: PetCardProps) {
           onEdit(pet);
         }}
         className="absolute top-2 right-2 text-avocado-800 rounded-full bg-avocado-500 hover:bg-avocado-300 p-3 cursor-pointer"
-        aria-label="Edit pet"
+        aria-label={t("editPet")}
       >
         <Pencil className="w-4 h-4" />
       </button>
@@ -73,10 +75,11 @@ export default function PetCard({ pet, onEdit }: PetCardProps) {
       <div className="bg-[#b0b9a2]/20 dark:bg-gray-700 w-full h-[2px] mb-4"></div>
       <div className="space-y-1">
         <p className="">
-          <span className="font-medium">Weight:</span> {pet.weight} kg
+          <span className="font-medium">{t("weight")}:</span> {pet.weight} kg
         </p>
         <p className="">
-          <span className="font-medium">Age:</span> {calculateAge(pet.dob)}
+          <span className="font-medium">{t("age")}:</span>{" "}
+          {calculateAge(pet.dob)}
         </p>
       </div>
     </div>

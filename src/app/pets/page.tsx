@@ -6,6 +6,7 @@ import PetCard from "@/components/PetCard";
 import PetModal from "@/components/PetModal";
 import PetFilters from "@/components/PetFilters";
 import { MdPets } from "react-icons/md";
+import { useTranslations } from "next-intl";
 
 interface Pet {
   id: string;
@@ -31,10 +32,11 @@ export default function PetsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPet, setSelectedPet] = useState<Pet | undefined>();
   const [filters, setFilters] = useState<Filters>({ name: "", type: "" });
+  const t = useTranslations("pets");
 
   const fetchPets = useCallback(async () => {
     if (!session?.user?.token) {
-      setError("Authentication required");
+      setError(t("errors.authenticationRequired"));
       setLoading(false);
       return;
     }
@@ -53,16 +55,18 @@ export default function PetsPage() {
         }
       );
       if (!response.ok) {
-        throw new Error("Failed to fetch pets");
+        throw new Error(t("errors.failedToFetch"));
       }
       const data = await response.json();
       setPets(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(
+        err instanceof Error ? err.message : t("errors.anErrorOccurred")
+      );
     } finally {
       setLoading(false);
     }
-  }, [session?.user?.token, filters]);
+  }, [session?.user?.token, filters, t]);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -91,7 +95,7 @@ export default function PetsPage() {
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading pets...</div>
+        <div className="text-xl">{t("loading")}</div>
       </div>
     );
   }
@@ -99,7 +103,7 @@ export default function PetsPage() {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl text-red-500">Error: {error}</div>
+        <div className="text-xl text-red-500">{t("error", { error })}</div>
       </div>
     );
   }
@@ -107,7 +111,7 @@ export default function PetsPage() {
   if (!session) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Please sign in to view your pets</div>
+        <div className="text-xl">{t("signInRequired")}</div>
       </div>
     );
   }
@@ -115,7 +119,7 @@ export default function PetsPage() {
   return (
     <div className="min-h-screen p-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">My Pets</h1>
+        <h1 className="text-3xl font-bold">{t("title")}</h1>
         <button
           onClick={handleAdd}
           className="bg-avocado-500 hover:bg-avocado-300 text-gray-800 px-4 py-2 rounded-lg transition-colors cursor-pointer font-medium flex items-center"

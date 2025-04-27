@@ -1,6 +1,8 @@
 {
   "HomePage": {
-    "title": "ola mundo!"
+    "title": "ola mundo!",
+    "welcome": "Bem-vindo ao Nosso App",
+    "goToLogin": "Ir para Login"
   },
   "login": {
     "title": "Bem-vindo de volta!",
@@ -20,5 +22,106 @@
       "invalidCredentials": "Credenciais inválidas.",
       "somethingWentWrong": "Algo deu errado. Por favor, tente novamente."
     }
+  },
+  "header": {
+    "pets": "Pets",
+    "reports": "Relatórios",
+    "profile": "Perfil",
+    "logout": "Sair"
+  },
+  "petCard": {
+    "weight": "Peso",
+    "age": "Idade",
+    "months": "meses",
+    "years": "anos",
+    "editPet": "Editar pet"
+  },
+  "petModal": {
+    "addNewPet": "Adicionar Novo Pet",
+    "editPet": "Editar Pet",
+    "imageUpload": {
+      "clickToUpload": "Clique para fazer upload",
+      "dragAndDrop": "ou arraste e solte",
+      "fileTypes": "PNG, JPG ou JPEG"
+    },
+    "form": {
+      "name": "Nome",
+      "namePlaceholder": "Digite o nome do pet",
+      "dateOfBirth": "Data de Nascimento",
+      "weight": "Peso",
+      "type": "Tipo",
+      "breed": "Raça",
+      "breedPlaceholder": "Digite a raça do pet",
+      "gender": "Gênero",
+      "female": "Fêmea",
+      "male": "Macho",
+      "dog": "Cachorro",
+      "cat": "Gato",
+      "other": "Outro"
+    },
+    "errors": {
+      "authenticationRequired": "Autenticação necessária",
+      "failedToSave": "Falha ao salvar pet",
+      "anErrorOccurred": "Ocorreu um erro"
+    }
+  },
+  "eventModal": {
+    "title": "Adicionar Evento",
+    "form": {
+      "eventTitle": "Título do Evento",
+      "eventTitlePlaceholder": "Digite o título do evento",
+      "eventType": "Tipo de Evento",
+      "eventDate": "Data do Evento",
+      "types": {
+        "normal": "Normal",
+        "medical": "Médico",
+        "grooming": "Cuidados",
+        "training": "Treinamento"
+      }
+    },
+    "buttons": {
+      "cancel": "Cancelar",
+      "addEvent": "Adicionar Evento",
+      "adding": "Adicionando..."
+    },
+    "errors": {
+      "authenticationRequired": "Autenticação necessária",
+      "failedToCreate": "Falha ao criar evento",
+      "anErrorOccurred": "Ocorreu um erro"
+    }
+  },
+  "petFilters": {
+    "searchPlaceholder": "Buscar por nome do pet...",
+    "type": "Tipo",
+    "types": {
+      "dog": "Cachorro",
+      "cat": "Gato",
+      "other": "Outro"
+    },
+    "clearFilter": "Limpar Filtro"
+  },
+  "pets": {
+    "title": "Meus Pets",
+    "addPet": "Adicionar Pet",
+    "loading": "Carregando pets...",
+    "error": "Erro: {error}",
+    "signInRequired": "Por favor, faça login para ver seus pets",
+    "noPets": {
+      "message": "Você ainda não tem nenhum pet",
+      "addPet": "Adicionar um Pet"
+    },
+    "errors": {
+      "authenticationRequired": "Autenticação necessária",
+      "failedToFetch": "Falha ao buscar pets",
+      "anErrorOccurred": "Ocorreu um erro"
+    }
+  },
+  "common": {
+    "loading": "Carregando...",
+    "error": "Erro: {error}",
+    "close": "Fechar",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "update": "Atualizar"
   }
 }

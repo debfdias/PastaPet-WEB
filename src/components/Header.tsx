@@ -6,10 +6,12 @@ import { Button } from "./ui/button";
 import { signOut, useSession } from "next-auth/react";
 import { ThemeButtons } from "./ui/ThemeButtons";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export function Header() {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const t = useTranslations("header");
 
   const handleLogout = async () => {
     await signOut({ redirect: true, callbackUrl: "/" });
@@ -35,7 +37,7 @@ export function Header() {
                     : ""
                 }
               >
-                Pets
+                {t("pets")}
               </span>
               {pathname === "/pets" && (
                 <div className="absolute -bottom-[18px] left-1/2 -translate-x-1/2 w-18 h-1 bg-text-primary dark:bg-avocado-500 rounded-t-md" />
@@ -52,7 +54,7 @@ export function Header() {
                     : ""
                 }
               >
-                Reports
+                {t("reports")}
               </span>
               {pathname === "/reports" && (
                 <div className="absolute -bottom-[18px] left-1/2 -translate-x-1/2 w-24 h-1 bg-text-primary dark:bg-avocado-500 rounded-t-md" />
@@ -68,7 +70,7 @@ export function Header() {
                 className="rounded-full hover:bg-text-primary/20 transition-colors duration-200 cursor-pointer dark:hover:text-avocado-500"
               >
                 <User className="h-5 w-5" />
-                <span className="sr-only">Profile</span>
+                <span className="sr-only">{t("profile")}</span>
               </Button>
             </Link>
             <Button
@@ -78,7 +80,7 @@ export function Header() {
               className="rounded-full hover:bg-text-primary/20  dark:hover:text-red-400 hover:text-red-600 transition-colors duration-200 cursor-pointer"
             >
               <LogOut className="h-5 w-5" />
-              <span className="sr-only">Logout</span>
+              <span className="sr-only">{t("logout")}</span>
             </Button>
           </div>
         </div>

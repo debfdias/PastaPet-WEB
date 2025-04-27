@@ -1,6 +1,8 @@
 {
   "HomePage": {
-    "title": "Hello world!"
+    "title": "Hello world!",
+    "welcome": "Welcome to Our App",
+    "goToLogin": "Go to Login"
   },
   "login": {
     "title": "Welcome back!",
@@ -20,5 +22,106 @@
       "invalidCredentials": "Invalid credentials.",
       "somethingWentWrong": "Something went wrong. Please try again."
     }
+  },
+  "header": {
+    "pets": "Pets",
+    "reports": "Reports",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "petCard": {
+    "weight": "Weight",
+    "age": "Age",
+    "months": "months",
+    "years": "years",
+    "editPet": "Edit pet"
+  },
+  "petModal": {
+    "addNewPet": "Add New Pet",
+    "editPet": "Edit Pet",
+    "imageUpload": {
+      "clickToUpload": "Click to upload",
+      "dragAndDrop": "or drag and drop",
+      "fileTypes": "PNG, JPG or JPEG"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Enter pet's name",
+      "dateOfBirth": "Date of Birth",
+      "weight": "Weight",
+      "type": "Type",
+      "breed": "Breed",
+      "breedPlaceholder": "Enter pet's breed",
+      "gender": "Gender",
+      "female": "Female",
+      "male": "Male",
+      "dog": "Dog",
+      "cat": "Cat",
+      "other": "Other"
+    },
+    "errors": {
+      "authenticationRequired": "Authentication required",
+      "failedToSave": "Failed to save pet",
+      "anErrorOccurred": "An error occurred"
+    }
+  },
+  "eventModal": {
+    "title": "Add Event",
+    "form": {
+      "eventTitle": "Event Title",
+      "eventTitlePlaceholder": "Enter event title",
+      "eventType": "Event Type",
+      "eventDate": "Event Date",
+      "types": {
+        "normal": "Normal",
+        "medical": "Medical",
+        "grooming": "Grooming",
+        "training": "Training"
+      }
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "addEvent": "Add Event",
+      "adding": "Adding..."
+    },
+    "errors": {
+      "authenticationRequired": "Authentication required",
+      "failedToCreate": "Failed to create event",
+      "anErrorOccurred": "An error occurred"
+    }
+  },
+  "petFilters": {
+    "searchPlaceholder": "Search by pet name...",
+    "type": "Type",
+    "types": {
+      "dog": "Dog",
+      "cat": "Cat",
+      "other": "Other"
+    },
+    "clearFilter": "Clear Filter"
+  },
+  "pets": {
+    "title": "My Pets",
+    "addPet": "Add Pet",
+    "loading": "Loading pets...",
+    "error": "Error: {error}",
+    "signInRequired": "Please sign in to view your pets",
+    "noPets": {
+      "message": "You don't have any pets yet",
+      "addPet": "Add a Pet"
+    },
+    "errors": {
+      "authenticationRequired": "Authentication required",
+      "failedToFetch": "Failed to fetch pets",
+      "anErrorOccurred": "An error occurred"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error: {error}",
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save",
+    "update": "Update"
   }
 }

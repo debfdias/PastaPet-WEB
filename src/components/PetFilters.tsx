@@ -1,5 +1,6 @@
 import { ChangeEvent, useState } from "react";
 import { MdFilterAltOff, MdSearch } from "react-icons/md";
+import { useTranslations } from "next-intl";
 
 interface PetFiltersProps {
   onFilterChange: (filters: { name: string; type: string }) => void;
@@ -8,6 +9,7 @@ interface PetFiltersProps {
 export default function PetFilters({ onFilterChange }: PetFiltersProps) {
   const [selectedType, setSelectedType] = useState<string>("");
   const [nameInput, setNameInput] = useState<string>("");
+  const t = useTranslations("petFilters");
 
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
@@ -35,7 +37,7 @@ export default function PetFilters({ onFilterChange }: PetFiltersProps) {
             <input
               type="text"
               id="name"
-              placeholder="Search by pet name..."
+              placeholder={t("searchPlaceholder")}
               value={nameInput}
               onChange={handleNameChange}
               className="appearance-none relative block w-full p-3 pr-10 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 sm:text-md bg-gray-100 dark:bg-gray-700"
@@ -45,7 +47,7 @@ export default function PetFilters({ onFilterChange }: PetFiltersProps) {
         </div>
 
         <div className="w-full md:flex-1">
-          <label className="block text-sm font-medium mb-2">Type</label>
+          <label className="block text-sm font-medium mb-2">{t("type")}</label>
           <div className="flex gap-4">
             <label className="inline-flex items-center">
               <input
@@ -56,7 +58,7 @@ export default function PetFilters({ onFilterChange }: PetFiltersProps) {
                 onChange={handleTypeChange}
                 className="w-4 h-4 text-avocado-500 bg-gray-100 border-gray-300 focus:ring-avocado-500 cursor-pointer"
               />
-              <span className="ml-2">Dog</span>
+              <span className="ml-2">{t("types.dog")}</span>
             </label>
             <label className="inline-flex items-center">
               <input
@@ -67,7 +69,7 @@ export default function PetFilters({ onFilterChange }: PetFiltersProps) {
                 onChange={handleTypeChange}
                 className="w-4 h-4 text-avocado-500 bg-gray-100 border-gray-300 focus:ring-avocado-500 cursor-pointer"
               />
-              <span className="ml-2">Cat</span>
+              <span className="ml-2">{t("types.cat")}</span>
             </label>
             <label className="inline-flex items-center">
               <input
@@ -78,7 +80,7 @@ export default function PetFilters({ onFilterChange }: PetFiltersProps) {
                 onChange={handleTypeChange}
                 className="w-4 h-4 text-avocado-500 bg-gray-100 border-gray-300 focus:ring-avocado-500 cursor-pointer"
               />
-              <span className="ml-2">Other</span>
+              <span className="ml-2">{t("types.other")}</span>
             </label>
           </div>
         </div>
@@ -87,7 +89,7 @@ export default function PetFilters({ onFilterChange }: PetFiltersProps) {
           onClick={handleReset}
           className="w-full md:w-auto px-4 py-2 cursor-pointer bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center justify-center"
         >
-          <div>Clear Filter</div>
+          <div>{t("clearFilter")}</div>
           <MdFilterAltOff className="ml-2" />
         </button>
       </div>
