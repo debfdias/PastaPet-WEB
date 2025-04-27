@@ -41,7 +41,6 @@
     "editPet": "Editar Pet",
     "imageUpload": {
       "clickToUpload": "Clique para fazer upload",
-      "dragAndDrop": "ou arraste e solte",
       "fileTypes": "PNG, JPG ou JPEG"
     },
     "form": {

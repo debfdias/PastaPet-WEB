@@ -133,14 +133,13 @@ export default function PetsPage() {
 
       {pets.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-[50vh]">
-          <p className="text-xl text-gray-600 mb-4">
-            You don&apos;t have any pets yet
-          </p>
+          <p className="text-xl mb-4">{t("noPets.message")}</p>
           <button
             onClick={handleAdd}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors"
+            className="bg-avocado-500 hover:bg-avocado-300 text-gray-800 px-4 py-2 rounded-lg transition-colors cursor-pointer font-medium flex items-center"
           >
-            Add a Pet
+            <div>Add Pet</div>
+            <MdPets className="ml-2" />
           </button>
         </div>
       ) : (

@@ -231,7 +231,6 @@ export default function PetModal({
                       <span className="font-semibold">
                         {t("imageUpload.clickToUpload")}
                       </span>{" "}
-                      {t("imageUpload.dragAndDrop")}
                     </p>
                     <p className="text-xs text-gray-500">
                       {t("imageUpload.fileTypes")}
