@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { User, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { signOut, useSession } from "next-auth/react";
 import { ThemeButtons } from "./ui/ThemeButtons";
+import { usePathname } from "next/navigation";
 
 export function Header() {
-  const pathname = usePathname();
   const { data: session } = useSession();
+  const pathname = usePathname();
 
   const handleLogout = async () => {
     await signOut({ redirect: true, callbackUrl: "/" });
@@ -21,28 +21,42 @@ export function Header() {
 
   return (
     <div className="pb-16">
-      <header className="fixed top-0 z-50 w-full border-b bg-black">
-        <div className="px-20 w-full flex h-14 items-center justify-between">
-          <div className="flex items-center space-x-8">
+      <header className="fixed top-0 z-50 w-full border-b-2 border-text-primary/10 bg-header font-semibold">
+        <div className="px-20 w-full flex h-15 items-center justify-between">
+          <div className="flex items-center space-x-16 text-xl">
             <Link
               href="/pets"
-              className={`flex items-center space-x-2 px-2 py-1 rounded-md transition-all duration-200 hover:bg-accent/50 ${
-                pathname === "/pets"
-                  ? "text-primary font-medium"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={`flex items-center rounded-md transition-all duration-200 dark:hover:text-avocado-500 relative`}
             >
-              <span>Pets</span>
+              <span
+                className={
+                  pathname === "/pets"
+                    ? "dark:text-avocado-500 text-text-primary font-semibold"
+                    : ""
+                }
+              >
+                Pets
+              </span>
+              {pathname === "/pets" && (
+                <div className="absolute -bottom-[18px] left-1/2 -translate-x-1/2 w-18 h-1 bg-text-primary dark:bg-avocado-500 rounded-t-md" />
+              )}
             </Link>
             <Link
               href="/reports"
-              className={`flex items-center space-x-2 px-2 py-1 rounded-md transition-all duration-200 hover:bg-accent/50 ${
-                pathname === "/reports"
-                  ? "text-primary font-medium"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={`flex items-center rounded-md transition-all duration-200 dark:hover:text-avocado-500 relative`}
             >
-              <span>Reports</span>
+              <span
+                className={
+                  pathname === "/reports"
+                    ? "dark:text-avocado-500 text-text-primary"
+                    : ""
+                }
+              >
+                Reports
+              </span>
+              {pathname === "/reports" && (
+                <div className="absolute -bottom-[18px] left-1/2 -translate-x-1/2 w-24 h-1 bg-text-primary dark:bg-avocado-500 rounded-t-md" />
+              )}
             </Link>
           </div>
           <div className="flex items-center space-x-2">
@@ -51,7 +65,7 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="rounded-full hover:bg-accent/50 transition-colors duration-200"
+                className="rounded-full hover:bg-text-primary/20 transition-colors duration-200 cursor-pointer dark:hover:text-avocado-500"
               >
                 <User className="h-5 w-5" />
                 <span className="sr-only">Profile</span>
@@ -61,7 +75,7 @@ export function Header() {
               variant="ghost"
               size="icon"
               onClick={handleLogout}
-              className="rounded-full hover:bg-accent/50 transition-colors duration-200"
+              className="rounded-full hover:bg-white/10 dark:hover:text-red-400 hover:text-red-800 transition-colors duration-200 cursor-pointer"
             >
               <LogOut className="h-5 w-5" />
               <span className="sr-only">Logout</span>

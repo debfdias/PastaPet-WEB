@@ -35,7 +35,7 @@ export default function LoginPage() {
       className={`min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8`}
     >
       <div className="max-w-md w-full space-y-8">
-        <div className={`p-8 rounded-lg shadow-md bg-card`}>
+        <div className={`p-8 rounded-lg shadow-md dark:bg-card bg-pet-card`}>
           <div>
             <h2 className={`text-center text-3xl font-extrabold mb-8`}>
               Welcome back!
@@ -56,7 +56,7 @@ export default function LoginPage() {
                   type="email"
                   autoComplete="email"
                   required
-                  className={`appearance-none relative block w-full p-3 dark:border-gray-600 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md `}
+                  className={`appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md`}
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -76,7 +76,7 @@ export default function LoginPage() {
                   type="password"
                   autoComplete="current-password"
                   required
-                  className={`appearance-none relative block w-full p-3 dark:border-gray-600 border-gray-300 border rounded-lg focus:outline-none  focus:border-avocado-500 focus:z-10 sm:text-md`}
+                  className={`appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none  focus:border-avocado-500 focus:z-10 sm:text-md`}
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -99,7 +99,7 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className={`cursor-pointer w-full flex justify-center p-3 border border-transparent text-md font-medium rounded-lg text-gray-800 bg-avocado-500 hover:bg-avocado-400 focus:outline-none focus:ring-2 transition-colors duration-200`}
+              className={`cursor-pointer w-full flex justify-center p-3 border border-transparent text-md font-medium rounded-lg text-gray-800 bg-avocado-500 hover:bg-green-300 focus:outline-none focus:ring-2 transition-colors duration-200`}
             >
               Sign in
             </button>

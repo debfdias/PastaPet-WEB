@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { useSession } from "next-auth/react";
 import { Pencil, Upload } from "lucide-react";
 import { uploadImage } from "@/lib/storage/client";
+import Image from "next/image";
 
 interface PetFormData {
   name: string;
@@ -12,6 +13,7 @@ interface PetFormData {
   weight: number;
   type: "DOG" | "CAT" | "OTHER";
   breed: string;
+  gender: "FEMALE" | "MALE";
   image?: string;
 }
 
@@ -25,6 +27,7 @@ interface PetModalProps {
     weight: number;
     type: string;
     breed: string;
+    gender: string;
     image?: string;
   };
   onSuccess: () => void;
@@ -73,6 +76,7 @@ export default function PetModal({
               weight: pet.weight,
               type: pet.type as "DOG" | "CAT" | "OTHER",
               breed: pet.breed,
+              gender: pet.gender as "FEMALE" | "MALE",
               image: pet.image,
             }
           : {
@@ -81,6 +85,7 @@ export default function PetModal({
               weight: 0,
               type: "DOG",
               breed: "",
+              gender: "FEMALE",
               image: "",
             }
       );
@@ -186,9 +191,11 @@ export default function PetModal({
             <div className="flex items-center justify-center w-full">
               <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
                 {previewUrl ? (
-                  <img
+                  <Image
                     src={previewUrl}
                     alt="Pet preview"
+                    width={400}
+                    height={300}
                     className="w-full h-full object-cover rounded-lg"
                   />
                 ) : (
@@ -290,6 +297,24 @@ export default function PetModal({
             {errors.breed && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.breed.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Gender
+            </label>
+            <select
+              {...register("gender", { required: "Gender is required" })}
+              className="w-full px-3 py-2 border rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="FEMALE">Female</option>
+              <option value="MALE">Male</option>
+            </select>
+            {errors.gender && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.gender.message}
               </p>
             )}
           </div>

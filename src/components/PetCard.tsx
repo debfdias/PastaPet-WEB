@@ -1,5 +1,7 @@
 import { differenceInYears, differenceInMonths } from "date-fns";
 import { Pencil } from "lucide-react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface Pet {
   id: string;
@@ -9,6 +11,7 @@ interface Pet {
   type: string;
   breed: string;
   image?: string;
+  gender: string;
 }
 
 interface PetCardProps {
@@ -17,6 +20,8 @@ interface PetCardProps {
 }
 
 export default function PetCard({ pet, onEdit }: PetCardProps) {
+  const router = useRouter();
+
   const calculateAge = (dob: string) => {
     const birthDate = new Date(dob);
     const years = differenceInYears(new Date(), birthDate);
@@ -28,10 +33,24 @@ export default function PetCard({ pet, onEdit }: PetCardProps) {
     return `${years} years ${months} months`;
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Prevent navigation if clicking the edit button
+    if ((e.target as HTMLElement).closest("button")) {
+      return;
+    }
+    router.push(`/pets/${pet.id}`);
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow relative">
+    <div
+      className="bg-pet-card rounded-lg p-3 relative cursor-pointer border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500"
+      onClick={handleCardClick}
+    >
       <button
-        onClick={() => onEdit(pet)}
+        onClick={(e) => {
+          e.stopPropagation();
+          onEdit(pet);
+        }}
         className="absolute top-2 right-2 p-1 text-gray-500 hover:text-gray-700"
         aria-label="Edit pet"
       >
@@ -39,27 +58,24 @@ export default function PetCard({ pet, onEdit }: PetCardProps) {
       </button>
       {pet.image && (
         <div className="mb-4">
-          <img
+          <Image
             src={pet.image}
             alt={`${pet.name}'s photo`}
-            className="w-full h-48 object-cover rounded-lg"
+            width={400}
+            height={192}
+            className="w-full h-48 object-cover rounded-t-lg"
           />
         </div>
       )}
-      <h3 className="text-xl font-semibold mb-2 pr-6 text-gray-700">
+      <h3 className="text-xl font-semibold mb-2 pr-6 text-text-primary text-transform: uppercase">
         {pet.name}
       </h3>
+      <div className="bg-[#b0b9a2]/20 dark:bg-gray-700 w-full h-[2px] mb-2"></div>
       <div className="space-y-1">
-        <p className="text-gray-600">
-          <span className="font-medium">Type:</span> {pet.type}
-        </p>
-        <p className="text-gray-600">
-          <span className="font-medium">Breed:</span> {pet.breed}
-        </p>
-        <p className="text-gray-600">
+        <p className="">
           <span className="font-medium">Weight:</span> {pet.weight} kg
         </p>
-        <p className="text-gray-600">
+        <p className="">
           <span className="font-medium">Age:</span> {calculateAge(pet.dob)}
         </p>
       </div>

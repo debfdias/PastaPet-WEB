@@ -29,7 +29,7 @@ export default async function RootLayout({
   return (
     <html suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased text-gray-700 dark:text-gray-300`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased text-gray-800 dark:text-gray-300`}
       >
         <NextIntlClientProvider>
           <ThemeProvider enableSystem={true} defaultTheme="system">

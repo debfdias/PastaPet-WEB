@@ -3,23 +3,37 @@
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @theme {
-  --color-avocado-200: oklch(0.98 0.04 113.22);
-  --color-avocado-300: oklch(0.94 0.11 115.03);
-  --color-avocado-400: hsl(148 91% 65%);
+  --color-avocado-300: hsl(148 91% 69%);
   --color-avocado-500: hsl(148 91% 45%);
   --color-card: hsl(160 61% 91%);
-  --color-background-light: hsl(150 61% 91%);
-  --color-background-dark: hsl(207 95% 8%);
+  --color-background-light: hsl(360 100% 100%);
+  --color-background-dark: oklch(21% 0.034 264.665);
+  --color-text-primary: hsl(148 91% 45%);
+  --color-text-secondary: hsl(148 91% 19%);
+  --color-header: hsl(96 71.6% 67%);
+  --color-header2: hsl(96 71.6% 67%);
+  --color-pet-card: hsl(148 58% 56%);
+  --color-green-300: hsl(96 71.6% 80%);
+  --color-green-500: hsl(96 71.6% 63%);
+  --color-green-600: hsl(86 71.6% 58%);
 }
 
 @layer base {
   [data-theme="light"] {
-    --color-card: hsl(148 91% 96%);
-    --color-avocado-500: hsl(148 91% 45%);
+    --color-pet-card: hsl(84 13.5% 92.7%);
+    --color-card: hsl(148 58% 56%);
+    --color-text-primary: hsl(148 91% 12%);
+    --color-text-secondary: hsl(148 91% 22%);
+    --color-header2: hsl(96 71.6% 67%);
+    --color-header: hsl(148 91% 45%);
   }
   [data-theme="dark"] {
-    --color-card: hsl(220 42.9% 14%);
-    --color-avocado-500: hsl(148 91% 45%);
+    --color-pet-card: oklch(27.8% 0.033 256);
+    --color-card: oklch(27.8% 0.033 256);
+    --color-text-primary: hsl(148 91% 85%);
+    --color-text-secondary: hsl(138 91% 66%);
+    --color-header: oklch(27.8% 0.033 256);
+    --color-header2: hsl(96 71.6% 67%);
   }
 }
 

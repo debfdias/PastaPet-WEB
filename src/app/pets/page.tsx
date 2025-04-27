@@ -12,6 +12,8 @@ interface Pet {
   weight: number;
   type: string;
   breed: string;
+  gender: string;
+  image?: string;
 }
 
 export default function PetsPage() {
@@ -30,7 +32,7 @@ export default function PetsPage() {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/pets", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pets`, {
         headers: {
           Authorization: `Bearer ${session.user.token}`,
         },
@@ -97,7 +99,7 @@ export default function PetsPage() {
         <h1 className="text-3xl font-bold">My Pets</h1>
         <button
           onClick={handleAdd}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
+          className="bg-avocado-500 hover:bg-green-600 text-gray-800 px-4 py-2 rounded-lg transition-colors cursor-pointer font-medium"
         >
           Add Pet
         </button>
