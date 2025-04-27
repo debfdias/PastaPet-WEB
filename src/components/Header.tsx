@@ -75,7 +75,7 @@ export function Header() {
               variant="ghost"
               size="icon"
               onClick={handleLogout}
-              className="rounded-full hover:bg-white/10 dark:hover:text-red-400 hover:text-red-800 transition-colors duration-200 cursor-pointer"
+              className="rounded-full hover:bg-text-primary/20  dark:hover:text-red-400 hover:text-red-600 transition-colors duration-200 cursor-pointer"
             >
               <LogOut className="h-5 w-5" />
               <span className="sr-only">Logout</span>

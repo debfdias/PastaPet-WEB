@@ -43,7 +43,7 @@ export default function PetCard({ pet, onEdit }: PetCardProps) {
 
   return (
     <div
-      className="bg-pet-card rounded-lg p-3 relative cursor-pointer border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500"
+      className="bg-pet-card rounded-lg p-3 relative cursor-pointer border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/20"
       onClick={handleCardClick}
     >
       <button
@@ -51,7 +51,7 @@ export default function PetCard({ pet, onEdit }: PetCardProps) {
           e.stopPropagation();
           onEdit(pet);
         }}
-        className="absolute top-2 right-2 p-1 text-gray-500 hover:text-gray-700"
+        className="absolute top-2 right-2 text-avocado-800 rounded-full bg-avocado-500 hover:bg-avocado-300 p-3 cursor-pointer"
         aria-label="Edit pet"
       >
         <Pencil className="w-4 h-4" />
@@ -67,10 +67,10 @@ export default function PetCard({ pet, onEdit }: PetCardProps) {
           />
         </div>
       )}
-      <h3 className="text-xl font-semibold mb-2 pr-6 text-text-primary text-transform: uppercase">
+      <h3 className="text-xl font-semibold mb-4 pr-6 text-transform: uppercase dark:text-white">
         {pet.name}
       </h3>
-      <div className="bg-[#b0b9a2]/20 dark:bg-gray-700 w-full h-[2px] mb-2"></div>
+      <div className="bg-[#b0b9a2]/20 dark:bg-gray-700 w-full h-[2px] mb-4"></div>
       <div className="space-y-1">
         <p className="">
           <span className="font-medium">Weight:</span> {pet.weight} kg

@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { Pencil, Upload } from "lucide-react";
 import { uploadImage } from "@/lib/storage/client";
 import Image from "next/image";
+import { CgCloseR } from "react-icons/cg";
 
 interface PetFormData {
   name: string;
@@ -55,6 +56,7 @@ export default function PetModal({
   const [error, setError] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const imageInputRef = useRef<HTMLInputElement>(null);
 
@@ -64,6 +66,26 @@ export default function PetModal({
     reset,
     formState: { errors },
   } = useForm<PetFormData>();
+
+  // Add click outside handler
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, onClose]);
 
   // Reset form when pet changes or modal opens/closes
   useEffect(() => {
@@ -162,8 +184,11 @@ export default function PetModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4">
+      <div
+        ref={modalRef}
+        className="bg-pet-card rounded-lg p-6 w-full max-w-3xl"
+      >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">
             {pet ? (
@@ -177,19 +202,20 @@ export default function PetModal({
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 hover:text-gray-700 cursor-pointer "
           >
-            ✕
+            <CgCloseR className="w-6 h-6 dark:hover:text-avocado-300" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Pet Image
-            </label>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col lg:flex-row gap-6"
+        >
+          {/* Image upload - Full width on mobile, 1/3 on desktop */}
+          <div className="w-full lg:w-1/3">
             <div className="flex items-center justify-center w-full">
-              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+              <label className="flex flex-col items-center justify-center w-full h-48 lg:h-64 border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-800">
                 {previewUrl ? (
                   <Image
                     src={previewUrl}
@@ -219,123 +245,138 @@ export default function PetModal({
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Name
-            </label>
-            <input
-              {...register("name", { required: "Name is required" })}
-              className="w-full px-3 py-2 border rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              type="text"
-            />
-            {errors.name && (
-              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-            )}
-          </div>
+          {/* Form fields - Full width on mobile, 2/3 on desktop */}
+          <div className="w-full lg:w-2/3">
+            <div className="grid grid-cols-2 gap-4">
+              {/* First column */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Name</label>
+                  <input
+                    {...register("name", { required: "Name is required" })}
+                    className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                    type="text"
+                  />
+                  {errors.name && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.name.message}
+                    </p>
+                  )}
+                </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Date of Birth
-            </label>
-            <input
-              {...register("dob", { required: "Date of birth is required" })}
-              className="w-full px-3 py-2 border rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              type="date"
-            />
-            {errors.dob && (
-              <p className="text-red-500 text-sm mt-1">{errors.dob.message}</p>
-            )}
-          </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Date of Birth
+                  </label>
+                  <input
+                    {...register("dob", {
+                      required: "Date of birth is required",
+                    })}
+                    className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                    type="date"
+                  />
+                  {errors.dob && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.dob.message}
+                    </p>
+                  )}
+                </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Weight (kg)
-            </label>
-            <input
-              {...register("weight", {
-                required: "Weight is required",
-                min: { value: 0, message: "Weight must be positive" },
-                valueAsNumber: true,
-              })}
-              className="w-full px-3 py-2 border rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              type="number"
-              step="0.1"
-            />
-            {errors.weight && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.weight.message}
-              </p>
-            )}
-          </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Weight (kg)
+                  </label>
+                  <input
+                    {...register("weight", {
+                      required: "Weight is required",
+                      min: { value: 0, message: "Weight must be positive" },
+                      valueAsNumber: true,
+                    })}
+                    className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                    type="number"
+                    step="0.1"
+                  />
+                  {errors.weight && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.weight.message}
+                    </p>
+                  )}
+                </div>
+              </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Type
-            </label>
-            <select
-              {...register("type", { required: "Type is required" })}
-              className="w-full px-3 py-2 border rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="DOG">Dog</option>
-              <option value="CAT">Cat</option>
-              <option value="OTHER">Other</option>
-            </select>
-            {errors.type && (
-              <p className="text-red-500 text-sm mt-1">{errors.type.message}</p>
-            )}
-          </div>
+              {/* Second column */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Type</label>
+                  <select
+                    {...register("type", { required: "Type is required" })}
+                    className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                  >
+                    <option value="DOG">Dog</option>
+                    <option value="CAT">Cat</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                  {errors.type && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.type.message}
+                    </p>
+                  )}
+                </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Breed
-            </label>
-            <input
-              {...register("breed", { required: "Breed is required" })}
-              className="w-full px-3 py-2 border rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              type="text"
-            />
-            {errors.breed && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.breed.message}
-              </p>
-            )}
-          </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Breed
+                  </label>
+                  <input
+                    {...register("breed", { required: "Breed is required" })}
+                    className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                    type="text"
+                  />
+                  {errors.breed && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.breed.message}
+                    </p>
+                  )}
+                </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Gender
-            </label>
-            <select
-              {...register("gender", { required: "Gender is required" })}
-              className="w-full px-3 py-2 border rounded-lg text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="FEMALE">Female</option>
-              <option value="MALE">Male</option>
-            </select>
-            {errors.gender && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.gender.message}
-              </p>
-            )}
-          </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Gender
+                  </label>
+                  <select
+                    {...register("gender", { required: "Gender is required" })}
+                    className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                  >
+                    <option value="FEMALE">Female</option>
+                    <option value="MALE">Male</option>
+                  </select>
+                  {errors.gender && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.gender.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
 
-          <div className="flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
-            >
-              {isSubmitting ? "Saving..." : pet ? "Update" : "Add Pet"}
-            </button>
+            <div className="flex justify-end gap-2 mt-6">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 cursor-pointer"
+              >
+                <div className="hover:underline">Cancel</div>
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-4 py-2 bg-avocado-500 text-avocado-800 rounded-lg hover:bg-avocado-300 disabled:opacity-50 cursor-pointer font-semibold"
+              >
+                {isSubmitting ? "Saving..." : pet ? "Update" : "Add Pet"}
+              </button>
+            </div>
           </div>
         </form>
       </div>
