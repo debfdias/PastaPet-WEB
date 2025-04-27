@@ -361,18 +361,18 @@ export default function PetModal({
 
             {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
 
-            <div className="flex justify-end gap-2 mt-6">
+            <div className="flex justify-end gap-4 mt-6">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 cursor-pointer"
+                className="px-4 py-2 cursor-pointer bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
               >
-                <div className="hover:underline">Cancel</div>
+                <div className="">Cancel</div>
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-4 py-2 bg-avocado-500 text-avocado-800 rounded-lg hover:bg-avocado-300 disabled:opacity-50 cursor-pointer font-semibold"
+                className="px-4 py-2 bg-avocado-500 text-avocado-800 rounded-lg hover:bg-avocado-300 disabled:opacity-50 cursor-pointer font-semibold transition-colors duration-200"
               >
                 {isSubmitting ? "Saving..." : pet ? "Update" : "Add Pet"}
               </button>

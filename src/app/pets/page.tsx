@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import PetCard from "@/components/PetCard";
 import PetModal from "@/components/PetModal";
+import PetFilters from "@/components/PetFilters";
+import { MdPets } from "react-icons/md";
 
 interface Pet {
   id: string;
@@ -16,6 +18,11 @@ interface Pet {
   image?: string;
 }
 
+interface Filters {
+  name: string;
+  type: string;
+}
+
 export default function PetsPage() {
   const { data: session, status } = useSession();
   const [pets, setPets] = useState<Pet[]>([]);
@@ -23,6 +30,7 @@ export default function PetsPage() {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPet, setSelectedPet] = useState<Pet | undefined>();
+  const [filters, setFilters] = useState<Filters>({ name: "", type: "" });
 
   const fetchPets = useCallback(async () => {
     if (!session?.user?.token) {
@@ -32,11 +40,18 @@ export default function PetsPage() {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pets`, {
-        headers: {
-          Authorization: `Bearer ${session.user.token}`,
-        },
-      });
+      const queryParams = new URLSearchParams();
+      if (filters.name) queryParams.append("name", filters.name);
+      if (filters.type) queryParams.append("type", filters.type);
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/pets?${queryParams.toString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.user.token}`,
+          },
+        }
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch pets");
       }
@@ -47,12 +62,16 @@ export default function PetsPage() {
     } finally {
       setLoading(false);
     }
-  }, [session?.user?.token]);
+  }, [session?.user?.token, filters]);
 
   useEffect(() => {
     if (status === "loading") return;
     fetchPets();
   }, [session, status, fetchPets]);
+
+  const handleFilterChange = (newFilters: Filters) => {
+    setFilters(newFilters);
+  };
 
   const handleEdit = (pet: Pet) => {
     setSelectedPet(pet);
@@ -99,11 +118,14 @@ export default function PetsPage() {
         <h1 className="text-3xl font-bold">My Pets</h1>
         <button
           onClick={handleAdd}
-          className="bg-avocado-500 hover:bg-green-600 text-gray-800 px-4 py-2 rounded-lg transition-colors cursor-pointer font-medium"
+          className="bg-avocado-500 hover:bg-avocado-300 text-gray-800 px-4 py-2 rounded-lg transition-colors cursor-pointer font-medium flex items-center"
         >
-          Add Pet
+          <div>Add Pet</div>
+          <MdPets className="ml-2" />
         </button>
       </div>
+
+      <PetFilters onFilterChange={handleFilterChange} />
 
       {pets.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-[50vh]">

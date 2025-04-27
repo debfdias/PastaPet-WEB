@@ -43,7 +43,7 @@ export default function PetCard({ pet, onEdit }: PetCardProps) {
 
   return (
     <div
-      className="bg-pet-card rounded-lg p-3 relative cursor-pointer border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/20"
+      className="bg-pet-card rounded-lg p-3 relative cursor-pointer border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 hover:shadow-lg transition-all duration-200"
       onClick={handleCardClick}
     >
       <button
