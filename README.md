@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PastaPet Web 🐾
 
-## Getting Started
+A web app to track your pet’s daily life, treatments, vaccines, and notes—all in one place.
 
-First, run the development server:
+<img width="1308" alt="Screenshot 2025-04-27 at 15 00 48" src="https://github.com/user-attachments/assets/ca88b0de-a4a5-454f-9ffa-db01a1562fbf" />
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Features ✨
+- **Daily Logs** 📅 – Record meals, walks, and behavior.
+- **Vaccine & Treatment Tracker** 💉 – Never miss a vet appointment.
+- **Custom Tags** � – Categorize entries (e.g., "Grooming", "Medication").
+- **Notes** 📝 – Save important observations.
+- **Dashboard** 📊 – Visualize pet health trends.
+- **Secure Auth** 🔐 – Powered by Supabase.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Tech Stack ⚙️
+- **Framework**: Next.js (App Router)
+- **Styling**: Tailwind CSS
+- **Database**: Supabase (PostgreSQL)
+- **Auth**: Supabase Auth
+- **Language**: TypeScript
+- **Deployment**: Vercel
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Screenshots 🖼️
+*(Replace these with your actual screenshots)*
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+<img width="1311" alt="Screenshot 2025-04-27 at 15 01 02" src="https://github.com/user-attachments/assets/589c2d03-5f5d-4835-a3ab-655b99ee4dc2" />
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Getting Started 🚀
+
+### Prerequisites
+- Node.js ≥ 18
+- Supabase account ([sign up here](https://supabase.com))
+
+### Usage
+   ```bash
+   git clone https://github.com/debfdias/PastaPet-WEB.git
+   cd PastaPet-WEB
+   pnpm install
+   pnpm run dev
