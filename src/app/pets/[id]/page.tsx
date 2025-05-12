@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import EventModal from "@/components/EventModal";
+import VaccineModal from "@/components/VaccineModal";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 
@@ -15,6 +16,29 @@ interface Event {
   eventDate: string;
   petId: string;
   userId: string;
+}
+
+interface VaccineType {
+  id: string;
+  name: string;
+  diseaseCovered: string[];
+  isCore: boolean;
+  boosterRequired: boolean;
+  boosterIntervalMonths?: number;
+  totalRequiredDoses?: number;
+}
+
+interface Vaccine {
+  id: string;
+  petId: string;
+  vaccineType: VaccineType;
+  vaccineTypeId: string;
+  administrationDate: string;
+  nextDueDate?: string;
+  validUntil?: string;
+  lotNumber?: string;
+  administeredBy?: string;
+  notes?: string;
 }
 
 interface Pet {
@@ -30,6 +54,7 @@ interface Pet {
   updatedAt: string;
   userId: string;
   events: Event[];
+  VaccineRecord: Vaccine[];
 }
 
 export default function PetDetailsPage() {
@@ -39,6 +64,7 @@ export default function PetDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isVaccineModalOpen, setIsVaccineModalOpen] = useState(false);
 
   const fetchPetDetails = async () => {
     if (!session?.user?.token) {
@@ -166,11 +192,50 @@ export default function PetDetailsPage() {
             )}
           </div>
         </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6 mt-8">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold">Vaccine Records</h2>
+            <button
+              onClick={() => setIsVaccineModalOpen(true)}
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+            >
+              Add Vaccine
+            </button>
+          </div>
+          <div className="space-y-4">
+            {pet.VaccineRecord?.map((record) => (
+              <div
+                key={record.id}
+                className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <h3 className="font-semibold">{record.vaccineType.name}</h3>
+                <p className="text-sm text-gray-500">
+                  {format(new Date(record.administrationDate), "PPP", {
+                    locale: ptBR,
+                  })}
+                </p>
+              </div>
+            ))}
+            {pet.VaccineRecord.length === 0 && (
+              <p className="text-gray-500 text-center">
+                No vaccine records yet
+              </p>
+            )}
+          </div>
+        </div>
       </div>
 
       <EventModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        petId={pet.id}
+        onSuccess={fetchPetDetails}
+      />
+
+      <VaccineModal
+        isOpen={isVaccineModalOpen}
+        onClose={() => setIsVaccineModalOpen(false)}
         petId={pet.id}
         onSuccess={fetchPetDetails}
       />
