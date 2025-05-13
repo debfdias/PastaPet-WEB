@@ -63,7 +63,7 @@ export const authOptions: NextAuthOptions = {
         },
       };
     },
-    jwt: ({ token, user }) => {
+    jwt: ({ token, user, trigger, session }) => {
       if (user) {
         return {
           ...token,
@@ -72,6 +72,9 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           token: user.token,
         };
+      }
+      if (trigger === "update" && session) {
+        return { ...token, ...session };
       }
       return token;
     },

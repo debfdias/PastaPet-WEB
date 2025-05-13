@@ -183,5 +183,29 @@
       "addButton": "Add Vaccine",
       "noRecords": "No vaccine records yet"
     }
+  },
+  "userProfile": {
+    "title": "Profile Settings",
+    "form": {
+      "email": "Email Address",
+      "fullName": "Full Name",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "passwordPlaceholder": "Password",
+      "confirmPasswordPlaceholder": "Confirm your new password"
+    },
+    "buttons": {
+      "updateProfile": "Update Profile",
+      "updating": "Updating..."
+    },
+    "errors": {
+      "authenticationRequired": "You must be logged in to update your profile",
+      "failedToUpdate": "Failed to update profile",
+      "anErrorOccurred": "An error occurred while updating your profile",
+      "passwordMismatch": "Passwords do not match"
+    },
+    "success": {
+      "profileUpdated": "Profile updated successfully"
+    }
   }
 }

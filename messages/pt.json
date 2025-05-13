@@ -183,5 +183,29 @@
       "addButton": "Adicionar Vacina",
       "noRecords": "Nenhum registro de vacina ainda"
     }
+  },
+  "userProfile": {
+    "title": "Configurações do Perfil",
+    "form": {
+      "email": "Endereço de Email",
+      "fullName": "Nome Completo",
+      "newPassword": "Senha",
+      "confirmPassword": "Confirmar Senha",
+      "passwordPlaceholder": "Nova senha",
+      "confirmPasswordPlaceholder": "Confirme sua nova senha"
+    },
+    "buttons": {
+      "updateProfile": "Atualizar Perfil",
+      "updating": "Atualizando..."
+    },
+    "errors": {
+      "authenticationRequired": "Você precisa estar logado para atualizar seu perfil",
+      "failedToUpdate": "Falha ao atualizar o perfil",
+      "anErrorOccurred": "Ocorreu um erro ao atualizar seu perfil",
+      "passwordMismatch": "As senhas não coincidem"
+    },
+    "success": {
+      "profileUpdated": "Perfil atualizado com sucesso"
+    }
   }
 }
