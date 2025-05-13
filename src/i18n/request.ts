@@ -2,7 +2,7 @@ import { getRequestConfig } from "next-intl/server";
 
 export default getRequestConfig(async ({ locale }) => {
   if (!locale) {
-    locale = "en"; // default to English if no locale is provided
+    locale = "pt"; // default to English if no locale is provided
   }
 
   return {

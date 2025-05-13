@@ -7,6 +7,7 @@ import PetModal from "@/components/PetModal";
 import PetFilters from "@/components/PetFilters";
 import { MdPets } from "react-icons/md";
 import { useTranslations } from "next-intl";
+import { toast } from "react-toastify";
 
 interface Pet {
   id: string;
@@ -22,6 +23,7 @@ interface Pet {
 interface Filters {
   name: string;
   type: string;
+  orderByAge?: string;
 }
 
 export default function PetsPage() {
@@ -31,7 +33,11 @@ export default function PetsPage() {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPet, setSelectedPet] = useState<Pet | undefined>();
-  const [filters, setFilters] = useState<Filters>({ name: "", type: "" });
+  const [filters, setFilters] = useState<Filters>({
+    name: "",
+    type: "",
+    orderByAge: "",
+  });
   const t = useTranslations("pets");
 
   const fetchPets = useCallback(async () => {
@@ -45,6 +51,8 @@ export default function PetsPage() {
       const queryParams = new URLSearchParams();
       if (filters.name) queryParams.append("name", filters.name);
       if (filters.type) queryParams.append("type", filters.type);
+      if (filters.orderByAge)
+        queryParams.append("orderByAge", filters.orderByAge);
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/pets?${queryParams.toString()}`,
@@ -60,9 +68,10 @@ export default function PetsPage() {
       const data = await response.json();
       setPets(data);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : t("errors.anErrorOccurred")
-      );
+      const errorMessage =
+        err instanceof Error ? err.message : t("errors.anErrorOccurred");
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -74,6 +83,7 @@ export default function PetsPage() {
   }, [session, status, fetchPets]);
 
   const handleFilterChange = (newFilters: Filters) => {
+    console.log("New filters:", newFilters);
     setFilters(newFilters);
   };
 
@@ -90,6 +100,13 @@ export default function PetsPage() {
   const handleModalClose = () => {
     setIsModalOpen(false);
     setSelectedPet(undefined);
+  };
+
+  const handleSuccess = () => {
+    fetchPets();
+    toast.success(
+      selectedPet ? t("success.petUpdated") : t("success.petAdded")
+    );
   };
 
   if (status === "loading" || loading) {
@@ -124,7 +141,7 @@ export default function PetsPage() {
           onClick={handleAdd}
           className="bg-avocado-500 hover:bg-avocado-300 text-gray-800 px-4 py-2 rounded-lg transition-colors cursor-pointer font-medium flex items-center"
         >
-          <div>Add Pet</div>
+          <div>{t("addPet")}</div>
           <MdPets className="ml-2" />
         </button>
       </div>
@@ -138,7 +155,7 @@ export default function PetsPage() {
             onClick={handleAdd}
             className="bg-avocado-500 hover:bg-avocado-300 text-gray-800 px-4 py-2 rounded-lg transition-colors cursor-pointer font-medium flex items-center"
           >
-            <div>Add Pet</div>
+            <div>{t("noPets.addPet")}</div>
             <MdPets className="ml-2" />
           </button>
         </div>
@@ -154,7 +171,7 @@ export default function PetsPage() {
         isOpen={isModalOpen}
         onClose={handleModalClose}
         pet={selectedPet}
-        onSuccess={fetchPets}
+        onSuccess={handleSuccess}
       />
     </div>
   );

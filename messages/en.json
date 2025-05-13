@@ -16,6 +16,7 @@
     },
     "forgotPassword": "Forgot your password?",
     "signIn": "Sign in",
+    "loading": "Signing in...",
     "noAccount": "Don't have an account?",
     "signUp": "Sign up",
     "errors": {
@@ -87,6 +88,9 @@
       "authenticationRequired": "Authentication required",
       "failedToCreate": "Failed to create event",
       "anErrorOccurred": "An error occurred"
+    },
+    "success": {
+      "eventAdded": "Event added successfully!"
     }
   },
   "petFilters": {
@@ -97,7 +101,10 @@
       "cat": "Cat",
       "other": "Other"
     },
-    "clearFilter": "Clear Filter"
+    "clearFilter": "Clear Filter",
+    "orderByAge": {
+      "label": "Age"
+    }
   },
   "pets": {
     "title": "My Pets",
@@ -113,6 +120,10 @@
       "authenticationRequired": "Authentication required",
       "failedToFetch": "Failed to fetch pets",
       "anErrorOccurred": "An error occurred"
+    },
+    "success": {
+      "petAdded": "Pet added successfully!",
+      "petUpdated": "Pet updated successfully!"
     }
   },
   "common": {
@@ -122,5 +133,55 @@
     "cancel": "Cancel",
     "save": "Save",
     "update": "Update"
+  },
+  "vaccineModal": {
+    "title": "Add Vaccine Record",
+    "form": {
+      "vaccineType": {
+        "label": "Vaccine Type",
+        "placeholder": "Select a vaccine type"
+      },
+      "administrationDate": "Administration Date",
+      "nextDueDate": "Next Due Date",
+      "validUntil": "Valid Until",
+      "lotNumber": "Lot Number",
+      "administeredBy": {
+        "label": "Administered By",
+        "placeholder": "Vet or clinic name"
+      },
+      "notes": "Notes"
+    },
+    "errors": {
+      "failedToFetch": "Failed to fetch vaccine types",
+      "failedToCreate": "Failed to create vaccine record"
+    },
+    "buttons": {
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "success": {
+      "vaccineAdded": "Vaccine record added successfully!"
+    }
+  },
+  "petDetails": {
+    "title": "Pet Information",
+    "info": {
+      "type": "Type",
+      "breed": "Breed",
+      "gender": "Gender",
+      "dateOfBirth": "Date of Birth",
+      "weight": "Weight"
+    },
+    "events": {
+      "title": "Events",
+      "addButton": "Add Event",
+      "noEvents": "No events yet"
+    },
+    "vaccines": {
+      "title": "Vaccine Records",
+      "addButton": "Add Vaccine",
+      "noRecords": "No vaccine records yet"
+    }
   }
 }

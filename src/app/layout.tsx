@@ -5,6 +5,8 @@ import { AuthProvider } from "./providers/AuthProvider";
 import { Header } from "@/components/Header";
 import { ThemeProvider } from "next-themes";
 import { NextIntlClientProvider } from "next-intl";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,8 +36,20 @@ export default async function RootLayout({
         <NextIntlClientProvider>
           <ThemeProvider enableSystem={true} defaultTheme="system">
             <AuthProvider>
-              <Header />
+              <Header hideOnHome />
               <main className="px-4 md:px-12">{children}</main>
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+              />
             </AuthProvider>
           </ThemeProvider>
         </NextIntlClientProvider>

@@ -16,6 +16,7 @@
     },
     "forgotPassword": "Esqueceu sua senha?",
     "signIn": "Entrar",
+    "loading": "Entrando...",
     "noAccount": "Não tem uma conta?",
     "signUp": "Cadastre-se",
     "errors": {
@@ -87,6 +88,9 @@
       "authenticationRequired": "Autenticação necessária",
       "failedToCreate": "Falha ao criar evento",
       "anErrorOccurred": "Ocorreu um erro"
+    },
+    "success": {
+      "eventAdded": "Evento adicionado com sucesso!"
     }
   },
   "petFilters": {
@@ -97,7 +101,10 @@
       "cat": "Gato",
       "other": "Outro"
     },
-    "clearFilter": "Limpar Filtro"
+    "clearFilter": "Limpar Filtro",
+    "orderByAge": {
+      "label": "Idade"
+    }
   },
   "pets": {
     "title": "Meus Pets",
@@ -113,6 +120,10 @@
       "authenticationRequired": "Autenticação necessária",
       "failedToFetch": "Falha ao buscar pets",
       "anErrorOccurred": "Ocorreu um erro"
+    },
+    "success": {
+      "petAdded": "Pet adicionado com sucesso!",
+      "petUpdated": "Pet atualizado com sucesso!"
     }
   },
   "common": {
@@ -122,5 +133,55 @@
     "cancel": "Cancelar",
     "save": "Salvar",
     "update": "Atualizar"
+  },
+  "vaccineModal": {
+    "title": "Adicionar Registro de Vacina",
+    "form": {
+      "vaccineType": {
+        "label": "Tipo de Vacina",
+        "placeholder": "Selecione um tipo de vacina"
+      },
+      "administrationDate": "Data de Administração",
+      "nextDueDate": "Próxima Data",
+      "validUntil": "Válido Até",
+      "lotNumber": "Número do Lote",
+      "administeredBy": {
+        "label": "Administrado Por",
+        "placeholder": "Nome do veterinário ou clínica"
+      },
+      "notes": "Observações"
+    },
+    "errors": {
+      "failedToFetch": "Falha ao buscar tipos de vacina",
+      "failedToCreate": "Falha ao criar registro de vacina"
+    },
+    "buttons": {
+      "save": "Salvar",
+      "saving": "Salvando...",
+      "cancel": "Cancelar"
+    },
+    "success": {
+      "vaccineAdded": "Registro de vacina adicionado com sucesso!"
+    }
+  },
+  "petDetails": {
+    "title": "Informações do Pet",
+    "info": {
+      "type": "Tipo",
+      "breed": "Raça",
+      "gender": "Gênero",
+      "dateOfBirth": "Data de Nascimento",
+      "weight": "Peso"
+    },
+    "events": {
+      "title": "Eventos",
+      "addButton": "Adicionar Evento",
+      "noEvents": "Nenhum evento ainda"
+    },
+    "vaccines": {
+      "title": "Registros de Vacina",
+      "addButton": "Adicionar Vacina",
+      "noRecords": "Nenhum registro de vacina ainda"
+    }
   }
 }

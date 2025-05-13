@@ -8,6 +8,7 @@ import EventModal from "@/components/EventModal";
 import VaccineModal from "@/components/VaccineModal";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface Event {
   id: string;
@@ -58,6 +59,7 @@ interface Pet {
 }
 
 export default function PetDetailsPage() {
+  const t = useTranslations();
   const { data: session, status } = useSession();
   const params = useParams();
   const [pet, setPet] = useState<Pet | null>(null);
@@ -68,7 +70,7 @@ export default function PetDetailsPage() {
 
   const fetchPetDetails = async () => {
     if (!session?.user?.token) {
-      setError("Authentication required");
+      setError(t("pets.errors.authenticationRequired"));
       setLoading(false);
       return;
     }
@@ -83,12 +85,16 @@ export default function PetDetailsPage() {
         }
       );
       if (!response.ok) {
-        throw new Error("Failed to fetch pet details");
+        throw new Error(t("pets.errors.failedToFetch"));
       }
       const data = await response.json();
       setPet(data);
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(
+        error instanceof Error
+          ? error.message
+          : t("pets.errors.anErrorOccurred")
+      );
     } finally {
       setLoading(false);
     }
@@ -102,7 +108,7 @@ export default function PetDetailsPage() {
   if (status === "loading" || loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        Loading...
+        {t("common.loading")}
       </div>
     );
   }
@@ -110,7 +116,9 @@ export default function PetDetailsPage() {
   if (error) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="text-xl text-red-500">Error: {error}</div>
+        <div className="text-xl text-red-500">
+          {t("common.error", { error })}
+        </div>
       </div>
     );
   }
@@ -118,7 +126,7 @@ export default function PetDetailsPage() {
   if (!session) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="text-xl">Please sign in to view pet details</div>
+        <div className="text-xl">{t("pets.signInRequired")}</div>
       </div>
     );
   }
@@ -135,7 +143,7 @@ export default function PetDetailsPage() {
     <div className="container mx-auto py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-bold mb-4">Pet Information</h2>
+          <h2 className="text-2xl font-bold mb-4">{t("petDetails.title")}</h2>
           <div className="space-y-4">
             <div className="flex items-center space-x-4">
               <Image
@@ -147,18 +155,28 @@ export default function PetDetailsPage() {
               />
               <div>
                 <h3 className="text-2xl font-bold">{pet.name}</h3>
-                <p className="text-gray-600">Type: {pet.type}</p>
-                <p className="text-gray-600">Breed: {pet.breed}</p>
-                <p className="text-gray-600">Gender: {pet.gender}</p>
+                <p className="text-gray-600">
+                  {t("petDetails.info.type")}: {pet.type}
+                </p>
+                <p className="text-gray-600">
+                  {t("petDetails.info.breed")}: {pet.breed}
+                </p>
+                <p className="text-gray-600">
+                  {t("petDetails.info.gender")}: {pet.gender}
+                </p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-500">Date of Birth</p>
+                <p className="text-sm text-gray-500">
+                  {t("petDetails.info.dateOfBirth")}
+                </p>
                 <p>{format(new Date(pet.dob), "PPP", { locale: ptBR })}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Weight</p>
+                <p className="text-sm text-gray-500">
+                  {t("petDetails.info.weight")}
+                </p>
                 <p>{pet.weight} kg</p>
               </div>
             </div>
@@ -167,12 +185,14 @@ export default function PetDetailsPage() {
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">Events</h2>
+            <h2 className="text-2xl font-bold">
+              {t("petDetails.events.title")}
+            </h2>
             <button
               onClick={() => setIsModalOpen(true)}
               className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
             >
-              Add Event
+              {t("petDetails.events.addButton")}
             </button>
           </div>
           <div className="space-y-4">
@@ -188,19 +208,23 @@ export default function PetDetailsPage() {
               </div>
             ))}
             {pet.events.length === 0 && (
-              <p className="text-gray-500 text-center">No events yet</p>
+              <p className="text-gray-500 text-center">
+                {t("petDetails.events.noEvents")}
+              </p>
             )}
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6 mt-8">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">Vaccine Records</h2>
+            <h2 className="text-2xl font-bold">
+              {t("petDetails.vaccines.title")}
+            </h2>
             <button
               onClick={() => setIsVaccineModalOpen(true)}
               className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
             >
-              Add Vaccine
+              {t("petDetails.vaccines.addButton")}
             </button>
           </div>
           <div className="space-y-4">
@@ -219,7 +243,7 @@ export default function PetDetailsPage() {
             ))}
             {pet.VaccineRecord.length === 0 && (
               <p className="text-gray-500 text-center">
-                No vaccine records yet
+                {t("petDetails.vaccines.noRecords")}
               </p>
             )}
           </div>

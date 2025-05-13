@@ -5,16 +5,21 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { ClipLoader } from "react-spinners";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const t = useTranslations("login");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
     const result = await signIn("credentials", {
       redirect: false,
       email,
@@ -22,6 +27,7 @@ export default function LoginPage() {
     });
 
     if (result?.error) {
+      setIsLoading(false);
       if (result.status === 401) {
         setError(t("errors.invalidCredentials"));
       } else {
@@ -101,9 +107,17 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className={`cursor-pointer w-full flex justify-center p-3 border border-transparent text-md font-medium rounded-lg text-gray-800 bg-avocado-500 hover:bg-green-300 focus:outline-none focus:ring-2 transition-colors duration-200`}
+              disabled={isLoading}
+              className={`cursor-pointer w-full flex justify-center p-3 border border-transparent text-md font-medium rounded-lg text-gray-800 bg-avocado-500 hover:bg-green-300 focus:outline-none focus:ring-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed items-center gap-2`}
             >
-              {t("signIn")}
+              {isLoading ? (
+                <>
+                  <ClipLoader size={20} color="#1F2937" />
+                  <span>{t("loading")}</span>
+                </>
+              ) : (
+                t("signIn")
+              )}
             </button>
           </form>
         </div>

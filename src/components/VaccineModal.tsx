@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { CgCloseR } from "react-icons/cg";
 import { Syringe } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { toast } from "react-toastify";
 
 interface VaccineType {
   id: string;
@@ -28,6 +30,7 @@ export default function VaccineModal({
   petId,
   onSuccess,
 }: VaccineModalProps) {
+  const t = useTranslations();
   const { data: session } = useSession();
   const [vaccineTypes, setVaccineTypes] = useState<VaccineType[]>([]);
   const [loading, setLoading] = useState(false);
@@ -68,12 +71,16 @@ export default function VaccineModal({
           },
         }
       );
-      if (!response.ok) throw new Error("Failed to fetch vaccine types");
+      if (!response.ok) throw new Error(t("vaccineModal.errors.failedToFetch"));
       const data = await response.json();
       setVaccineTypes(data);
     } catch (error) {
       console.error("Error fetching vaccine types:", error);
-      setError("Failed to fetch vaccine types");
+      setError(t("vaccineModal.errors.failedToFetch"));
+      toast.error(t("vaccineModal.errors.failedToFetch"), {
+        position: "top-right",
+        autoClose: 3000,
+      });
     }
   };
 
@@ -99,13 +106,25 @@ export default function VaccineModal({
       );
 
       if (!response.ok) {
-        throw new Error("Failed to create vaccine record");
+        throw new Error(t("vaccineModal.errors.failedToCreate"));
       }
 
+      toast.success(t("vaccineModal.success.vaccineAdded"), {
+        position: "top-right",
+        autoClose: 3000,
+      });
       onSuccess();
       onClose();
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : t("petModal.errors.anErrorOccurred");
+      setError(errorMessage);
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 3000,
+      });
     } finally {
       setLoading(false);
     }
@@ -129,7 +148,7 @@ export default function VaccineModal({
           <h2 className="text-2xl font-bold">
             <div className="flex items-center gap-2">
               <Syringe className="w-5 h-5" />
-              Add Vaccine Record
+              {t("vaccineModal.title")}
             </div>
           </h2>
           <button
@@ -144,7 +163,7 @@ export default function VaccineModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">
-                Vaccine Type *
+                {t("vaccineModal.form.vaccineType.label")} *
               </label>
               <select
                 name="vaccineTypeId"
@@ -153,7 +172,9 @@ export default function VaccineModal({
                 required
                 className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
               >
-                <option value="">Select a vaccine type</option>
+                <option value="">
+                  {t("vaccineModal.form.vaccineType.placeholder")}
+                </option>
                 {vaccineTypes.map((type) => (
                   <option key={type.id} value={type.id}>
                     {type.name}
@@ -164,7 +185,7 @@ export default function VaccineModal({
 
             <div>
               <label className="block text-sm font-medium mb-1">
-                Administration Date *
+                {t("vaccineModal.form.administrationDate")} *
               </label>
               <input
                 type="date"
@@ -178,7 +199,7 @@ export default function VaccineModal({
 
             <div>
               <label className="block text-sm font-medium mb-1">
-                Next Due Date
+                {t("vaccineModal.form.nextDueDate")}
               </label>
               <input
                 type="date"
@@ -191,7 +212,7 @@ export default function VaccineModal({
 
             <div>
               <label className="block text-sm font-medium mb-1">
-                Valid Until
+                {t("vaccineModal.form.validUntil")}
               </label>
               <input
                 type="date"
@@ -204,7 +225,7 @@ export default function VaccineModal({
 
             <div>
               <label className="block text-sm font-medium mb-1">
-                Lot Number
+                {t("vaccineModal.form.lotNumber")}
               </label>
               <input
                 type="text"
@@ -217,21 +238,23 @@ export default function VaccineModal({
 
             <div>
               <label className="block text-sm font-medium mb-1">
-                Administered By
+                {t("vaccineModal.form.administeredBy.label")}
               </label>
               <input
                 type="text"
                 name="administeredBy"
                 value={formData.administeredBy}
                 onChange={handleChange}
-                placeholder="Vet or clinic name"
+                placeholder={t("vaccineModal.form.administeredBy.placeholder")}
                 className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Notes</label>
+            <label className="block text-sm font-medium mb-1">
+              {t("vaccineModal.form.notes")}
+            </label>
             <textarea
               name="notes"
               value={formData.notes}
@@ -249,14 +272,16 @@ export default function VaccineModal({
               onClick={onClose}
               className="px-4 py-2 cursor-pointer bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
             >
-              Cancel
+              {t("vaccineModal.buttons.cancel")}
             </button>
             <button
               type="submit"
               disabled={loading}
               className="px-4 py-2 bg-avocado-500 text-avocado-800 rounded-lg hover:bg-avocado-300 disabled:opacity-50 cursor-pointer font-semibold transition-colors duration-200"
             >
-              {loading ? "Saving..." : "Save"}
+              {loading
+                ? t("vaccineModal.buttons.saving")
+                : t("vaccineModal.buttons.save")}
             </button>
           </div>
         </form>

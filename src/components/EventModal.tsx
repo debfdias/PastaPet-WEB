@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { CgCloseR } from "react-icons/cg";
 import { useTranslations } from "next-intl";
+import { toast } from "react-toastify";
 
 interface EventModalProps {
   isOpen: boolean;
@@ -52,7 +53,12 @@ export default function EventModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!session?.user?.token) {
-      setError(t("errors.authenticationRequired"));
+      const errorMessage = t("errors.authenticationRequired");
+      setError(errorMessage);
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return;
     }
 
@@ -81,15 +87,23 @@ export default function EventModal({
         throw new Error(t("errors.failedToCreate"));
       }
 
+      toast.success(t("success.eventAdded"), {
+        position: "top-right",
+        autoClose: 3000,
+      });
       onSuccess();
       onClose();
       setTitle("");
       setType("normal");
       setDate(new Date().toISOString().split("T")[0]);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : t("errors.anErrorOccurred")
-      );
+      const errorMessage =
+        err instanceof Error ? err.message : t("errors.anErrorOccurred");
+      setError(errorMessage);
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 3000,
+      });
     } finally {
       setIsSubmitting(false);
     }
