@@ -182,6 +182,19 @@
       "title": "Registros de Vacina",
       "addButton": "Adicionar Vacina",
       "noRecords": "Nenhum registro de vacina ainda"
+    },
+    "exams": {
+      "title": "Registros de Exames",
+      "addButton": "Adicionar Exame",
+      "noRecords": "Nenhum registro de exame ainda",
+      "administeredBy": "Realizado por",
+      "viewFile": "Ver Arquivo"
+    },
+    "treatments": {
+      "title": "Registros de Tratamentos",
+      "addButton": "Adicionar Tratamento",
+      "noRecords": "Nenhum registro de tratamento ainda",
+      "medications": "Medicamentos"
     }
   },
   "userProfile": {
@@ -206,6 +219,81 @@
     },
     "success": {
       "profileUpdated": "Perfil atualizado com sucesso"
+    }
+  },
+  "examModal": {
+    "title": "Adicionar Registro de Exame",
+    "form": {
+      "title": {
+        "label": "Título do Exame",
+        "placeholder": "Digite o título do exame"
+      },
+      "cause": {
+        "label": "Causa",
+        "placeholder": "Digite a causa do exame"
+      },
+      "administeredBy": {
+        "label": "Realizado Por",
+        "placeholder": "Digite o nome do veterinário ou clínica"
+      },
+      "fileUrl": {
+        "label": "URL do Arquivo",
+        "placeholder": "Digite a URL do arquivo (opcional)"
+      },
+      "resultSummary": {
+        "label": "Resumo do Resultado",
+        "placeholder": "Digite o resumo dos resultados do exame"
+      }
+    },
+    "errors": {
+      "failedToCreate": "Falha ao criar registro de exame",
+      "anErrorOccurred": "Ocorreu um erro"
+    },
+    "buttons": {
+      "save": "Salvar",
+      "saving": "Salvando...",
+      "cancel": "Cancelar"
+    },
+    "success": {
+      "examAdded": "Registro de exame adicionado com sucesso!"
+    }
+  },
+  "treatmentModal": {
+    "title": "Adicionar Registro de Tratamento",
+    "form": {
+      "cause": {
+        "label": "Causa",
+        "placeholder": "Digite a causa do tratamento"
+      },
+      "description": {
+        "label": "Descrição",
+        "placeholder": "Digite a descrição do tratamento"
+      },
+      "startDate": "Data de Início",
+      "endDate": "Data de Término"
+    },
+    "medications": {
+      "title": "Medicamentos",
+      "addButton": "Adicionar Medicamento",
+      "medication": "Medicamento",
+      "form": {
+        "name": "Nome do Medicamento",
+        "dosage": "Dosagem",
+        "frequency": "Frequência",
+        "notes": "Observações"
+      }
+    },
+    "errors": {
+      "failedToCreate": "Falha ao criar registro de tratamento",
+      "anErrorOccurred": "Ocorreu um erro"
+    },
+    "buttons": {
+      "save": "Salvar",
+      "saving": "Salvando...",
+      "cancel": "Cancelar"
+    },
+    "success": {
+      "treatmentAdded": "Registro de tratamento adicionado com sucesso!"
     }
   }
 }

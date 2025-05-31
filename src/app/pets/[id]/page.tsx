@@ -6,6 +6,8 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import EventModal from "@/components/EventModal";
 import VaccineModal from "@/components/VaccineModal";
+import ExamModal from "@/components/ExamModal";
+import TreatmentModal from "@/components/TreatmentModal";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
@@ -42,6 +44,39 @@ interface Vaccine {
   notes?: string;
 }
 
+interface Medication {
+  id: string;
+  treatmentId: string;
+  name: string;
+  dosage: string;
+  frequency: string;
+  notes: string;
+  startDate: string;
+  endDate: string;
+}
+
+interface Treatment {
+  id: string;
+  petId: string;
+  cause: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  medications: Medication[];
+  exams: Exam[];
+}
+
+interface Exam {
+  id: string;
+  petId: string;
+  title: string;
+  cause: string;
+  administeredBy: string;
+  fileUrl?: string;
+  resultSummary: string;
+  treatmentId?: string;
+}
+
 interface Pet {
   id: string;
   name: string;
@@ -56,6 +91,8 @@ interface Pet {
   userId: string;
   events: Event[];
   VaccineRecord: Vaccine[];
+  Treatment: Treatment[];
+  Exam: Exam[];
 }
 
 export default function PetDetailsPage() {
@@ -67,6 +104,8 @@ export default function PetDetailsPage() {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isVaccineModalOpen, setIsVaccineModalOpen] = useState(false);
+  const [isExamModalOpen, setIsExamModalOpen] = useState(false);
+  const [isTreatmentModalOpen, setIsTreatmentModalOpen] = useState(false);
 
   const fetchPetDetails = async () => {
     if (!session?.user?.token) {
@@ -88,6 +127,7 @@ export default function PetDetailsPage() {
         throw new Error(t("pets.errors.failedToFetch"));
       }
       const data = await response.json();
+      console.log(data);
       setPet(data);
     } catch (error) {
       setError(
@@ -215,7 +255,7 @@ export default function PetDetailsPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6 mt-8">
+        <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold">
               {t("petDetails.vaccines.title")}
@@ -248,6 +288,104 @@ export default function PetDetailsPage() {
             )}
           </div>
         </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold">
+              {t("petDetails.exams.title")}
+            </h2>
+            <button
+              onClick={() => setIsExamModalOpen(true)}
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+            >
+              {t("petDetails.exams.addButton")}
+            </button>
+          </div>
+          <div className="space-y-4">
+            {pet.Exam?.map((exam) => (
+              <div
+                key={exam.id}
+                className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <h3 className="font-semibold">{exam.title}</h3>
+                <p className="text-sm text-gray-600">{exam.cause}</p>
+                <p className="text-sm text-gray-500">
+                  {t("petDetails.exams.administeredBy")}: {exam.administeredBy}
+                </p>
+                {exam.fileUrl && (
+                  <a
+                    href={exam.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:text-blue-700 text-sm"
+                  >
+                    {t("petDetails.exams.viewFile")}
+                  </a>
+                )}
+              </div>
+            ))}
+            {pet.Exam.length === 0 && (
+              <p className="text-gray-500 text-center">
+                {t("petDetails.exams.noRecords")}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold">
+              {t("petDetails.treatments.title")}
+            </h2>
+            <button
+              onClick={() => setIsTreatmentModalOpen(true)}
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+            >
+              {t("petDetails.treatments.addButton")}
+            </button>
+          </div>
+          <div className="space-y-4">
+            {pet.Treatment?.map((treatment) => (
+              <div
+                key={treatment.id}
+                className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <h3 className="font-semibold">{treatment.cause}</h3>
+                <p className="text-sm text-gray-600">{treatment.description}</p>
+                <div className="mt-2">
+                  <p className="text-sm text-gray-500">
+                    {format(new Date(treatment.startDate), "PPP", {
+                      locale: ptBR,
+                    })}{" "}
+                    -{" "}
+                    {format(new Date(treatment.endDate), "PPP", {
+                      locale: ptBR,
+                    })}
+                  </p>
+                </div>
+                {treatment.medications.length > 0 && (
+                  <div className="mt-2">
+                    <h4 className="text-sm font-medium mb-1">
+                      {t("petDetails.treatments.medications")}:
+                    </h4>
+                    <ul className="list-disc list-inside text-sm text-gray-600">
+                      {treatment.medications.map((med) => (
+                        <li key={med.id}>
+                          {med.name} - {med.dosage} ({med.frequency})
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ))}
+            {pet.Treatment.length === 0 && (
+              <p className="text-gray-500 text-center">
+                {t("petDetails.treatments.noRecords")}
+              </p>
+            )}
+          </div>
+        </div>
       </div>
 
       <EventModal
@@ -260,6 +398,20 @@ export default function PetDetailsPage() {
       <VaccineModal
         isOpen={isVaccineModalOpen}
         onClose={() => setIsVaccineModalOpen(false)}
+        petId={pet.id}
+        onSuccess={fetchPetDetails}
+      />
+
+      <ExamModal
+        isOpen={isExamModalOpen}
+        onClose={() => setIsExamModalOpen(false)}
+        petId={pet.id}
+        onSuccess={fetchPetDetails}
+      />
+
+      <TreatmentModal
+        isOpen={isTreatmentModalOpen}
+        onClose={() => setIsTreatmentModalOpen(false)}
         petId={pet.id}
         onSuccess={fetchPetDetails}
       />

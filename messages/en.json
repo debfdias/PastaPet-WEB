@@ -182,6 +182,19 @@
       "title": "Vaccine Records",
       "addButton": "Add Vaccine",
       "noRecords": "No vaccine records yet"
+    },
+    "exams": {
+      "title": "Exam Records",
+      "addButton": "Add Exam",
+      "noRecords": "No exam records yet",
+      "administeredBy": "Administered by",
+      "viewFile": "View File"
+    },
+    "treatments": {
+      "title": "Treatment Records",
+      "addButton": "Add Treatment",
+      "noRecords": "No treatment records yet",
+      "medications": "Medications"
     }
   },
   "userProfile": {
@@ -206,6 +219,81 @@
     },
     "success": {
       "profileUpdated": "Profile updated successfully"
+    }
+  },
+  "examModal": {
+    "title": "Add Exam Record",
+    "form": {
+      "title": {
+        "label": "Exam Title",
+        "placeholder": "Enter exam title"
+      },
+      "cause": {
+        "label": "Cause",
+        "placeholder": "Enter exam cause"
+      },
+      "administeredBy": {
+        "label": "Administered By",
+        "placeholder": "Enter veterinarian or clinic name"
+      },
+      "fileUrl": {
+        "label": "File URL",
+        "placeholder": "Enter file URL (optional)"
+      },
+      "resultSummary": {
+        "label": "Result Summary",
+        "placeholder": "Enter exam results summary"
+      }
+    },
+    "errors": {
+      "failedToCreate": "Failed to create exam record",
+      "anErrorOccurred": "An error occurred"
+    },
+    "buttons": {
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "success": {
+      "examAdded": "Exam record added successfully!"
+    }
+  },
+  "treatmentModal": {
+    "title": "Add Treatment Record",
+    "form": {
+      "cause": {
+        "label": "Cause",
+        "placeholder": "Enter treatment cause"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Enter treatment description"
+      },
+      "startDate": "Start Date",
+      "endDate": "End Date"
+    },
+    "medications": {
+      "title": "Medications",
+      "addButton": "Add Medication",
+      "medication": "Medication",
+      "form": {
+        "name": "Medication Name",
+        "dosage": "Dosage",
+        "frequency": "Frequency",
+        "notes": "Notes"
+      }
+    },
+    "errors": {
+      "failedToCreate": "Failed to create treatment record",
+      "anErrorOccurred": "An error occurred"
+    },
+    "buttons": {
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "success": {
+      "treatmentAdded": "Treatment record added successfully!"
     }
   }
 }
