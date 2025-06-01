@@ -222,10 +222,10 @@
     }
   },
   "examModal": {
-    "title": "Adicionar Registro de Exame",
+    "title": "Adicionar Exame",
     "form": {
       "title": {
-        "label": "Título do Exame",
+        "label": "Título",
         "placeholder": "Digite o título do exame"
       },
       "cause": {
@@ -234,28 +234,30 @@
       },
       "administeredBy": {
         "label": "Realizado Por",
-        "placeholder": "Digite o nome do veterinário ou clínica"
+        "placeholder": "Digite quem realizou o exame"
       },
       "fileUrl": {
-        "label": "URL do Arquivo",
-        "placeholder": "Digite a URL do arquivo (opcional)"
+        "label": "Arquivo do Exame",
+        "clickToUpload": "Clique para fazer upload do arquivo",
+        "fileTypes": "PDF, PNG, JPG ou JPEG"
       },
+      "fileSelected": "Arquivo selecionado",
       "resultSummary": {
         "label": "Resumo do Resultado",
         "placeholder": "Digite o resumo dos resultados do exame"
       }
     },
+    "buttons": {
+      "cancel": "Cancelar",
+      "save": "Salvar",
+      "saving": "Salvando..."
+    },
     "errors": {
-      "failedToCreate": "Falha ao criar registro de exame",
+      "failedToCreate": "Falha ao criar exame",
       "anErrorOccurred": "Ocorreu um erro"
     },
-    "buttons": {
-      "save": "Salvar",
-      "saving": "Salvando...",
-      "cancel": "Cancelar"
-    },
     "success": {
-      "examAdded": "Registro de exame adicionado com sucesso!"
+      "examAdded": "Exame adicionado com sucesso"
     }
   },
   "treatmentModal": {

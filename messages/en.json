@@ -222,10 +222,10 @@
     }
   },
   "examModal": {
-    "title": "Add Exam Record",
+    "title": "Add Exam",
     "form": {
       "title": {
-        "label": "Exam Title",
+        "label": "Title",
         "placeholder": "Enter exam title"
       },
       "cause": {
@@ -234,28 +234,30 @@
       },
       "administeredBy": {
         "label": "Administered By",
-        "placeholder": "Enter veterinarian or clinic name"
+        "placeholder": "Enter who administered the exam"
       },
       "fileUrl": {
-        "label": "File URL",
-        "placeholder": "Enter file URL (optional)"
+        "label": "Exam File",
+        "clickToUpload": "Click to upload exam file",
+        "fileTypes": "PDF, PNG, JPG or JPEG"
       },
+      "fileSelected": "File selected",
       "resultSummary": {
         "label": "Result Summary",
         "placeholder": "Enter exam results summary"
       }
     },
+    "buttons": {
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
+    },
     "errors": {
-      "failedToCreate": "Failed to create exam record",
+      "failedToCreate": "Failed to create exam",
       "anErrorOccurred": "An error occurred"
     },
-    "buttons": {
-      "save": "Save",
-      "saving": "Saving...",
-      "cancel": "Cancel"
-    },
     "success": {
-      "examAdded": "Exam record added successfully!"
+      "examAdded": "Exam added successfully"
     }
   },
   "treatmentModal": {
