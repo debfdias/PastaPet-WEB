@@ -57,7 +57,13 @@
       "male": "Macho",
       "dog": "Cachorro",
       "cat": "Gato",
-      "other": "Outro"
+      "other": "Outro",
+      "hasPetPlan": "Plano de Saúde",
+      "enablePetPlan": "Ativar Plano Pet",
+      "hasFuneraryPlan": "Plano Funerário",
+      "enableFuneraryPlan": "Ativar Plano Funerário",
+      "petPlanName": "Nome do Plano Pet",
+      "petPlanNamePlaceholder": "Digite o nome do plano pet"
     },
     "errors": {
       "authenticationRequired": "Autenticação necessária",

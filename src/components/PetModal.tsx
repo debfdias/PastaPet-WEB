@@ -8,6 +8,7 @@ import { uploadImage } from "@/lib/storage/client";
 import Image from "next/image";
 import { CgCloseR } from "react-icons/cg";
 import { useTranslations } from "next-intl";
+import { Switch } from "radix-ui";
 
 interface PetFormData {
   name: string;
@@ -17,6 +18,9 @@ interface PetFormData {
   breed: string;
   gender: "FEMALE" | "MALE";
   image?: string;
+  hasPetPlan: boolean;
+  hasFuneraryPlan: boolean;
+  petPlanName?: string;
 }
 
 interface PetModalProps {
@@ -31,6 +35,9 @@ interface PetModalProps {
     breed: string;
     gender: string;
     image?: string;
+    hasPetPlan: boolean;
+    hasFuneraryPlan: boolean;
+    petPlanName?: string;
   };
   onSuccess: () => void;
 }
@@ -63,7 +70,9 @@ export default function PetModal({
 
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  const { register, handleSubmit, reset } = useForm<PetFormData>();
+  const { register, handleSubmit, reset, watch, setValue } =
+    useForm<PetFormData>();
+  const hasPetPlan = watch("hasPetPlan");
 
   // Add click outside handler
   useEffect(() => {
@@ -98,6 +107,9 @@ export default function PetModal({
               breed: pet.breed,
               gender: pet.gender as "FEMALE" | "MALE",
               image: pet.image,
+              hasPetPlan: pet.hasPetPlan,
+              hasFuneraryPlan: pet.hasFuneraryPlan,
+              petPlanName: pet.petPlanName || "",
             }
           : {
               name: "",
@@ -107,6 +119,9 @@ export default function PetModal({
               breed: "",
               gender: "FEMALE",
               image: "",
+              hasPetPlan: false,
+              hasFuneraryPlan: false,
+              petPlanName: "",
             }
       );
       setSelectedImage(null);
@@ -319,6 +334,51 @@ export default function PetModal({
                   <option value="MALE">{t("form.male")}</option>
                 </select>
               </div>
+              <div>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">
+                    {t("form.hasPetPlan")}
+                  </label>
+                  <Switch.Root
+                    className="w-[42px] h-[25px] bg-gray-300 rounded-full relative data-[state=checked]:bg-avocado-500 outline-none cursor-pointer"
+                    checked={hasPetPlan}
+                    onCheckedChange={(checked: boolean) => {
+                      setValue("hasPetPlan", checked);
+                    }}
+                  >
+                    <Switch.Thumb className="block w-[21px] h-[21px] bg-white rounded-full shadow-lg transition-transform duration-100 translate-x-0.5 will-change-transform data-[state=checked]:translate-x-[19px]" />
+                  </Switch.Root>
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">
+                    {t("form.hasFuneraryPlan")}
+                  </label>
+                  <Switch.Root
+                    className="w-[42px] h-[25px] bg-gray-300 rounded-full relative data-[state=checked]:bg-avocado-500 outline-none cursor-pointer"
+                    checked={watch("hasFuneraryPlan")}
+                    onCheckedChange={(checked: boolean) => {
+                      setValue("hasFuneraryPlan", checked);
+                    }}
+                  >
+                    <Switch.Thumb className="block w-[21px] h-[21px] bg-white rounded-full shadow-lg transition-transform duration-100 translate-x-0.5 will-change-transform data-[state=checked]:translate-x-[19px]" />
+                  </Switch.Root>
+                </div>
+              </div>
+              {hasPetPlan && (
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium mb-1">
+                    {t("form.petPlanName")}
+                  </label>
+                  <input
+                    type="text"
+                    {...register("petPlanName")}
+                    placeholder={t("form.petPlanNamePlaceholder")}
+                    className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                  />
+                </div>
+              )}
             </div>
 
             {error && <p className="text-red-500 text-sm mt-4">{error}</p>}

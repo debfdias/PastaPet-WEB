@@ -57,7 +57,13 @@
       "male": "Male",
       "dog": "Dog",
       "cat": "Cat",
-      "other": "Other"
+      "other": "Other",
+      "hasPetPlan": "Health Plan",
+      "enablePetPlan": "Enable Pet Plan",
+      "hasFuneraryPlan": "Funerary Plan",
+      "enableFuneraryPlan": "Enable Funerary Plan",
+      "petPlanName": "Pet Plan Name",
+      "petPlanNamePlaceholder": "Enter pet plan name"
     },
     "errors": {
       "authenticationRequired": "Authentication required",
