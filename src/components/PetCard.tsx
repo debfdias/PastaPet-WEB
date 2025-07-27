@@ -13,6 +13,9 @@ interface Pet {
   breed: string;
   image?: string;
   gender: string;
+  hasPetPlan: boolean;
+  hasFuneraryPlan: boolean;
+  petPlanName?: string;
 }
 
 interface PetCardProps {
