@@ -15,6 +15,17 @@ interface Medication {
   endDate: string;
 }
 
+interface Exam {
+  id: string;
+  petId: string;
+  title: string;
+  cause: string;
+  administeredBy: string;
+  fileUrl?: string;
+  resultSummary: string;
+  treatmentId?: string;
+}
+
 interface Treatment {
   id: string;
   petId: string;
@@ -23,7 +34,7 @@ interface Treatment {
   startDate: string;
   endDate: string;
   medications: Medication[];
-  exams: any[];
+  exams: Exam[];
 }
 
 interface TreatmentSectionProps {
@@ -97,4 +108,5 @@ export default function TreatmentSection({
     </div>
   );
 }
+
 
