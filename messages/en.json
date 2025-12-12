@@ -177,7 +177,11 @@
       "breed": "Breed",
       "gender": "Gender",
       "dateOfBirth": "Date of Birth",
-      "weight": "Weight"
+      "weight": "Weight",
+      "planActive": "Active",
+      "planStartDate": "Adhesion Date",
+      "planEligible": "Eligible to use funerary plan",
+      "planNotEligible": "Not yet eligible (6 months required)"
     },
     "events": {
       "title": "Events",

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
-import { format } from "date-fns";
+import { format, differenceInMonths, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import EventModal from "@/components/EventModal";
 import VaccineModal from "@/components/VaccineModal";
@@ -11,6 +11,11 @@ import TreatmentModal from "@/components/TreatmentModal";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { MdCheckCircle, MdPauseCircle } from "react-icons/md";
+import EventsSection from "@/components/EventsSection";
+import VaccineSection from "@/components/VaccineSection";
+import ExamSection from "@/components/ExamSection";
+import TreatmentSection from "@/components/TreatmentSection";
 
 interface Event {
   id: string;
@@ -89,6 +94,10 @@ interface Pet {
   createdAt: string;
   updatedAt: string;
   userId: string;
+  hasPetPlan: boolean;
+  petPlanName?: string | null;
+  hasFuneraryPlan: boolean;
+  funeraryPlanStartDate?: string | null;
   events: Event[];
   VaccineRecord: Vaccine[];
   Treatment: Treatment[];
@@ -97,6 +106,7 @@ interface Pet {
 
 export default function PetDetailsPage() {
   const t = useTranslations();
+  const petModalT = useTranslations("petModal");
   const { data: session, status } = useSession();
   const params = useParams();
   const [pet, setPet] = useState<Pet | null>(null);
@@ -107,7 +117,58 @@ export default function PetDetailsPage() {
   const [isExamModalOpen, setIsExamModalOpen] = useState(false);
   const [isTreatmentModalOpen, setIsTreatmentModalOpen] = useState(false);
 
-  const fetchPetDetails = async () => {
+  const translateType = (type: string) => {
+    const typeMap: Record<string, string> = {
+      DOG: petModalT("form.dog"),
+      CAT: petModalT("form.cat"),
+      OTHER: petModalT("form.other"),
+    };
+    return typeMap[type] || type;
+  };
+
+  const translateGender = (gender: string) => {
+    const genderMap: Record<string, string> = {
+      FEMALE: petModalT("form.female"),
+      MALE: petModalT("form.male"),
+    };
+    return genderMap[gender] || gender;
+  };
+
+  const getFuneraryPlanStatus = (startDate: string | null | undefined) => {
+    if (!startDate) return null;
+    const start = new Date(startDate);
+    const now = new Date();
+    const monthsPassed = differenceInMonths(now, start);
+
+    // Calculate the eligibility date (6 months from start)
+    const eligibilityDate = new Date(start);
+    eligibilityDate.setMonth(eligibilityDate.getMonth() + 6);
+
+    const daysRemaining = differenceInDays(eligibilityDate, now);
+    const monthsRemaining = Math.floor(daysRemaining / 30);
+
+    if (monthsPassed >= 6 || daysRemaining <= 0) {
+      return { eligible: true, monthsPassed };
+    } else {
+      return {
+        eligible: false,
+        monthsRemaining: monthsRemaining > 0 ? monthsRemaining : 0,
+        daysRemaining: daysRemaining > 0 ? daysRemaining : 0,
+      };
+    }
+  };
+
+  // Helper function to parse date strings and avoid timezone issues
+  const parseDateString = (dateString: string): Date => {
+    // Handle formats like "2025-12-12 00:00:00" or "2025-12-12T00:00:00"
+    // Extract just the date part (YYYY-MM-DD) and create a local date
+    const dateOnly = dateString.split(" ")[0].split("T")[0];
+    const [year, month, day] = dateOnly.split("-").map(Number);
+    // Create date in local timezone (month is 0-indexed in JS Date)
+    return new Date(year, month - 1, day);
+  };
+
+  const fetchPetDetails = useCallback(async () => {
     if (!session?.user?.token) {
       setError(t("pets.errors.authenticationRequired"));
       setLoading(false);
@@ -138,12 +199,12 @@ export default function PetDetailsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [session?.user?.token, params.id, t]);
 
   useEffect(() => {
     if (status === "loading") return;
     fetchPetDetails();
-  }, [session, status, params.id]);
+  }, [session, status, fetchPetDetails]);
 
   if (status === "loading" || loading) {
     return (
@@ -182,7 +243,7 @@ export default function PetDetailsPage() {
   return (
     <div className="container mx-auto py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-pet-card rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-bold mb-4">{t("petDetails.title")}</h2>
           <div className="space-y-4">
             <div className="flex items-center space-x-4">
@@ -195,197 +256,139 @@ export default function PetDetailsPage() {
               />
               <div>
                 <h3 className="text-2xl font-bold">{pet.name}</h3>
-                <p className="text-gray-600">
-                  {t("petDetails.info.type")}: {pet.type}
+                <p className="text-gray-600 dark:text-gray-300">
+                  {t("petDetails.info.type")}: {translateType(pet.type)}
                 </p>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300">
                   {t("petDetails.info.breed")}: {pet.breed}
                 </p>
-                <p className="text-gray-600">
-                  {t("petDetails.info.gender")}: {pet.gender}
+                <p className="text-gray-600 dark:text-gray-300">
+                  {t("petDetails.info.gender")}: {translateGender(pet.gender)}
                 </p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {t("petDetails.info.dateOfBirth")}
                 </p>
                 <p>{format(new Date(pet.dob), "PPP", { locale: ptBR })}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {t("petDetails.info.weight")}
                 </p>
                 <p>{pet.weight} kg</p>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">
-              {t("petDetails.events.title")}
-            </h2>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
-            >
-              {t("petDetails.events.addButton")}
-            </button>
-          </div>
-          <div className="space-y-4">
-            {pet.events.map((event) => (
-              <div
-                key={event.id}
-                className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <h3 className="font-semibold">{event.title}</h3>
-                <p className="text-sm text-gray-500">
-                  {format(new Date(event.eventDate), "PPP", { locale: ptBR })}
-                </p>
-              </div>
-            ))}
-            {pet.events.length === 0 && (
-              <p className="text-gray-500 text-center">
-                {t("petDetails.events.noEvents")}
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">
-              {t("petDetails.vaccines.title")}
-            </h2>
-            <button
-              onClick={() => setIsVaccineModalOpen(true)}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
-            >
-              {t("petDetails.vaccines.addButton")}
-            </button>
-          </div>
-          <div className="space-y-4">
-            {pet.VaccineRecord?.map((record) => (
-              <div
-                key={record.id}
-                className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <h3 className="font-semibold">{record.vaccineType.name}</h3>
-                <p className="text-sm text-gray-500">
-                  {format(new Date(record.administrationDate), "PPP", {
-                    locale: ptBR,
-                  })}
-                </p>
-              </div>
-            ))}
-            {pet.VaccineRecord.length === 0 && (
-              <p className="text-gray-500 text-center">
-                {t("petDetails.vaccines.noRecords")}
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">
-              {t("petDetails.exams.title")}
-            </h2>
-            <button
-              onClick={() => setIsExamModalOpen(true)}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
-            >
-              {t("petDetails.exams.addButton")}
-            </button>
-          </div>
-          <div className="space-y-4">
-            {pet.Exam?.map((exam) => (
-              <div
-                key={exam.id}
-                className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <h3 className="font-semibold">{exam.title}</h3>
-                <p className="text-sm text-gray-600">{exam.cause}</p>
-                <p className="text-sm text-gray-500">
-                  {t("petDetails.exams.administeredBy")}: {exam.administeredBy}
-                </p>
-                {exam.fileUrl && (
-                  <a
-                    href={exam.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:text-blue-700 text-sm"
-                  >
-                    {t("petDetails.exams.viewFile")}
-                  </a>
-                )}
-              </div>
-            ))}
-            {pet.Exam.length === 0 && (
-              <p className="text-gray-500 text-center">
-                {t("petDetails.exams.noRecords")}
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">
-              {t("petDetails.treatments.title")}
-            </h2>
-            <button
-              onClick={() => setIsTreatmentModalOpen(true)}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
-            >
-              {t("petDetails.treatments.addButton")}
-            </button>
-          </div>
-          <div className="space-y-4">
-            {pet.Treatment?.map((treatment) => (
-              <div
-                key={treatment.id}
-                className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <h3 className="font-semibold">{treatment.cause}</h3>
-                <p className="text-sm text-gray-600">{treatment.description}</p>
-                <div className="mt-2">
-                  <p className="text-sm text-gray-500">
-                    {format(new Date(treatment.startDate), "PPP", {
-                      locale: ptBR,
-                    })}{" "}
-                    -{" "}
-                    {format(new Date(treatment.endDate), "PPP", {
-                      locale: ptBR,
-                    })}
-                  </p>
+            {(pet.hasPetPlan || pet.hasFuneraryPlan) && (
+              <div className="mt-4 pt-4 border-t border-gray-300 dark:border-gray-600">
+                <h4 className="font-semibold mb-3 text-gray-800 dark:text-gray-200">
+                  Planos
+                </h4>
+                <div className="space-y-3">
+                  {pet.hasPetPlan && (
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <p className="text-base font-semibold text-gray-800 dark:text-gray-200">
+                          {petModalT("form.hasPetPlan")}
+                        </p>
+                      </div>
+                      <div className="flex-1 text-right">
+                        <p className="text-base font-medium text-gray-800 dark:text-gray-200">
+                          {pet.petPlanName || t("petDetails.info.planActive")}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {pet.hasFuneraryPlan && (
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <p className="text-base font-semibold text-gray-800 dark:text-gray-200">
+                          {petModalT("form.hasFuneraryPlan")}
+                        </p>
+                        {pet.funeraryPlanStartDate && (
+                          <p className="text-base text-gray-700 dark:text-gray-300 mt-1">
+                            {t("petDetails.info.planStartDate")}:{" "}
+                            {format(
+                              new Date(pet.funeraryPlanStartDate),
+                              "PPP",
+                              {
+                                locale: ptBR,
+                              }
+                            )}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex-1 text-right">
+                        {pet.funeraryPlanStartDate && (
+                          <div className="flex items-center justify-end gap-2">
+                            {(() => {
+                              const status = getFuneraryPlanStatus(
+                                pet.funeraryPlanStartDate
+                              );
+                              if (!status) return null;
+                              if (status.eligible) {
+                                return (
+                                  <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+                                    <MdCheckCircle size={24} />
+                                  </div>
+                                );
+                              } else {
+                                return (
+                                  <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+                                    <MdPauseCircle size={24} />
+                                    <span className="text-base font-semibold text-gray-800 dark:text-gray-200">
+                                      {status.monthsRemaining !== undefined &&
+                                      status.monthsRemaining > 0
+                                        ? `${status.monthsRemaining} ${
+                                            status.monthsRemaining === 1
+                                              ? "mês"
+                                              : "meses"
+                                          } restantes`
+                                        : status.daysRemaining !== undefined
+                                        ? `${status.daysRemaining} ${
+                                            status.daysRemaining === 1
+                                              ? "dia"
+                                              : "dias"
+                                          } restantes`
+                                        : ""}
+                                    </span>
+                                  </div>
+                                );
+                              }
+                            })()}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
-                {treatment.medications.length > 0 && (
-                  <div className="mt-2">
-                    <h4 className="text-sm font-medium mb-1">
-                      {t("petDetails.treatments.medications")}:
-                    </h4>
-                    <ul className="list-disc list-inside text-sm text-gray-600">
-                      {treatment.medications.map((med) => (
-                        <li key={med.id}>
-                          {med.name} - {med.dosage} ({med.frequency})
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </div>
-            ))}
-            {pet.Treatment.length === 0 && (
-              <p className="text-gray-500 text-center">
-                {t("petDetails.treatments.noRecords")}
-              </p>
             )}
           </div>
         </div>
+
+        <EventsSection
+          events={pet.events}
+          onAddClick={() => setIsModalOpen(true)}
+          parseDateString={parseDateString}
+        />
+
+        <VaccineSection
+          vaccines={pet.VaccineRecord || []}
+          onAddClick={() => setIsVaccineModalOpen(true)}
+        />
+
+        <ExamSection
+          exams={pet.Exam || []}
+          onAddClick={() => setIsExamModalOpen(true)}
+        />
+
+        <TreatmentSection
+          treatments={pet.Treatment || []}
+          onAddClick={() => setIsTreatmentModalOpen(true)}
+        />
       </div>
 
       <EventModal
