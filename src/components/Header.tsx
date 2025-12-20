@@ -35,6 +35,25 @@ export function Header({ hideOnHome = false }: HeaderProps) {
   const NavLinks = ({ isMobile = false }) => (
     <>
       <Link
+        href="/dashboard"
+        className={`flex items-center rounded-md transition-all duration-200 dark:hover:text-avocado-500 relative ${
+          isMobile ? "text-2xl" : ""
+        }`}
+      >
+        <span
+          className={
+            pathname === "/dashboard"
+              ? "dark:text-avocado-500 text-text-primary font-semibold"
+              : ""
+          }
+        >
+          {t("home")}
+        </span>
+        {pathname === "/dashboard" && !isMobile && (
+          <div className="absolute -bottom-[18px] left-1/2 -translate-x-1/2 w-16 h-1 bg-text-primary dark:bg-avocado-500 rounded-t-md md:block hidden" />
+        )}
+      </Link>
+      <Link
         href="/pets"
         className={`flex items-center rounded-md transition-all duration-200 dark:hover:text-avocado-500 relative ${
           isMobile ? "text-2xl" : ""

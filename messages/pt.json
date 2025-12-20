@@ -25,6 +25,7 @@
     }
   },
   "header": {
+    "home": "Início",
     "pets": "Pets",
     "reports": "Relatórios",
     "profile": "Perfil",
@@ -307,5 +308,29 @@
     "success": {
       "treatmentAdded": "Registro de tratamento adicionado com sucesso!"
     }
+  },
+  "dashboard": {
+    "welcome": "Bem-vindo",
+    "subtitle": "Gerencie seus pets e visualize relatórios do seu painel",
+    "myPets": {
+      "title": "Meus Pets",
+      "description": "Gerencie e visualize todas as informações, registros de saúde e eventos dos seus pets."
+    },
+    "myReports": {
+      "title": "Meus Relatórios",
+      "description": "Visualize relatórios e análises abrangentes sobre a saúde e atividades dos seus pets."
+    },
+    "quickActions": {
+      "title": "Ações Rápidas",
+      "addPet": "Adicionar Pet",
+      "addEvent": "Adicionar Evento",
+      "viewAllPets": "Ver Todos Pets",
+      "viewReports": "Ver Relatórios",
+      "viewProfile": "Ver Perfil",
+      "healthSummary": "Resumo de Saúde"
+    },
+    "viewAll": "Ver Todos",
+    "noPets": "Você ainda não tem nenhum pet",
+    "petsDescription": "Gerencie os registros de saúde dos seus pets, incluindo vacinas, exames, tratamentos e eventos."
   }
 }

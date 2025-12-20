@@ -25,6 +25,7 @@
     }
   },
   "header": {
+    "home": "Home",
     "pets": "Pets",
     "reports": "Reports",
     "profile": "Profile",
@@ -307,5 +308,29 @@
     "success": {
       "treatmentAdded": "Treatment record added successfully!"
     }
+  },
+  "dashboard": {
+    "welcome": "Welcome",
+    "subtitle": "Manage your pets and view reports from your dashboard",
+    "myPets": {
+      "title": "My Pets",
+      "description": "Manage and view all your pets' information, health records, and events."
+    },
+    "myReports": {
+      "title": "My Reports",
+      "description": "View comprehensive reports and analytics about your pets' health and activities."
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "addPet": "Add Pet",
+      "addEvent": "Add Event",
+      "viewAllPets": "View All Pets",
+      "viewReports": "View Reports",
+      "viewProfile": "View Profile",
+      "healthSummary": "Health Summary"
+    },
+    "viewAll": "View All",
+    "noPets": "You don't have any pets yet",
+    "petsDescription": "Manage your pets' health records, including vaccines, exams, treatments, and events."
   }
 }
