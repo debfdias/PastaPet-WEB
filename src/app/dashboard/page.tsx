@@ -210,7 +210,7 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="flex items-center -space-x-3">
-              {pets.map((pet, index) => (
+              {pets.map((pet) => (
                 <Link
                   key={pet.id}
                   href={`/pets/${pet.id}`}
