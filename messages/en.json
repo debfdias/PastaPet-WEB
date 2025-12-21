@@ -267,6 +267,7 @@
     "errors": {
       "failedToCreate": "Failed to create exam",
       "failedToUpdate": "Failed to update exam",
+      "failedToLoadPdf": "Failed to load PDF",
       "anErrorOccurred": "An error occurred"
     },
     "success": {

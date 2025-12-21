@@ -267,6 +267,7 @@
     "errors": {
       "failedToCreate": "Falha ao criar exame",
       "failedToUpdate": "Falha ao atualizar exame",
+      "failedToLoadPdf": "Falha ao carregar PDF",
       "anErrorOccurred": "Ocorreu um erro"
     },
     "success": {

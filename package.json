@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
-    "@radix-ui/react-accordion": "^1.2.11",
     "@supabase/ssr": "^0.6.1",
     "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.1",

@@ -9,6 +9,14 @@ import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
 import { uploadFile } from "@/lib/storage/client";
 import Image from "next/image";
+import { Document, Page, pdfjs } from "react-pdf";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/TextLayer.css";
+
+// Set up PDF.js worker for Next.js
+if (typeof window !== "undefined") {
+  pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+}
 
 interface Exam {
   id: string;
@@ -40,6 +48,9 @@ export default function ExamModal({
   const [error, setError] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isPdf, setIsPdf] = useState(false);
+  const [numPages, setNumPages] = useState<number | null>(null);
+  const [pageNumber, setPageNumber] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     title: "",
@@ -64,10 +75,14 @@ export default function ExamModal({
         });
         if (exam.fileUrl) {
           setPreviewUrl(exam.fileUrl);
+          setIsPdf(exam.fileUrl.toLowerCase().endsWith(".pdf") || exam.fileUrl.includes("application/pdf"));
         } else {
           setPreviewUrl(null);
+          setIsPdf(false);
         }
         setSelectedFile(null);
+        setPageNumber(1);
+        setNumPages(null);
       } else {
         // Reset form data when creating new exam
         setFormData({
@@ -80,6 +95,9 @@ export default function ExamModal({
         });
         setSelectedFile(null);
         setPreviewUrl(null);
+        setIsPdf(false);
+        setPageNumber(1);
+        setNumPages(null);
       }
     }
   }, [isOpen, exam]);
@@ -89,14 +107,24 @@ export default function ExamModal({
       const file = e.target.files[0];
       const fileUrl = URL.createObjectURL(file);
       setSelectedFile(fileUrl);
+      const isPdfFile = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+      setIsPdf(isPdfFile);
       if (file.type.startsWith("image/")) {
+        setPreviewUrl(fileUrl);
+      } else if (isPdfFile) {
         setPreviewUrl(fileUrl);
       } else {
         setPreviewUrl(null);
       }
       setFormData((prev) => ({ ...prev, selectedFileName: file.name }));
+      setPageNumber(1);
+      setNumPages(null);
       e.target.value = "";
     }
+  };
+
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+    setNumPages(numPages);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -276,8 +304,68 @@ export default function ExamModal({
                 {t("examModal.form.fileUrl.label")}
               </label>
               <div className="flex items-center justify-center w-full h-[231px]">
-                <label className="flex flex-col items-center justify-center w-full h-full border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
-                  {previewUrl ? (
+                <label className="flex flex-col items-center justify-center w-full h-full border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 relative">
+                  {previewUrl && isPdf ? (
+                    <div className="w-full h-full overflow-auto p-2">
+                      <Document
+                        file={previewUrl}
+                        onLoadSuccess={onDocumentLoadSuccess}
+                        loading={
+                          <div className="flex items-center justify-center h-full">
+                            <p className="text-sm text-gray-500">
+                              {t("common.loading")}
+                            </p>
+                          </div>
+                        }
+                        error={
+                          <div className="flex flex-col items-center justify-center h-full">
+                            <FaFilePdf className="w-12 h-12 mb-2 dark:text-gray-300 text-red-400" />
+                            <p className="text-sm text-gray-500 text-center px-2">
+                              {t("examModal.errors.failedToLoadPdf")}
+                            </p>
+                          </div>
+                        }
+                      >
+                        <Page
+                          pageNumber={pageNumber}
+                          width={280}
+                          renderTextLayer={false}
+                          renderAnnotationLayer={false}
+                        />
+                      </Document>
+                      {numPages && numPages > 1 && (
+                        <div className="flex items-center justify-center gap-2 mt-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPageNumber((prev) => Math.max(1, prev - 1));
+                            }}
+                            disabled={pageNumber <= 1}
+                            className="px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50 cursor-pointer"
+                          >
+                            Previous
+                          </button>
+                          <span className="text-xs text-gray-500">
+                            {pageNumber} / {numPages}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPageNumber((prev) =>
+                                Math.min(numPages, prev + 1)
+                              );
+                            }}
+                            disabled={pageNumber >= numPages}
+                            className="px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50 cursor-pointer"
+                          >
+                            Next
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : previewUrl && !isPdf ? (
                     <Image
                       src={previewUrl}
                       alt="Exam file preview"
