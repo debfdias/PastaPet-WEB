@@ -1,18 +1,17 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import Image from "next/image";
-import { 
-  MdPets, 
-  MdEvent, 
-  MdArrowForward, 
-  MdBarChart, 
+import {
+  MdPets,
+  MdEvent,
+  MdArrowForward,
+  MdBarChart,
   MdPerson,
   MdHealthAndSafety,
-  MdList
+  MdList,
 } from "react-icons/md";
 import PetModal from "@/components/PetModal";
 import LastEvents from "@/components/LastEvents";
@@ -45,11 +44,14 @@ interface DashboardClientProps {
   initialPets: Pet[];
 }
 
-export default function DashboardClient({ session, initialPets }: DashboardClientProps) {
+export default function DashboardClient({
+  session,
+  initialPets,
+}: DashboardClientProps) {
   const router = useRouter();
   const t = useTranslations("dashboard");
   const petsT = useTranslations("pets");
-  const [pets, setPets] = useState<Pet[]>(initialPets);
+  const pets = initialPets;
   const [isPetModalOpen, setIsPetModalOpen] = useState(false);
 
   const handleAddPet = () => {
@@ -77,7 +79,9 @@ export default function DashboardClient({ session, initialPets }: DashboardClien
 
       {/* Quick Actions */}
       <div className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">{t("quickActions.title")}</h2>
+        <h2 className="text-2xl font-semibold mb-4">
+          {t("quickActions.title")}
+        </h2>
         <div className="flex flex-wrap gap-4">
           {/* Add Pet */}
           <button
@@ -85,7 +89,9 @@ export default function DashboardClient({ session, initialPets }: DashboardClien
             className="flex flex-col items-center justify-center gap-1 bg-pet-card border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 text-gray-800 dark:text-gray-200 p-2 rounded-lg transition-all cursor-pointer font-medium hover:scale-105 aspect-square w-20 h-20"
           >
             <MdPets className="text-6xl text-text-primary dark:text-avocado-500" />
-            <span className="text-xs font-semibold text-center leading-tight">{t("quickActions.addPet")}</span>
+            <span className="text-xs font-semibold text-center leading-tight">
+              {t("quickActions.addPet")}
+            </span>
           </button>
 
           {/* Add Event */}
@@ -94,7 +100,9 @@ export default function DashboardClient({ session, initialPets }: DashboardClien
             className="flex flex-col items-center justify-center gap-1 bg-pet-card border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 text-gray-800 dark:text-gray-200 p-2 rounded-lg transition-all cursor-pointer font-medium hover:scale-105 aspect-square w-20 h-20"
           >
             <MdEvent className="text-6xl text-text-primary dark:text-avocado-500" />
-            <span className="text-xs font-semibold text-center leading-tight">{t("quickActions.addEvent")}</span>
+            <span className="text-xs font-semibold text-center leading-tight">
+              {t("quickActions.addEvent")}
+            </span>
           </button>
 
           {/* View All Pets */}
@@ -103,7 +111,9 @@ export default function DashboardClient({ session, initialPets }: DashboardClien
             className="flex flex-col items-center justify-center gap-1 bg-pet-card border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 text-gray-800 dark:text-gray-200 p-2 rounded-lg transition-all cursor-pointer font-medium hover:scale-105 aspect-square w-20 h-20"
           >
             <MdList className="text-6xl text-text-primary dark:text-avocado-500" />
-            <span className="text-xs font-semibold text-center leading-tight">{t("quickActions.viewAllPets")}</span>
+            <span className="text-xs font-semibold text-center leading-tight">
+              {t("quickActions.viewAllPets")}
+            </span>
           </button>
 
           {/* View Reports */}
@@ -112,7 +122,9 @@ export default function DashboardClient({ session, initialPets }: DashboardClien
             className="flex flex-col items-center justify-center gap-1 bg-pet-card border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 text-gray-800 dark:text-gray-200 p-2 rounded-lg transition-all cursor-pointer font-medium hover:scale-105 aspect-square w-20 h-20"
           >
             <MdBarChart className="text-6xl text-text-primary dark:text-avocado-500" />
-            <span className="text-xs font-semibold text-center leading-tight">{t("quickActions.viewReports")}</span>
+            <span className="text-xs font-semibold text-center leading-tight">
+              {t("quickActions.viewReports")}
+            </span>
           </button>
 
           {/* View Profile */}
@@ -121,7 +133,9 @@ export default function DashboardClient({ session, initialPets }: DashboardClien
             className="flex flex-col items-center justify-center gap-1 bg-pet-card border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 text-gray-800 dark:text-gray-200 p-2 rounded-lg transition-all cursor-pointer font-medium hover:scale-105 aspect-square w-20 h-20"
           >
             <MdPerson className="text-6xl text-text-primary dark:text-avocado-500" />
-            <span className="text-xs font-semibold text-center leading-tight">{t("quickActions.viewProfile")}</span>
+            <span className="text-xs font-semibold text-center leading-tight">
+              {t("quickActions.viewProfile")}
+            </span>
           </button>
 
           {/* Health Summary */}
@@ -130,7 +144,9 @@ export default function DashboardClient({ session, initialPets }: DashboardClien
             className="flex flex-col items-center justify-center gap-1 bg-pet-card border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 text-gray-800 dark:text-gray-200 p-2 rounded-lg transition-all cursor-pointer font-medium hover:scale-105 aspect-square w-20 h-20"
           >
             <MdHealthAndSafety className="text-6xl text-text-primary dark:text-avocado-500" />
-            <span className="text-xs font-semibold text-center leading-tight">{t("quickActions.healthSummary")}</span>
+            <span className="text-xs font-semibold text-center leading-tight">
+              {t("quickActions.healthSummary")}
+            </span>
           </button>
         </div>
       </div>
@@ -238,4 +254,3 @@ export default function DashboardClient({ session, initialPets }: DashboardClien
     </div>
   );
 }
-

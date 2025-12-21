@@ -1,7 +1,6 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import { getTranslations } from "next-intl/server";
 import DashboardClient from "./DashboardClient";
 
 interface Pet {
@@ -20,24 +19,21 @@ interface Pet {
 
 async function getPets(token: string): Promise<Pet[]> {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/pets`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        // Next.js fetch caching options
-        // Pet data doesn't change frequently, so we cache for 1 day
-        // router.refresh() will bypass cache and fetch fresh data when needed
-        next: {
-          // Revalidate every 24 hours (86400 seconds)
-          // Adjust to 259200 for 3 days if preferred
-          revalidate: 86400, // 1 day in seconds
-          // Cache tags for manual revalidation via server actions
-          tags: ['pets'],
-        },
-      }
-    );
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pets`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      // Next.js fetch caching options
+      // Pet data doesn't change frequently, so we cache for 1 day
+      // router.refresh() will bypass cache and fetch fresh data when needed
+      next: {
+        // Revalidate every 24 hours (86400 seconds)
+        // Adjust to 259200 for 3 days if preferred
+        revalidate: 86400, // 1 day in seconds
+        // Cache tags for manual revalidation via server actions
+        tags: ["pets"],
+      },
+    });
 
     if (!response.ok) {
       return [];
@@ -53,7 +49,6 @@ async function getPets(token: string): Promise<Pet[]> {
 
 export default async function Dashboard() {
   const session = await getServerSession(authOptions);
-  const t = await getTranslations("dashboard");
 
   if (!session) {
     redirect("/login");
@@ -62,10 +57,5 @@ export default async function Dashboard() {
   // Fetch pets on the server with caching
   const pets = await getPets(session.user.token);
 
-  return (
-    <DashboardClient
-      session={session}
-      initialPets={pets}
-    />
-  );
+  return <DashboardClient session={session} initialPets={pets} />;
 }
