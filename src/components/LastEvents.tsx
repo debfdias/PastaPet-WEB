@@ -87,6 +87,16 @@ export default function LastEvents({ token }: LastEventsProps) {
     setCurrentPage(page);
   };
 
+  // Helper function to parse date strings and avoid timezone issues
+  const parseDateString = (dateString: string): Date => {
+    // Handle formats like "2025-12-12 00:00:00" or "2025-12-12T00:00:00"
+    // Extract just the date part (YYYY-MM-DD) and create a local date
+    const dateOnly = dateString.split(" ")[0].split("T")[0];
+    const [year, month, day] = dateOnly.split("-").map(Number);
+    // Create date in local timezone (month is 0-indexed in JS Date)
+    return new Date(year, month - 1, day);
+  };
+
   const formatEventType = (type: string) => {
     const typeMap: Record<string, string> = {
       normal: t("types.normal"),
@@ -171,7 +181,7 @@ export default function LastEvents({ token }: LastEventsProps) {
                             >
                               <td className="p-3">{event.title}</td>
                               <td className="p-3">
-                                {format(new Date(event.eventDate), "PP")}
+                                {format(parseDateString(event.eventDate), "PP")}
                               </td>
                               <td className="p-3">
                                 <span className="px-2 py-1 rounded-md bg-avocado-500/20 text-avocado-800 dark:text-avocado-300 text-sm">

@@ -272,7 +272,9 @@ export default function PetDetailsPage() {
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   {t("petDetails.info.dateOfBirth")}
                 </p>
-                <p>{format(new Date(pet.dob), "PPP", { locale: ptBR })}</p>
+                <p>
+                  {format(parseDateString(pet.dob), "PPP", { locale: ptBR })}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -311,7 +313,7 @@ export default function PetDetailsPage() {
                           <p className="text-base text-gray-700 dark:text-gray-300 mt-1">
                             {t("petDetails.info.planStartDate")}:{" "}
                             {format(
-                              new Date(pet.funeraryPlanStartDate),
+                              parseDateString(pet.funeraryPlanStartDate),
                               "PPP",
                               {
                                 locale: ptBR,
