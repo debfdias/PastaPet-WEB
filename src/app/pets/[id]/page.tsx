@@ -115,6 +115,7 @@ export default function PetDetailsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isVaccineModalOpen, setIsVaccineModalOpen] = useState(false);
   const [isExamModalOpen, setIsExamModalOpen] = useState(false);
+  const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
   const [isTreatmentModalOpen, setIsTreatmentModalOpen] = useState(false);
 
   const translateType = (type: string) => {
@@ -385,7 +386,14 @@ export default function PetDetailsPage() {
 
         <ExamSection
           exams={pet.Exam || []}
-          onAddClick={() => setIsExamModalOpen(true)}
+          onAddClick={() => {
+            setSelectedExam(null);
+            setIsExamModalOpen(true);
+          }}
+          onEditClick={(exam) => {
+            setSelectedExam(exam);
+            setIsExamModalOpen(true);
+          }}
         />
 
         <TreatmentSection
@@ -411,9 +419,13 @@ export default function PetDetailsPage() {
 
       <ExamModal
         isOpen={isExamModalOpen}
-        onClose={() => setIsExamModalOpen(false)}
+        onClose={() => {
+          setIsExamModalOpen(false);
+          setSelectedExam(null);
+        }}
         petId={pet.id}
         onSuccess={fetchPetDetails}
+        exam={selectedExam}
       />
 
       <TreatmentModal

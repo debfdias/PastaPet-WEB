@@ -234,6 +234,7 @@
   },
   "examModal": {
     "title": "Add Exam",
+    "editTitle": "Edit Exam",
     "form": {
       "title": {
         "label": "Title",
@@ -265,10 +266,12 @@
     },
     "errors": {
       "failedToCreate": "Failed to create exam",
+      "failedToUpdate": "Failed to update exam",
       "anErrorOccurred": "An error occurred"
     },
     "success": {
-      "examAdded": "Exam added successfully"
+      "examAdded": "Exam added successfully",
+      "examUpdated": "Exam updated successfully"
     }
   },
   "treatmentModal": {

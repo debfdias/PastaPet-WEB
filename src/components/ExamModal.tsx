@@ -10,11 +10,21 @@ import { toast } from "react-toastify";
 import { uploadFile } from "@/lib/storage/client";
 import Image from "next/image";
 
+interface Exam {
+  id: string;
+  title: string;
+  cause: string;
+  administeredBy: string;
+  fileUrl?: string;
+  resultSummary: string;
+}
+
 interface ExamModalProps {
   isOpen: boolean;
   onClose: () => void;
   petId: string;
   onSuccess: () => void;
+  exam?: Exam | null;
 }
 
 export default function ExamModal({
@@ -22,6 +32,7 @@ export default function ExamModal({
   onClose,
   petId,
   onSuccess,
+  exam,
 }: ExamModalProps) {
   const t = useTranslations();
   const { data: session } = useSession();
@@ -41,19 +52,37 @@ export default function ExamModal({
 
   useEffect(() => {
     if (isOpen) {
-      // Reset form data when modal opens
-      setFormData({
-        title: "",
-        cause: "",
-        administeredBy: "",
-        fileUrl: "",
-        resultSummary: "",
-        selectedFileName: "",
-      });
-      setSelectedFile(null);
-      setPreviewUrl(null);
+      if (exam) {
+        // Pre-fill form with exam data when editing
+        setFormData({
+          title: exam.title || "",
+          cause: exam.cause || "",
+          administeredBy: exam.administeredBy || "",
+          fileUrl: exam.fileUrl || "",
+          resultSummary: exam.resultSummary || "",
+          selectedFileName: "",
+        });
+        if (exam.fileUrl) {
+          setPreviewUrl(exam.fileUrl);
+        } else {
+          setPreviewUrl(null);
+        }
+        setSelectedFile(null);
+      } else {
+        // Reset form data when creating new exam
+        setFormData({
+          title: "",
+          cause: "",
+          administeredBy: "",
+          fileUrl: "",
+          resultSummary: "",
+          selectedFileName: "",
+        });
+        setSelectedFile(null);
+        setPreviewUrl(null);
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, exam]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -101,27 +130,51 @@ export default function ExamModal({
         fileUrl = uploadedUrl;
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/exams`, {
-        method: "POST",
+      const isEditing = !!exam;
+      const url = isEditing
+        ? `${process.env.NEXT_PUBLIC_API_URL}/exams/${exam.id}`
+        : `${process.env.NEXT_PUBLIC_API_URL}/exams`;
+
+      const requestBody = isEditing
+        ? {
+            title: formData.title,
+            cause: formData.cause,
+            ...(formData.administeredBy && { administeredBy: formData.administeredBy }),
+            ...(fileUrl && { fileUrl }),
+            ...(formData.resultSummary && { resultSummary: formData.resultSummary }),
+          }
+        : {
+            petId,
+            ...formData,
+            fileUrl,
+          };
+
+      const response = await fetch(url, {
+        method: isEditing ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session?.user?.token}`,
         },
-        body: JSON.stringify({
-          petId,
-          ...formData,
-          fileUrl,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
-        throw new Error(t("examModal.errors.failedToCreate"));
+        throw new Error(
+          isEditing
+            ? t("examModal.errors.failedToUpdate")
+            : t("examModal.errors.failedToCreate")
+        );
       }
 
-      toast.success(t("examModal.success.examAdded"), {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      toast.success(
+        isEditing
+          ? t("examModal.success.examUpdated")
+          : t("examModal.success.examAdded"),
+        {
+          position: "top-right",
+          autoClose: 3000,
+        }
+      );
       onSuccess();
       onClose();
     } catch (error) {
@@ -157,7 +210,7 @@ export default function ExamModal({
           <h2 className="text-2xl font-bold">
             <div className="flex items-center gap-2">
               <Microscope className="w-5 h-5" />
-              {t("examModal.title")}
+              {exam ? t("examModal.editTitle") : t("examModal.title")}
             </div>
           </h2>
           <button
@@ -204,14 +257,13 @@ export default function ExamModal({
 
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  {t("examModal.form.administeredBy.label")} *
+                  {t("examModal.form.administeredBy.label")}
                 </label>
                 <input
                   type="text"
                   name="administeredBy"
                   value={formData.administeredBy}
                   onChange={handleChange}
-                  required
                   placeholder={t("examModal.form.administeredBy.placeholder")}
                   className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
                 />

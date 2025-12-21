@@ -15,7 +15,6 @@ interface Pet {
   breed: string;
   gender: string;
   image?: string;
-  active: boolean;
   hasPetPlan: boolean;
   hasFuneraryPlan: boolean;
   petPlanName?: string;
