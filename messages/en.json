@@ -353,5 +353,35 @@
         "next": "Next page"
       }
     }
+  },
+  "footer": {
+    "social": {
+      "title": "Social Media"
+    },
+    "contact": {
+      "title": "Contact"
+    },
+    "cantinho": {
+      "title": "Cantinho da Saudade",
+      "link": "View inactive pets",
+      "description": "A space dedicated to honoring our beloved pets who have passed away."
+    },
+    "copyright": "© {year} Pasta Pet. All rights reserved."
+  },
+  "inactivePets": {
+    "title": "Cantinho da Saudade",
+    "subtitle": "A space dedicated to honoring our beloved pets who have passed away.",
+    "loading": "Loading pets...",
+    "error": "Error: {error}",
+    "signInRequired": "Please sign in to view your pets",
+    "noPets": {
+      "message": "You don't have any inactive pets",
+      "description": "This space is dedicated to pets who have passed away."
+    },
+    "errors": {
+      "authenticationRequired": "Authentication required",
+      "failedToFetch": "Failed to fetch pets",
+      "anErrorOccurred": "An error occurred"
+    }
   }
 }

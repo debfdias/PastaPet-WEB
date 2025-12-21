@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import * as Accordion from "@radix-ui/react-accordion";
 import { ChevronDown } from "lucide-react";
@@ -8,6 +9,7 @@ import classNames from "clsx";
 import { format } from "date-fns";
 import Pagination from "./Pagination";
 import { ClipLoader } from "react-spinners";
+import { MdEventNote } from "react-icons/md";
 
 interface Pet {
   id: string;
@@ -39,6 +41,7 @@ interface LastEventsProps {
 }
 
 export default function LastEvents({ token }: LastEventsProps) {
+  const router = useRouter();
   const t = useTranslations("dashboard.lastEvents");
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -124,7 +127,10 @@ export default function LastEvents({ token }: LastEventsProps) {
                   "focus:outline-none focus-visible:ring-2 focus-visible:ring-avocado-500"
                 )}
               >
-                <h3 className="text-2xl font-bold">{t("title")}</h3>
+                <div className="flex items-center gap-3">
+                  <MdEventNote className="text-3xl text-avocado-500" />
+                  <h3 className="text-2xl font-bold">{t("title")}</h3>
+                </div>
                 <ChevronDown
                   className="AccordionChevron w-5 h-5 transition-transform duration-300 flex-shrink-0"
                   aria-hidden
@@ -177,7 +183,10 @@ export default function LastEvents({ token }: LastEventsProps) {
                           {events.map((event) => (
                             <tr
                               key={event.id}
-                              className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                              onClick={() =>
+                                router.push(`/pets/${event.petId}`)
+                              }
+                              className="border-b border-gray-200 dark:border-gray-700 hover:bg-avocado-500/10 dark:hover:bg-avocado-500/20 transition-colors cursor-pointer"
                             >
                               <td className="p-3">{event.title}</td>
                               <td className="p-3">

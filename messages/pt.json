@@ -190,19 +190,19 @@
       "noEvents": "Nenhum evento ainda"
     },
     "vaccines": {
-      "title": "Registros de Vacina",
+      "title": "Vacinas",
       "addButton": "Adicionar Vacina",
       "noRecords": "Nenhum registro de vacina ainda"
     },
     "exams": {
-      "title": "Registros de Exames",
+      "title": "Exames",
       "addButton": "Adicionar Exame",
       "noRecords": "Nenhum registro de exame ainda",
       "administeredBy": "Realizado por",
       "viewFile": "Ver Arquivo"
     },
     "treatments": {
-      "title": "Registros de Tratamentos",
+      "title": "Tratamentos",
       "addButton": "Adicionar Tratamento",
       "noRecords": "Nenhum registro de tratamento ainda",
       "medications": "Medicamentos"
@@ -352,6 +352,36 @@
         "previous": "Página anterior",
         "next": "Próxima página"
       }
+    }
+  },
+  "footer": {
+    "social": {
+      "title": "Redes Sociais"
+    },
+    "contact": {
+      "title": "Contato"
+    },
+    "cantinho": {
+      "title": "Cantinho da Saudade",
+      "link": "Ver pets inativos",
+      "description": "Um espaço dedicado para homenagear nossos queridos pets que já partiram."
+    },
+    "copyright": "© {year} Pasta Pet. Todos os direitos reservados."
+  },
+  "inactivePets": {
+    "title": "Cantinho da Saudade",
+    "subtitle": "Um espaço dedicado para homenagear nossos queridos pets que já partiram.",
+    "loading": "Carregando pets...",
+    "error": "Erro: {error}",
+    "signInRequired": "Por favor, faça login para ver seus pets",
+    "noPets": {
+      "message": "Você não tem pets inativos",
+      "description": "Este espaço é dedicado aos pets que já partiram."
+    },
+    "errors": {
+      "authenticationRequired": "Autenticação necessária",
+      "failedToFetch": "Falha ao buscar pets",
+      "anErrorOccurred": "Ocorreu um erro"
     }
   }
 }

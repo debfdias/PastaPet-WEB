@@ -3,6 +3,7 @@ import { ptBR } from "date-fns/locale";
 import { useTranslations } from "next-intl";
 import { MdVaccines } from "react-icons/md";
 import { FaPlus } from "react-icons/fa";
+import { TbVaccine } from "react-icons/tb";
 
 interface VaccineType {
   id: string;
@@ -43,7 +44,10 @@ export default function VaccineSection({
   return (
     <div className="bg-pet-card rounded-lg p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">{t("title")}</h2>
+        <div className="flex items-center gap-3">
+          <TbVaccine className="text-2xl text-avocado-500" />
+          <h2 className="text-2xl font-bold">{t("title")}</h2>
+        </div>
         <button
           onClick={onAddClick}
           className="flex items-center justify-center gap-1 px-3 py-3 rounded-lg bg-avocado-500 hover:bg-avocado-300 text-gray-800 transition-colors cursor-pointer"

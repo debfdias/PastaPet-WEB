@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import { MdAssignment } from "react-icons/md";
 import { FaPlus } from "react-icons/fa";
+import { ImLab } from "react-icons/im";
 
 interface Exam {
   id: string;
@@ -18,16 +19,17 @@ interface ExamSectionProps {
   onAddClick: () => void;
 }
 
-export default function ExamSection({
-  exams,
-  onAddClick,
-}: ExamSectionProps) {
+export default function ExamSection({ exams, onAddClick }: ExamSectionProps) {
   const t = useTranslations("petDetails.exams");
 
   return (
     <div className="bg-pet-card rounded-lg p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">{t("title")}</h2>
+        <div className="flex items-center gap-3">
+          <ImLab className="text-xl text-avocado-500" />
+          <h2 className="text-2xl font-bold">{t("title")}</h2>
+        </div>
+
         <button
           onClick={onAddClick}
           className="flex items-center justify-center gap-1 px-3 py-3 rounded-lg bg-avocado-500 hover:bg-avocado-300 text-gray-800 transition-colors cursor-pointer"
@@ -72,5 +74,3 @@ export default function ExamSection({
     </div>
   );
 }
-
-
