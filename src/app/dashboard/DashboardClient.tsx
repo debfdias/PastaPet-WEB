@@ -15,6 +15,7 @@ import {
   MdList
 } from "react-icons/md";
 import PetModal from "@/components/PetModal";
+import LastEvents from "@/components/LastEvents";
 import { toast } from "react-toastify";
 import { useState } from "react";
 
@@ -221,6 +222,11 @@ export default function DashboardClient({ session, initialPets }: DashboardClien
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Last Events Section */}
+      <div className="mt-8">
+        <LastEvents token={session.user.token} />
       </div>
 
       {/* Pet Modal */}

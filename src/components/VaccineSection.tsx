@@ -30,11 +30,13 @@ interface Vaccine {
 interface VaccineSectionProps {
   vaccines: Vaccine[];
   onAddClick: () => void;
+  parseDateString: (dateString: string) => Date;
 }
 
 export default function VaccineSection({
   vaccines,
   onAddClick,
+  parseDateString,
 }: VaccineSectionProps) {
   const t = useTranslations("petDetails.vaccines");
 
@@ -60,7 +62,7 @@ export default function VaccineSection({
               {record.vaccineType.name}
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              {format(new Date(record.administrationDate), "PPP", {
+              {format(parseDateString(record.administrationDate), "PPP", {
                 locale: ptBR,
               })}
             </p>
@@ -75,5 +77,3 @@ export default function VaccineSection({
     </div>
   );
 }
-
-

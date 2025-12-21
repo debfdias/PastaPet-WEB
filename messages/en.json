@@ -331,6 +331,27 @@
     },
     "viewAll": "View All",
     "noPets": "You don't have any pets yet",
-    "petsDescription": "Manage your pets' health records, including vaccines, exams, treatments, and events."
+    "petsDescription": "Manage your pets' health records, including vaccines, exams, treatments, and events.",
+    "lastEvents": {
+      "title": "Last Events",
+      "loading": "Loading events...",
+      "noEvents": "No events found",
+      "table": {
+        "title": "Title",
+        "date": "Date",
+        "type": "Type",
+        "pet": "Pet"
+      },
+      "types": {
+        "normal": "Normal",
+        "medical": "Medical",
+        "grooming": "Grooming",
+        "training": "Training"
+      },
+      "pagination": {
+        "previous": "Previous page",
+        "next": "Next page"
+      }
+    }
   }
 }

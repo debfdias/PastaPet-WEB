@@ -331,6 +331,27 @@
     },
     "viewAll": "Ver Todos",
     "noPets": "Você ainda não tem nenhum pet",
-    "petsDescription": "Gerencie os registros de saúde dos seus pets, incluindo vacinas, exames, tratamentos e eventos."
+    "petsDescription": "Gerencie os registros de saúde dos seus pets, incluindo vacinas, exames, tratamentos e eventos.",
+    "lastEvents": {
+      "title": "Últimos Eventos",
+      "loading": "Carregando eventos...",
+      "noEvents": "Nenhum evento encontrado",
+      "table": {
+        "title": "Título",
+        "date": "Data",
+        "type": "Tipo",
+        "pet": "Pet"
+      },
+      "types": {
+        "normal": "Normal",
+        "medical": "Médico",
+        "grooming": "Cuidados",
+        "training": "Treinamento"
+      },
+      "pagination": {
+        "previous": "Página anterior",
+        "next": "Próxima página"
+      }
+    }
   }
 }

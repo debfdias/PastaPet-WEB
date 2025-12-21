@@ -40,11 +40,13 @@ interface Treatment {
 interface TreatmentSectionProps {
   treatments: Treatment[];
   onAddClick: () => void;
+  parseDateString: (dateString: string) => Date;
 }
 
 export default function TreatmentSection({
   treatments,
   onAddClick,
+  parseDateString,
 }: TreatmentSectionProps) {
   const t = useTranslations("petDetails.treatments");
 
@@ -74,11 +76,11 @@ export default function TreatmentSection({
             </p>
             <div className="mt-2">
               <p className="text-sm text-gray-500 dark:text-gray-500">
-                {format(new Date(treatment.startDate), "PPP", {
+                {format(parseDateString(treatment.startDate), "PPP", {
                   locale: ptBR,
                 })}{" "}
                 -{" "}
-                {format(new Date(treatment.endDate), "PPP", {
+                {format(parseDateString(treatment.endDate), "PPP", {
                   locale: ptBR,
                 })}
               </p>

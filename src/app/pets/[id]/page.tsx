@@ -378,6 +378,7 @@ export default function PetDetailsPage() {
         <VaccineSection
           vaccines={pet.VaccineRecord || []}
           onAddClick={() => setIsVaccineModalOpen(true)}
+          parseDateString={parseDateString}
         />
 
         <ExamSection
@@ -388,6 +389,7 @@ export default function PetDetailsPage() {
         <TreatmentSection
           treatments={pet.Treatment || []}
           onAddClick={() => setIsTreatmentModalOpen(true)}
+          parseDateString={parseDateString}
         />
       </div>
 

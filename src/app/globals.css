@@ -45,3 +45,55 @@
 :root[data-theme="dark"] {
   background-color: var(--color-background-dark);
 }
+
+/* Accordion Styles */
+.AccordionHeader {
+  all: unset;
+  display: block;
+}
+
+.AccordionTrigger {
+  all: unset;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+}
+
+.AccordionChevron {
+  transition: transform 300ms;
+}
+
+.AccordionTrigger[data-state="open"] > .AccordionChevron {
+  transform: rotate(180deg);
+}
+
+.AccordionContent {
+  overflow: hidden;
+}
+
+.AccordionContent[data-state="open"] {
+  animation: slideDown 300ms ease-out;
+}
+
+.AccordionContent[data-state="closed"] {
+  animation: slideUp 300ms ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
