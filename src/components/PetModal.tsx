@@ -77,7 +77,7 @@ export default function PetModal({
 
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  const { register, handleSubmit, reset, watch, setValue, getValues } =
+  const { register, handleSubmit, reset, watch, setValue } =
     useForm<PetFormData>({
       defaultValues: {
         name: "",
@@ -98,7 +98,7 @@ export default function PetModal({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      
+
       // Check if click is outside modal
       if (modalRef.current && !modalRef.current.contains(target)) {
         // Check if click is inside a Radix Select portal (dropdown)
@@ -107,9 +107,9 @@ export default function PetModal({
         while (element && element !== document.body) {
           // Check if element is inside a Radix Select content (has role="listbox" or is inside a portal)
           if (
-            element.getAttribute('role') === 'listbox' ||
+            element.getAttribute("role") === "listbox" ||
             element.closest('[role="listbox"]') ||
-            element.closest('[data-radix-portal]')
+            element.closest("[data-radix-portal]")
           ) {
             return; // Don't close if clicking inside Select dropdown
           }
@@ -131,7 +131,7 @@ export default function PetModal({
   // Reset form when pet changes or modal opens/closes
   useEffect(() => {
     if (isOpen) {
-      const formData = pet
+      const formData: PetFormData = pet
         ? {
             name: pet.name,
             dob: pet.dob.split("T")[0],
