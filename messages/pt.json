@@ -36,7 +36,9 @@
     "age": "Idade",
     "months": "meses",
     "years": "anos",
-    "editPet": "Editar pet"
+    "editPet": "Editar pet",
+    "petPlan": "Plano Pet",
+    "funeraryPlan": "Plano Funerário"
   },
   "petModal": {
     "addNewPet": "Adicionar Novo Pet",
@@ -182,6 +184,14 @@
       "planActive": "Ativo",
       "planStartDate": "Data de adesão",
       "planEligible": "Elegível para usar o plano funerário",
+      "health": "Saúde",
+      "date": "Data",
+      "adhesion": "Adesão",
+      "available": "Disponível",
+      "inGracePeriod": "em carência por",
+      "month": "mês",
+      "months": "meses",
+      "petHealthPlan": "Plano de saúde do pet",
       "planNotEligible": "Ainda não elegível (6 meses necessários)"
     },
     "events": {

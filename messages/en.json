@@ -36,7 +36,9 @@
     "age": "Age",
     "months": "months",
     "years": "years",
-    "editPet": "Edit pet"
+    "editPet": "Edit pet",
+    "petPlan": "Pet Plan",
+    "funeraryPlan": "Funerary Plan"
   },
   "petModal": {
     "addNewPet": "Add New Pet",
@@ -182,6 +184,14 @@
       "planActive": "Active",
       "planStartDate": "Adhesion Date",
       "planEligible": "Eligible to use funerary plan",
+      "health": "Health",
+      "date": "Date",
+      "adhesion": "Adhesion",
+      "available": "Available",
+      "inGracePeriod": "in grace period for",
+      "month": "month",
+      "months": "months",
+      "petHealthPlan": "Pet health plan",
       "planNotEligible": "Not yet eligible (6 months required)"
     },
     "events": {

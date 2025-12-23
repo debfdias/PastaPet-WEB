@@ -2,16 +2,16 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
-import { format, differenceInMonths, differenceInDays } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { differenceInMonths, differenceInDays } from "date-fns";
 import EventModal from "@/components/EventModal";
 import VaccineModal from "@/components/VaccineModal";
 import ExamModal from "@/components/ExamModal";
 import TreatmentModal from "@/components/TreatmentModal";
+import PetModal from "@/components/PetModal";
+import PetInfo from "@/components/PetInfo";
 import { useSession } from "next-auth/react";
-import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { MdCheckCircle, MdPauseCircle } from "react-icons/md";
+import { toast } from "react-toastify";
 import EventsSection from "@/components/EventsSection";
 import VaccineSection from "@/components/VaccineSection";
 import ExamSection from "@/components/ExamSection";
@@ -117,6 +117,7 @@ export default function PetDetailsPage() {
   const [isExamModalOpen, setIsExamModalOpen] = useState(false);
   const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
   const [isTreatmentModalOpen, setIsTreatmentModalOpen] = useState(false);
+  const [isPetModalOpen, setIsPetModalOpen] = useState(false);
 
   const translateType = (type: string) => {
     const typeMap: Record<string, string> = {
@@ -241,136 +242,30 @@ export default function PetDetailsPage() {
     );
   }
 
+  const handlePetEdit = () => {
+    setIsPetModalOpen(true);
+  };
+
+  const handlePetModalClose = () => {
+    setIsPetModalOpen(false);
+  };
+
+  const handlePetSuccess = () => {
+    fetchPetDetails();
+    toast.success(t("pets.success.petUpdated"));
+  };
+
   return (
     <div className="container mx-auto py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-pet-card rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-bold mb-4">{t("petDetails.title")}</h2>
-          <div className="space-y-4">
-            <div className="flex items-center space-x-4">
-              <Image
-                src={pet.image}
-                alt={pet.name}
-                width={128}
-                height={128}
-                className="object-cover rounded-full"
-              />
-              <div>
-                <h3 className="text-2xl font-bold">{pet.name}</h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  {t("petDetails.info.type")}: {translateType(pet.type)}
-                </p>
-                <p className="text-gray-600 dark:text-gray-300">
-                  {t("petDetails.info.breed")}: {pet.breed}
-                </p>
-                <p className="text-gray-600 dark:text-gray-300">
-                  {t("petDetails.info.gender")}: {translateGender(pet.gender)}
-                </p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t("petDetails.info.dateOfBirth")}
-                </p>
-                <p>
-                  {format(parseDateString(pet.dob), "PPP", { locale: ptBR })}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t("petDetails.info.weight")}
-                </p>
-                <p>{pet.weight} kg</p>
-              </div>
-            </div>
-            {(pet.hasPetPlan || pet.hasFuneraryPlan) && (
-              <div className="mt-4 pt-4 border-t border-gray-300 dark:border-gray-600">
-                <h4 className="font-semibold mb-3 text-gray-800 dark:text-gray-200">
-                  Planos
-                </h4>
-                <div className="space-y-3">
-                  {pet.hasPetPlan && (
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <p className="text-base font-semibold text-gray-800 dark:text-gray-200">
-                          {petModalT("form.hasPetPlan")}
-                        </p>
-                      </div>
-                      <div className="flex-1 text-right">
-                        <p className="text-base font-medium text-gray-800 dark:text-gray-200">
-                          {pet.petPlanName || t("petDetails.info.planActive")}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                  {pet.hasFuneraryPlan && (
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <p className="text-base font-semibold text-gray-800 dark:text-gray-200">
-                          {petModalT("form.hasFuneraryPlan")}
-                        </p>
-                        {pet.funeraryPlanStartDate && (
-                          <p className="text-base text-gray-700 dark:text-gray-300 mt-1">
-                            {t("petDetails.info.planStartDate")}:{" "}
-                            {format(
-                              parseDateString(pet.funeraryPlanStartDate),
-                              "PPP",
-                              {
-                                locale: ptBR,
-                              }
-                            )}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex-1 text-right">
-                        {pet.funeraryPlanStartDate && (
-                          <div className="flex items-center justify-end gap-2">
-                            {(() => {
-                              const status = getFuneraryPlanStatus(
-                                pet.funeraryPlanStartDate
-                              );
-                              if (!status) return null;
-                              if (status.eligible) {
-                                return (
-                                  <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
-                                    <MdCheckCircle size={24} />
-                                  </div>
-                                );
-                              } else {
-                                return (
-                                  <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
-                                    <MdPauseCircle size={24} />
-                                    <span className="text-base font-semibold text-gray-800 dark:text-gray-200">
-                                      {status.monthsRemaining !== undefined &&
-                                      status.monthsRemaining > 0
-                                        ? `${status.monthsRemaining} ${
-                                            status.monthsRemaining === 1
-                                              ? "mês"
-                                              : "meses"
-                                          } restantes`
-                                        : status.daysRemaining !== undefined
-                                        ? `${status.daysRemaining} ${
-                                            status.daysRemaining === 1
-                                              ? "dia"
-                                              : "dias"
-                                          } restantes`
-                                        : ""}
-                                    </span>
-                                  </div>
-                                );
-                              }
-                            })()}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        <PetInfo
+          pet={pet}
+          onEdit={handlePetEdit}
+          translateType={translateType}
+          translateGender={translateGender}
+          parseDateString={parseDateString}
+          getFuneraryPlanStatus={getFuneraryPlanStatus}
+        />
 
         <EventsSection
           events={pet.events}
@@ -433,6 +328,25 @@ export default function PetDetailsPage() {
         onClose={() => setIsTreatmentModalOpen(false)}
         petId={pet.id}
         onSuccess={fetchPetDetails}
+      />
+
+      <PetModal
+        isOpen={isPetModalOpen}
+        onClose={handlePetModalClose}
+        pet={{
+          id: pet.id,
+          name: pet.name,
+          dob: pet.dob,
+          weight: pet.weight,
+          type: pet.type,
+          breed: pet.breed,
+          gender: pet.gender,
+          image: pet.image,
+          hasPetPlan: pet.hasPetPlan,
+          hasFuneraryPlan: pet.hasFuneraryPlan,
+          petPlanName: pet.petPlanName || undefined,
+        }}
+        onSuccess={handlePetSuccess}
       />
     </div>
   );
