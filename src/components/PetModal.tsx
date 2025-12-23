@@ -9,6 +9,13 @@ import Image from "next/image";
 import { CgCloseR } from "react-icons/cg";
 import { useTranslations } from "next-intl";
 import { Switch } from "radix-ui";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface PetFormData {
   name: string;
@@ -70,17 +77,44 @@ export default function PetModal({
 
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  const { register, handleSubmit, reset, watch, setValue } =
-    useForm<PetFormData>();
+  const { register, handleSubmit, reset, watch, setValue, getValues } =
+    useForm<PetFormData>({
+      defaultValues: {
+        name: "",
+        dob: "",
+        weight: 0,
+        type: "DOG",
+        breed: "",
+        gender: "FEMALE",
+        image: "",
+        hasPetPlan: false,
+        hasFuneraryPlan: false,
+        petPlanName: "",
+      },
+    });
   const hasPetPlan = watch("hasPetPlan");
 
   // Add click outside handler
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
-      ) {
+      const target = event.target as HTMLElement;
+      
+      // Check if click is outside modal
+      if (modalRef.current && !modalRef.current.contains(target)) {
+        // Check if click is inside a Radix Select portal (dropdown)
+        // Radix Select renders the dropdown in a portal, check if target is inside any portal
+        let element = target;
+        while (element && element !== document.body) {
+          // Check if element is inside a Radix Select content (has role="listbox" or is inside a portal)
+          if (
+            element.getAttribute('role') === 'listbox' ||
+            element.closest('[role="listbox"]') ||
+            element.closest('[data-radix-portal]')
+          ) {
+            return; // Don't close if clicking inside Select dropdown
+          }
+          element = element.parentElement as HTMLElement;
+        }
         onClose();
       }
     };
@@ -97,37 +131,36 @@ export default function PetModal({
   // Reset form when pet changes or modal opens/closes
   useEffect(() => {
     if (isOpen) {
-      reset(
-        pet
-          ? {
-              name: pet.name,
-              dob: pet.dob.split("T")[0],
-              weight: pet.weight,
-              type: pet.type as "DOG" | "CAT" | "OTHER",
-              breed: pet.breed,
-              gender: pet.gender as "FEMALE" | "MALE",
-              image: pet.image,
-              hasPetPlan: pet.hasPetPlan,
-              hasFuneraryPlan: pet.hasFuneraryPlan,
-              petPlanName: pet.petPlanName || "",
-            }
-          : {
-              name: "",
-              dob: "",
-              weight: 0,
-              type: "DOG",
-              breed: "",
-              gender: "FEMALE",
-              image: "",
-              hasPetPlan: false,
-              hasFuneraryPlan: false,
-              petPlanName: "",
-            }
-      );
+      const formData = pet
+        ? {
+            name: pet.name,
+            dob: pet.dob.split("T")[0],
+            weight: pet.weight,
+            type: pet.type as "DOG" | "CAT" | "OTHER",
+            breed: pet.breed,
+            gender: pet.gender as "FEMALE" | "MALE",
+            image: pet.image,
+            hasPetPlan: pet.hasPetPlan,
+            hasFuneraryPlan: pet.hasFuneraryPlan,
+            petPlanName: pet.petPlanName || "",
+          }
+        : {
+            name: "",
+            dob: "",
+            weight: 0,
+            type: "DOG",
+            breed: "",
+            gender: "FEMALE",
+            image: "",
+            hasPetPlan: false,
+            hasFuneraryPlan: false,
+            petPlanName: "",
+          };
+      reset(formData, { keepDefaultValues: false });
       setSelectedImage(null);
       setPreviewUrl(pet?.image || null);
     }
-  }, [isOpen, pet, reset]);
+  }, [isOpen, pet, reset, setValue]);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -302,14 +335,24 @@ export default function PetModal({
                 <label className="block text-sm font-medium mb-1">
                   {t("form.type")}
                 </label>
-                <select
-                  {...register("type", { required: true })}
-                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                <Select
+                  key={`type-${pet?.id || "new"}-${watch("type")}`}
+                  value={watch("type") || "DOG"}
+                  onValueChange={(value) => {
+                    setValue("type", value as "DOG" | "CAT" | "OTHER", {
+                      shouldValidate: true,
+                    });
+                  }}
                 >
-                  <option value="DOG">{t("form.dog")}</option>
-                  <option value="CAT">{t("form.cat")}</option>
-                  <option value="OTHER">{t("form.other")}</option>
-                </select>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="DOG">{t("form.dog")}</SelectItem>
+                    <SelectItem value="CAT">{t("form.cat")}</SelectItem>
+                    <SelectItem value="OTHER">{t("form.other")}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">
@@ -326,13 +369,23 @@ export default function PetModal({
                 <label className="block text-sm font-medium mb-1">
                   {t("form.gender")}
                 </label>
-                <select
-                  {...register("gender", { required: true })}
-                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                <Select
+                  key={`gender-${pet?.id || "new"}-${watch("gender")}`}
+                  value={watch("gender") || "FEMALE"}
+                  onValueChange={(value) => {
+                    setValue("gender", value as "FEMALE" | "MALE", {
+                      shouldValidate: true,
+                    });
+                  }}
                 >
-                  <option value="FEMALE">{t("form.female")}</option>
-                  <option value="MALE">{t("form.male")}</option>
-                </select>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="FEMALE">{t("form.female")}</SelectItem>
+                    <SelectItem value="MALE">{t("form.male")}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <div className="flex items-center justify-between">

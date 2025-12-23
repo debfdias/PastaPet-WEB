@@ -9,14 +9,31 @@ import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
 import { uploadFile } from "@/lib/storage/client";
 import Image from "next/image";
-import { Document, Page, pdfjs } from "react-pdf";
+import dynamic from "next/dynamic";
+
+// Dynamically import react-pdf components only on client side
+const Document = dynamic(
+  async () => {
+    const mod = await import("react-pdf");
+    // Set up PDF.js worker for Next.js
+    if (typeof window !== "undefined") {
+      mod.pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${mod.pdfjs.version}/build/pdf.worker.min.mjs`;
+    }
+    return { default: mod.Document };
+  },
+  { 
+    ssr: false,
+  }
+);
+
+const Page = dynamic(
+  () => import("react-pdf").then((mod) => mod.Page),
+  { ssr: false }
+);
+
+// Import CSS - these are safe in client components
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
-
-// Set up PDF.js worker for Next.js
-if (typeof window !== "undefined") {
-  pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
-}
 
 interface Exam {
   id: string;
@@ -52,6 +69,7 @@ export default function ExamModal({
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({
     title: "",
     cause: "",
@@ -60,6 +78,40 @@ export default function ExamModal({
     resultSummary: "",
     selectedFileName: "",
   });
+
+  // Add click outside handler
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      
+      // Check if click is outside modal
+      if (modalRef.current && !modalRef.current.contains(target)) {
+        // Check if click is inside a Radix Select portal (dropdown)
+        // Radix Select renders the dropdown in a portal, check if target is inside any portal
+        let element = target;
+        while (element && element !== document.body) {
+          // Check if element is inside a Radix Select content (has role="listbox" or is inside a portal)
+          if (
+            element.getAttribute('role') === 'listbox' ||
+            element.closest('[role="listbox"]') ||
+            element.closest('[data-radix-portal]')
+          ) {
+            return; // Don't close if clicking inside Select dropdown
+          }
+          element = element.parentElement as HTMLElement;
+        }
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, onClose]);
 
   useEffect(() => {
     if (isOpen) {
@@ -85,16 +137,16 @@ export default function ExamModal({
         setNumPages(null);
       } else {
         // Reset form data when creating new exam
-        setFormData({
-          title: "",
-          cause: "",
-          administeredBy: "",
-          fileUrl: "",
-          resultSummary: "",
-          selectedFileName: "",
-        });
-        setSelectedFile(null);
-        setPreviewUrl(null);
+      setFormData({
+        title: "",
+        cause: "",
+        administeredBy: "",
+        fileUrl: "",
+        resultSummary: "",
+        selectedFileName: "",
+      });
+      setSelectedFile(null);
+      setPreviewUrl(null);
         setIsPdf(false);
         setPageNumber(1);
         setNumPages(null);
@@ -199,8 +251,8 @@ export default function ExamModal({
           ? t("examModal.success.examUpdated")
           : t("examModal.success.examAdded"),
         {
-          position: "top-right",
-          autoClose: 3000,
+        position: "top-right",
+        autoClose: 3000,
         }
       );
       onSuccess();
@@ -233,7 +285,7 @@ export default function ExamModal({
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-      <div className="bg-pet-card rounded-lg p-6 w-full max-w-3xl">
+      <div ref={modalRef} className="bg-pet-card rounded-lg p-6 w-full max-w-3xl">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">
             <div className="flex items-center gap-2">

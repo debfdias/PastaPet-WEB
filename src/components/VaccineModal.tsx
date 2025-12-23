@@ -1,11 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { CgCloseR } from "react-icons/cg";
 import { Syringe } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface VaccineType {
   id: string;
@@ -35,6 +42,7 @@ export default function VaccineModal({
   const [vaccineTypes, setVaccineTypes] = useState<VaccineType[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({
     vaccineTypeId: "",
     administrationDate: "",
@@ -44,6 +52,40 @@ export default function VaccineModal({
     administeredBy: "",
     notes: "",
   });
+
+  // Add click outside handler
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+
+      // Check if click is outside modal
+      if (modalRef.current && !modalRef.current.contains(target)) {
+        // Check if click is inside a Radix Select portal (dropdown)
+        // Radix Select renders the dropdown in a portal, check if target is inside any portal
+        let element = target;
+        while (element && element !== document.body) {
+          // Check if element is inside a Radix Select content (has role="listbox" or is inside a portal)
+          if (
+            element.getAttribute("role") === "listbox" ||
+            element.closest('[role="listbox"]') ||
+            element.closest("[data-radix-portal]")
+          ) {
+            return; // Don't close if clicking inside Select dropdown
+          }
+          element = element.parentElement as HTMLElement;
+        }
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, onClose]);
 
   useEffect(() => {
     if (isOpen) {
@@ -143,7 +185,10 @@ export default function VaccineModal({
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4">
-      <div className="bg-pet-card rounded-lg p-6 w-full max-w-2xl">
+      <div
+        ref={modalRef}
+        className="bg-pet-card rounded-lg p-6 w-full max-w-2xl"
+      >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">
             <div className="flex items-center gap-2">
@@ -165,22 +210,26 @@ export default function VaccineModal({
               <label className="block text-sm font-medium mb-1">
                 {t("vaccineModal.form.vaccineType.label")} *
               </label>
-              <select
-                name="vaccineTypeId"
+              <Select
                 value={formData.vaccineTypeId}
-                onChange={handleChange}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, vaccineTypeId: value }))
+                }
                 required
-                className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
               >
-                <option value="">
-                  {t("vaccineModal.form.vaccineType.placeholder")}
-                </option>
-                {vaccineTypes.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.name}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={t("vaccineModal.form.vaccineType.placeholder")}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {vaccineTypes.map((type) => (
+                    <SelectItem key={type.id} value={type.id}>
+                      {type.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>

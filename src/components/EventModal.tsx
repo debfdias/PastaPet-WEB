@@ -5,6 +5,13 @@ import { useSession } from "next-auth/react";
 import { CgCloseR } from "react-icons/cg";
 import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface EventModalProps {
   isOpen: boolean;
@@ -33,10 +40,24 @@ export default function EventModal({
   // Add click outside handler
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
-      ) {
+      const target = event.target as HTMLElement;
+
+      // Check if click is outside modal
+      if (modalRef.current && !modalRef.current.contains(target)) {
+        // Check if click is inside a Radix Select portal (dropdown)
+        // Radix Select renders the dropdown in a portal, check if target is inside any portal
+        let element = target;
+        while (element && element !== document.body) {
+          // Check if element is inside a Radix Select content (has role="listbox" or is inside a portal)
+          if (
+            element.getAttribute("role") === "listbox" ||
+            element.closest('[role="listbox"]') ||
+            element.closest("[data-radix-portal]")
+          ) {
+            return; // Don't close if clicking inside Select dropdown
+          }
+          element = element.parentElement as HTMLElement;
+        }
         onClose();
       }
     };
@@ -147,16 +168,28 @@ export default function EventModal({
               <label className="block text-sm font-medium mb-1">
                 {t("form.eventType")}
               </label>
-              <select
+              <Select
                 value={type}
-                onChange={(e) => setType(e.target.value as EventType)}
-                className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                onValueChange={(value) => setType(value as EventType)}
               >
-                <option value="normal">{t("form.types.normal")}</option>
-                <option value="medical">{t("form.types.medical")}</option>
-                <option value="grooming">{t("form.types.grooming")}</option>
-                <option value="training">{t("form.types.training")}</option>
-              </select>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="normal">
+                    {t("form.types.normal")}
+                  </SelectItem>
+                  <SelectItem value="medical">
+                    {t("form.types.medical")}
+                  </SelectItem>
+                  <SelectItem value="grooming">
+                    {t("form.types.grooming")}
+                  </SelectItem>
+                  <SelectItem value="training">
+                    {t("form.types.training")}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
