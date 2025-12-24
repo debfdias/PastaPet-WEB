@@ -55,22 +55,6 @@ export default function VaccineModal({
     },
   });
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchVaccineTypes();
-      reset({
-        vaccineTypeId: "",
-        administrationDate: "",
-        nextDueDate: "",
-        validUntil: "",
-        lotNumber: "",
-        administeredBy: "",
-        notes: "",
-        isBooster: false,
-      });
-    }
-  }, [isOpen, reset]);
-
   const fetchVaccineTypes = async () => {
     try {
       const response = await fetch(
@@ -93,6 +77,23 @@ export default function VaccineModal({
     }
   };
 
+  useEffect(() => {
+    if (isOpen) {
+      fetchVaccineTypes();
+      reset({
+        vaccineTypeId: "",
+        administrationDate: "",
+        nextDueDate: "",
+        validUntil: "",
+        lotNumber: "",
+        administeredBy: "",
+        notes: "",
+        isBooster: false,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, reset]);
+
   const onSubmit = async (data: VaccineFormData) => {
     if (!session?.user?.token) {
       return;
@@ -104,16 +105,17 @@ export default function VaccineModal({
       const currentIsBooster = watch("isBooster");
 
       // Transform isBooster to booster for API
-      const { isBooster, ...restData } = data;
       const payload = {
         petId,
-        ...restData,
+        vaccineTypeId: data.vaccineTypeId,
+        administrationDate: data.administrationDate,
+        nextDueDate: data.nextDueDate,
+        validUntil: data.validUntil,
+        lotNumber: data.lotNumber,
+        administeredBy: data.administeredBy,
+        notes: data.notes,
         booster: currentIsBooster, // Use the watched value to ensure it's up to date
       };
-
-      console.log("Form data:", data);
-      console.log("Current isBooster:", currentIsBooster);
-      console.log("Payload:", payload);
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/vaccines`,
