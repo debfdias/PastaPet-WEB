@@ -50,7 +50,7 @@ export default function PetInfo({
   const t = useTranslations();
 
   return (
-    <div className="bg-pet-card rounded-lg p-6 relative">
+    <div className="bg-pet-card rounded-lg p-6 relative h-full flex flex-col">
       <button
         onClick={onEdit}
         className="absolute top-4 right-4 text-avocado-800 rounded-full bg-avocado-500 hover:bg-avocado-300 p-2 cursor-pointer"
@@ -59,7 +59,7 @@ export default function PetInfo({
         <LuPencil className="w-4 h-4" />
       </button>
       <h2 className="text-2xl font-bold mb-4">{t("petDetails.title")}</h2>
-      <div className="space-y-4">
+      <div className="space-y-4 flex-1 min-h-[400px]">
         <div className="flex items-center space-x-4">
           <div className="w-32 h-32 rounded-full overflow-hidden flex-shrink-0">
             <Image
@@ -127,7 +127,7 @@ export default function PetInfo({
                           href={planUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-blue-100 dark:bg-blue-700/20 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                          className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-blue-100 dark:bg-blue-700/20 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors border border-blue-200 dark:border-blue-400"
                         >
                           <span className="text-xs font-medium">
                             {t("petDetails.info.petHealthPlan")}
@@ -159,7 +159,7 @@ export default function PetInfo({
                         if (!status) return null;
                         if (status.eligible) {
                           return (
-                            <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+                            <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-400">
                               <FaCheck className="text-xs" />
                               <span className="text-xs font-medium">
                                 {t("petDetails.info.available")}
@@ -179,7 +179,7 @@ export default function PetInfo({
                               ? t("petDetails.info.month")
                               : t("petDetails.info.months");
                           return (
-                            <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400">
+                            <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-400">
                               <IoWarningOutline className="text-xs" />
                               <span className="text-xs font-medium">
                                 {t("petDetails.info.inGracePeriod")}{" "}

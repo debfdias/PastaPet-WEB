@@ -234,7 +234,7 @@ export default function TreatmentModal({
               </button>
             </div>
 
-            {fields.map((field, index) => (
+            {fields?.map((field, index) => (
               <div
                 key={field.id}
                 className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg mb-4"

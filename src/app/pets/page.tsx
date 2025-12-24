@@ -8,8 +8,10 @@ import PetFilters from "@/components/PetFilters";
 import { MdPets } from "react-icons/md";
 import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
+import { PetType, PetGender } from "@/types/pet";
 
-interface Pet {
+// API response type (type and gender are strings from API)
+interface PetApiResponse {
   id: string;
   name: string;
   dob: string;
@@ -31,11 +33,11 @@ interface Filters {
 
 export default function PetsPage() {
   const { data: session, status } = useSession();
-  const [pets, setPets] = useState<Pet[]>([]);
+  const [pets, setPets] = useState<PetApiResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedPet, setSelectedPet] = useState<Pet | undefined>();
+  const [selectedPet, setSelectedPet] = useState<PetApiResponse | undefined>();
   const [filters, setFilters] = useState<Filters>({
     name: "",
     type: "",
@@ -90,7 +92,7 @@ export default function PetsPage() {
     setFilters(newFilters);
   };
 
-  const handleEdit = (pet: Pet) => {
+  const handleEdit = (pet: PetApiResponse) => {
     setSelectedPet(pet);
     setIsModalOpen(true);
   };
@@ -151,7 +153,7 @@ export default function PetsPage() {
 
       <PetFilters onFilterChange={handleFilterChange} />
 
-      {pets.length === 0 ? (
+      {pets?.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-[50vh]">
           <p className="text-xl mb-4">{t("noPets.message")}</p>
           <button
@@ -173,7 +175,23 @@ export default function PetsPage() {
       <PetModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
-        pet={selectedPet}
+        pet={
+          selectedPet
+            ? {
+                id: selectedPet.id,
+                name: selectedPet.name,
+                dob: selectedPet.dob,
+                weight: selectedPet.weight,
+                type: selectedPet.type as PetType,
+                breed: selectedPet.breed,
+                gender: selectedPet.gender as PetGender,
+                image: selectedPet.image,
+                hasPetPlan: selectedPet.hasPetPlan,
+                hasFuneraryPlan: selectedPet.hasFuneraryPlan,
+                petPlanName: selectedPet.petPlanName,
+              }
+            : undefined
+        }
         onSuccess={handleSuccess}
       />
     </div>

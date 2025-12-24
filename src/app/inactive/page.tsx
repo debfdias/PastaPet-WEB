@@ -101,7 +101,7 @@ export default function InactivePetsPage() {
         </p>
       </div>
 
-      {pets.length === 0 ? (
+      {pets?.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-[50vh]">
           <p className="text-xl mb-2">{t("noPets.message")}</p>
           <p className="text-gray-600 dark:text-gray-400">

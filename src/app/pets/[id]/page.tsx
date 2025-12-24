@@ -18,59 +18,59 @@ import ExamSection from "@/components/ExamSection";
 import TreatmentSection from "@/components/TreatmentSection";
 import { PetGender, PetType } from "@/types/pet";
 
-interface Event {
-  id: string;
-  title: string;
-  type: string;
-  eventDate: string;
-  petId: string;
-  userId: string;
-}
+// interface Event {
+//   id: string;
+//   title: string;
+//   type: string;
+//   eventDate: string;
+//   petId: string;
+//   userId: string;
+// }
 
-interface VaccineType {
-  id: string;
-  name: string;
-  diseaseCovered: string[];
-  isCore: boolean;
-  boosterRequired: boolean;
-  boosterIntervalMonths?: number;
-  totalRequiredDoses?: number;
-}
+// interface VaccineType {
+//   id: string;
+//   name: string;
+//   diseaseCovered: string[];
+//   isCore: boolean;
+//   boosterRequired: boolean;
+//   boosterIntervalMonths?: number;
+//   totalRequiredDoses?: number;
+// }
 
-interface Vaccine {
-  id: string;
-  petId: string;
-  vaccineType: VaccineType;
-  vaccineTypeId: string;
-  administrationDate: string;
-  nextDueDate?: string;
-  validUntil?: string;
-  lotNumber?: string;
-  administeredBy?: string;
-  notes?: string;
-}
+// interface Vaccine {
+//   id: string;
+//   petId: string;
+//   vaccineType: VaccineType;
+//   vaccineTypeId: string;
+//   administrationDate: string;
+//   nextDueDate?: string;
+//   validUntil?: string;
+//   lotNumber?: string;
+//   administeredBy?: string;
+//   notes?: string;
+// }
 
-interface Medication {
-  id: string;
-  treatmentId: string;
-  name: string;
-  dosage: string;
-  frequency: string;
-  notes: string;
-  startDate: string;
-  endDate: string;
-}
+// interface Medication {
+//   id: string;
+//   treatmentId: string;
+//   name: string;
+//   dosage: string;
+//   frequency: string;
+//   notes: string;
+//   startDate: string;
+//   endDate: string;
+// }
 
-interface Treatment {
-  id: string;
-  petId: string;
-  cause: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  medications: Medication[];
-  exams: Exam[];
-}
+// interface Treatment {
+//   id: string;
+//   petId: string;
+//   cause: string;
+//   description: string;
+//   startDate: string;
+//   endDate: string;
+//   medications: Medication[];
+//   exams: Exam[];
+// }
 
 interface Exam {
   id: string;
@@ -99,10 +99,6 @@ interface Pet {
   petPlanName?: string | null;
   hasFuneraryPlan: boolean;
   funeraryPlanStartDate?: string | null;
-  events: Event[];
-  VaccineRecord: Vaccine[];
-  Treatment: Treatment[];
-  Exam: Exam[];
 }
 
 export default function PetDetailsPage() {
@@ -191,7 +187,6 @@ export default function PetDetailsPage() {
         throw new Error(t("pets.errors.failedToFetch"));
       }
       const data = await response.json();
-      console.log(data);
       setPet(data);
     } catch (error) {
       setError(
@@ -258,7 +253,7 @@ export default function PetDetailsPage() {
 
   return (
     <div className="container mx-auto py-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
         <PetInfo
           pet={pet}
           onEdit={handlePetEdit}
@@ -269,19 +264,19 @@ export default function PetDetailsPage() {
         />
 
         <EventsSection
-          events={pet.events}
+          petId={pet.id}
           onAddClick={() => setIsModalOpen(true)}
           parseDateString={parseDateString}
         />
 
         <VaccineSection
-          vaccines={pet.VaccineRecord || []}
+          petId={pet.id}
           onAddClick={() => setIsVaccineModalOpen(true)}
           parseDateString={parseDateString}
         />
 
         <ExamSection
-          exams={pet.Exam || []}
+          petId={pet.id}
           onAddClick={() => {
             setSelectedExam(null);
             setIsExamModalOpen(true);
@@ -293,7 +288,7 @@ export default function PetDetailsPage() {
         />
 
         <TreatmentSection
-          treatments={pet.Treatment || []}
+          petId={pet.id}
           onAddClick={() => setIsTreatmentModalOpen(true)}
           parseDateString={parseDateString}
         />
@@ -303,14 +298,20 @@ export default function PetDetailsPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         petId={pet.id}
-        onSuccess={fetchPetDetails}
+        onSuccess={() => {
+          // Trigger refetch in EventsSection
+          window.dispatchEvent(new CustomEvent("refresh-events"));
+        }}
       />
 
       <VaccineModal
         isOpen={isVaccineModalOpen}
         onClose={() => setIsVaccineModalOpen(false)}
         petId={pet.id}
-        onSuccess={fetchPetDetails}
+        onSuccess={() => {
+          // Trigger refetch in VaccineSection
+          window.dispatchEvent(new CustomEvent("refresh-vaccines"));
+        }}
       />
 
       <ExamModal
@@ -320,7 +321,10 @@ export default function PetDetailsPage() {
           setSelectedExam(null);
         }}
         petId={pet.id}
-        onSuccess={fetchPetDetails}
+        onSuccess={() => {
+          // Trigger refetch in ExamSection
+          window.dispatchEvent(new CustomEvent("refresh-exams"));
+        }}
         exam={selectedExam}
       />
 
@@ -328,7 +332,10 @@ export default function PetDetailsPage() {
         isOpen={isTreatmentModalOpen}
         onClose={() => setIsTreatmentModalOpen(false)}
         petId={pet.id}
-        onSuccess={fetchPetDetails}
+        onSuccess={() => {
+          // Trigger refetch in TreatmentSection
+          window.dispatchEvent(new CustomEvent("refresh-treatments"));
+        }}
       />
 
       <PetModal

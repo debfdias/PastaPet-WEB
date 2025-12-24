@@ -16,5 +16,6 @@ export interface VaccineFormData {
   lotNumber: string;
   administeredBy: string;
   notes: string;
+  isBooster: boolean;
 }
 

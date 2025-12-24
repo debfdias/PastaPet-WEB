@@ -154,6 +154,7 @@
       "nextDueDate": "Próxima Data",
       "validUntil": "Válido Até",
       "lotNumber": "Número do Lote",
+      "isBooster": "Reforço",
       "administeredBy": {
         "label": "Administrado Por",
         "placeholder": "Nome do veterinário ou clínica"
@@ -197,25 +198,29 @@
     "events": {
       "title": "Eventos",
       "addButton": "Adicionar Evento",
-      "noEvents": "Nenhum evento ainda"
+      "noEvents": "Nenhum evento ainda",
+      "loading": "Carregando eventos..."
     },
     "vaccines": {
       "title": "Vacinas",
       "addButton": "Adicionar Vacina",
-      "noRecords": "Nenhum registro de vacina ainda"
+      "noRecords": "Nenhum registro de vacina ainda",
+      "loading": "Carregando vacinas..."
     },
     "exams": {
       "title": "Exames",
       "addButton": "Adicionar Exame",
       "noRecords": "Nenhum registro de exame ainda",
       "administeredBy": "Realizado por",
-      "viewFile": "Ver Arquivo"
+      "viewFile": "Ver Arquivo",
+      "loading": "Carregando exames..."
     },
     "treatments": {
       "title": "Tratamentos",
       "addButton": "Adicionar Tratamento",
       "noRecords": "Nenhum registro de tratamento ainda",
-      "medications": "Medicamentos"
+      "medications": "Medicamentos",
+      "loading": "Carregando tratamentos..."
     }
   },
   "userProfile": {

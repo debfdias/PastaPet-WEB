@@ -148,7 +148,7 @@ export default function LastEvents({ token }: LastEventsProps) {
             <div className="px-6 pb-6 relative">
               {isInitialLoad && loading ? (
                 <div className="text-center py-8">{t("loading")}</div>
-              ) : events.length === 0 && !loading ? (
+              ) : events?.length === 0 && !loading ? (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                   {t("noEvents")}
                 </div>

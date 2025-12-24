@@ -1,9 +1,15 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useTranslations } from "next-intl";
+import { useSession } from "next-auth/react";
 import { MdVaccines } from "react-icons/md";
 import { FaPlus } from "react-icons/fa";
 import { TbVaccine } from "react-icons/tb";
+import Pagination from "./Pagination";
+import { ClipLoader } from "react-spinners";
 
 interface VaccineType {
   id: string;
@@ -28,21 +34,92 @@ interface Vaccine {
   notes?: string;
 }
 
+interface VaccinesResponse {
+  vaccineRecords: Vaccine[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
+    limit: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+}
+
 interface VaccineSectionProps {
-  vaccines: Vaccine[];
+  petId: string;
   onAddClick: () => void;
   parseDateString: (dateString: string) => Date;
 }
 
 export default function VaccineSection({
-  vaccines,
+  petId,
   onAddClick,
   parseDateString,
 }: VaccineSectionProps) {
+  const { data: session } = useSession();
   const t = useTranslations("petDetails.vaccines");
+  const [vaccines, setVaccines] = useState<Vaccine[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState<
+    VaccinesResponse["pagination"] | null
+  >(null);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  const fetchVaccines = async (page: number = 1) => {
+    if (!session?.user?.token) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/vaccines/pet/${petId}?page=${page}&limit=4`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.user.token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch vaccines");
+      }
+
+      const data: VaccinesResponse = await response.json();
+      setVaccines(data.vaccineRecords);
+      setPagination(data.pagination);
+      setIsInitialLoad(false);
+    } catch (error) {
+      console.error("Failed to fetch vaccines:", error);
+      if (isInitialLoad) {
+        setVaccines([]);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (session?.user?.token) {
+      fetchVaccines(currentPage);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, petId, session?.user?.token]);
+
+  useEffect(() => {
+    const handleRefresh = () => {
+      fetchVaccines(currentPage);
+    };
+    window.addEventListener("refresh-vaccines", handleRefresh);
+    return () => window.removeEventListener("refresh-vaccines", handleRefresh);
+  }, [currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   return (
-    <div className="bg-pet-card rounded-lg p-6">
+    <div className="bg-pet-card rounded-lg p-6 h-full flex flex-col">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-3">
           <TbVaccine className="text-2xl text-avocado-500" />
@@ -56,28 +133,106 @@ export default function VaccineSection({
           <MdVaccines size={16} />
         </button>
       </div>
-      <div className="space-y-3">
-        {vaccines.map((record) => (
-          <div
-            key={record.id}
-            className="p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-avocado-500/10 dark:hover:bg-avocado-500/20 hover:border-avocado-500/50 transition-all cursor-pointer"
-          >
-            <h3 className="font-semibold text-gray-800 dark:text-gray-200">
-              {record.vaccineType.name}
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              {format(parseDateString(record.administrationDate), "PPP", {
-                locale: ptBR,
+      {isInitialLoad && loading ? (
+        <div className="flex items-center justify-center gap-2 py-8">
+          <ClipLoader size={20} color="hsl(148 91% 45%)" />
+          <span>{t("loading") || "Loading..."}</span>
+        </div>
+      ) : vaccines?.length === 0 && !loading ? (
+        <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+          {t("noRecords")}
+        </p>
+      ) : (
+        <div className="flex flex-col flex-1 min-h-[345px]">
+          <div className="relative flex-1 min-h-0">
+            <div
+              className={
+                loading && !isInitialLoad
+                  ? "blur-sm opacity-60 pointer-events-none"
+                  : ""
+              }
+            >
+              {vaccines?.map((record) => {
+                const nextDueDate = record.nextDueDate
+                  ? parseDateString(record.nextDueDate)
+                  : null;
+                const needsBooster =
+                  record.vaccineType.boosterRequired && nextDueDate;
+
+                return (
+                  <div
+                    key={record.id}
+                    className="mt-2 bg-gray-100/50 dark:bg-gray-600/20 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-avocado-500/10 dark:hover:bg-avocado-500/20 hover:border-avocado-500/50 transition-all cursor-pointer"
+                  >
+                    <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+                      {record.vaccineType.name}
+                    </h3>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        {record.administeredBy && (
+                          <>
+                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                              {record.administeredBy}
+                            </p>
+                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                              •
+                            </span>
+                          </>
+                        )}
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                          {format(
+                            parseDateString(record.administrationDate),
+                            "dd/MM/yy",
+                            {
+                              locale: ptBR,
+                            }
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0 -mt-1.5">
+                        {record.vaccineType.isCore && (
+                          <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-700">
+                            Obrigatória
+                          </span>
+                        )}
+                        {needsBooster && (
+                          <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-orange-700">
+                            Reforço:{" "}
+                            {format(nextDueDate, "dd/MM/yy", {
+                              locale: ptBR,
+                            })}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
               })}
-            </p>
+            </div>
+            {loading && !isInitialLoad && (
+              <div className="absolute inset-0 flex items-center justify-center bg-pet-card/40 z-10 pointer-events-none">
+                <ClipLoader size={40} color="hsl(148 91% 45%)" />
+              </div>
+            )}
           </div>
-        ))}
-        {vaccines.length === 0 && (
-          <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-            {t("noRecords")}
-          </p>
-        )}
-      </div>
+          {pagination && pagination.totalPages > 1 && (
+            <div
+              className={`mt-auto pt-4 ${
+                loading ? "opacity-50 pointer-events-none" : ""
+              }`}
+            >
+              <Pagination
+                currentPage={currentPage}
+                totalPages={pagination.totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+          {(!pagination || pagination.totalPages <= 1) && (
+            <div className="mt-auto"></div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

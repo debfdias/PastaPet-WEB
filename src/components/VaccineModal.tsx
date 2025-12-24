@@ -7,6 +7,7 @@ import { CgCloseR } from "react-icons/cg";
 import { Syringe } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
+import { Switch } from "radix-ui";
 import {
   Select,
   SelectContent,
@@ -50,6 +51,7 @@ export default function VaccineModal({
       lotNumber: "",
       administeredBy: "",
       notes: "",
+      isBooster: false,
     },
   });
 
@@ -64,6 +66,7 @@ export default function VaccineModal({
         lotNumber: "",
         administeredBy: "",
         notes: "",
+        isBooster: false,
       });
     }
   }, [isOpen, reset]);
@@ -97,6 +100,21 @@ export default function VaccineModal({
     setIsSubmitting(true);
 
     try {
+      // Get the current value from watch to ensure we have the latest state
+      const currentIsBooster = watch("isBooster");
+
+      // Transform isBooster to booster for API
+      const { isBooster, ...restData } = data;
+      const payload = {
+        petId,
+        ...restData,
+        booster: currentIsBooster, // Use the watched value to ensure it's up to date
+      };
+
+      console.log("Form data:", data);
+      console.log("Current isBooster:", currentIsBooster);
+      console.log("Payload:", payload);
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/vaccines`,
         {
@@ -105,10 +123,7 @@ export default function VaccineModal({
             "Content-Type": "application/json",
             Authorization: `Bearer ${session.user.token}`,
           },
-          body: JSON.stringify({
-            petId,
-            ...data,
-          }),
+          body: JSON.stringify(payload),
         }
       );
 
@@ -204,7 +219,7 @@ export default function VaccineModal({
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  {vaccineTypes.map((type) => (
+                  {vaccineTypes?.map((type) => (
                     <SelectItem key={type.id} value={type.id}>
                       {type.name}
                     </SelectItem>
@@ -287,6 +302,26 @@ export default function VaccineModal({
                 placeholder={t("vaccineModal.form.administeredBy.placeholder")}
                 className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
               />
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center gap-3">
+              <label className="text-sm font-medium">
+                {t("vaccineModal.form.isBooster")}
+              </label>
+              <Switch.Root
+                className="w-[42px] h-[25px] bg-gray-300 rounded-full relative data-[state=checked]:bg-avocado-500 outline-none cursor-pointer"
+                checked={watch("isBooster")}
+                onCheckedChange={(checked: boolean) => {
+                  setValue("isBooster", checked, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  });
+                }}
+              >
+                <Switch.Thumb className="block w-[21px] h-[21px] bg-white rounded-full shadow-lg transition-transform duration-100 translate-x-0.5 will-change-transform data-[state=checked]:translate-x-[19px]" />
+              </Switch.Root>
             </div>
           </div>
 

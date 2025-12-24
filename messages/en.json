@@ -154,6 +154,7 @@
       "nextDueDate": "Next Due Date",
       "validUntil": "Valid Until",
       "lotNumber": "Lot Number",
+      "isBooster": "Booster",
       "administeredBy": {
         "label": "Administered By",
         "placeholder": "Vet or clinic name"
@@ -197,25 +198,29 @@
     "events": {
       "title": "Events",
       "addButton": "Add Event",
-      "noEvents": "No events yet"
+      "noEvents": "No events yet",
+      "loading": "Loading events..."
     },
     "vaccines": {
       "title": "Vaccine Records",
       "addButton": "Add Vaccine",
-      "noRecords": "No vaccine records yet"
+      "noRecords": "No vaccine records yet",
+      "loading": "Loading vaccines..."
     },
     "exams": {
       "title": "Exam Records",
       "addButton": "Add Exam",
       "noRecords": "No exam records yet",
       "administeredBy": "Administered by",
-      "viewFile": "View File"
+      "viewFile": "View File",
+      "loading": "Loading exams..."
     },
     "treatments": {
       "title": "Treatment Records",
       "addButton": "Add Treatment",
       "noRecords": "No treatment records yet",
-      "medications": "Medications"
+      "medications": "Medications",
+      "loading": "Loading treatments..."
     }
   },
   "userProfile": {
