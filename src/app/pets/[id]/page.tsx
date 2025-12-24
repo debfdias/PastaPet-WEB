@@ -16,6 +16,7 @@ import EventsSection from "@/components/EventsSection";
 import VaccineSection from "@/components/VaccineSection";
 import ExamSection from "@/components/ExamSection";
 import TreatmentSection from "@/components/TreatmentSection";
+import { PetGender, PetType } from "@/types/pet";
 
 interface Event {
   id: string;
@@ -338,9 +339,9 @@ export default function PetDetailsPage() {
           name: pet.name,
           dob: pet.dob,
           weight: pet.weight,
-          type: pet.type,
+          type: pet.type as PetType,
           breed: pet.breed,
-          gender: pet.gender,
+          gender: pet.gender as PetGender,
           image: pet.image,
           hasPetPlan: pet.hasPetPlan,
           hasFuneraryPlan: pet.hasFuneraryPlan,

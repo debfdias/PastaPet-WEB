@@ -16,36 +16,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-interface PetFormData {
-  name: string;
-  dob: string;
-  weight: number;
-  type: "DOG" | "CAT" | "OTHER";
-  breed: string;
-  gender: "FEMALE" | "MALE";
-  image?: string;
-  hasPetPlan: boolean;
-  hasFuneraryPlan: boolean;
-  petPlanName?: string;
-}
+import { Pet, PetFormData, PetType, PetGender } from "@/types/pet";
 
 interface PetModalProps {
   isOpen: boolean;
   onClose: () => void;
-  pet?: {
-    id: string;
-    name: string;
-    dob: string;
-    weight: number;
-    type: string;
-    breed: string;
-    gender: string;
-    image?: string;
-    hasPetPlan: boolean;
-    hasFuneraryPlan: boolean;
-    petPlanName?: string;
-  };
+  pet?: Pet;
   onSuccess: () => void;
 }
 
@@ -68,65 +44,35 @@ export default function PetModal({
 }: PetModalProps) {
   const { data: session } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const modalRef = useRef<HTMLDivElement>(null);
   const t = useTranslations("petModal");
   const commonT = useTranslations("common");
 
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  const { register, handleSubmit, reset, watch, setValue } =
-    useForm<PetFormData>({
-      defaultValues: {
-        name: "",
-        dob: "",
-        weight: 0,
-        type: "DOG",
-        breed: "",
-        gender: "FEMALE",
-        image: "",
-        hasPetPlan: false,
-        hasFuneraryPlan: false,
-        petPlanName: "",
-      },
-    });
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<PetFormData>({
+    defaultValues: {
+      name: "",
+      dob: "",
+      weight: 0,
+      type: PetType.DOG,
+      breed: "",
+      gender: PetGender.FEMALE,
+      image: "",
+      hasPetPlan: false,
+      hasFuneraryPlan: false,
+      petPlanName: "",
+    },
+  });
   const hasPetPlan = watch("hasPetPlan");
-
-  // Add click outside handler
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-
-      // Check if click is outside modal
-      if (modalRef.current && !modalRef.current.contains(target)) {
-        // Check if click is inside a Radix Select portal (dropdown)
-        // Radix Select renders the dropdown in a portal, check if target is inside any portal
-        let element = target;
-        while (element && element !== document.body) {
-          // Check if element is inside a Radix Select content (has role="listbox" or is inside a portal)
-          if (
-            element.getAttribute("role") === "listbox" ||
-            element.closest('[role="listbox"]') ||
-            element.closest("[data-radix-portal]")
-          ) {
-            return; // Don't close if clicking inside Select dropdown
-          }
-          element = element.parentElement as HTMLElement;
-        }
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen, onClose]);
 
   // Reset form when pet changes or modal opens/closes
   useEffect(() => {
@@ -136,9 +82,9 @@ export default function PetModal({
             name: pet.name,
             dob: pet.dob.split("T")[0],
             weight: pet.weight,
-            type: pet.type as "DOG" | "CAT" | "OTHER",
+            type: pet.type,
             breed: pet.breed,
-            gender: pet.gender as "FEMALE" | "MALE",
+            gender: pet.gender,
             image: pet.image,
             hasPetPlan: pet.hasPetPlan,
             hasFuneraryPlan: pet.hasFuneraryPlan,
@@ -148,9 +94,9 @@ export default function PetModal({
             name: "",
             dob: "",
             weight: 0,
-            type: "DOG",
+            type: PetType.DOG,
             breed: "",
-            gender: "FEMALE",
+            gender: PetGender.FEMALE,
             image: "",
             hasPetPlan: false,
             hasFuneraryPlan: false,
@@ -160,7 +106,7 @@ export default function PetModal({
       setSelectedImage(null);
       setPreviewUrl(pet?.image || null);
     }
-  }, [isOpen, pet, reset, setValue]);
+  }, [isOpen, pet, reset]);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -174,11 +120,9 @@ export default function PetModal({
 
   const onSubmit = async (data: PetFormData) => {
     if (!session?.user?.token) {
-      setError(t("errors.authenticationRequired"));
       return;
     }
     setIsSubmitting(true);
-    setError(null);
 
     try {
       let imageUrl = data.image;
@@ -221,9 +165,8 @@ export default function PetModal({
       onSuccess();
       onClose();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : t("errors.anErrorOccurred")
-      );
+      console.error("Error saving pet:", err);
+      // Error handling can be done via toast or formState.errors
     } finally {
       setIsSubmitting(false);
     }
@@ -231,11 +174,35 @@ export default function PetModal({
 
   if (!isOpen) return null;
 
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Only close if clicking directly on the backdrop, not on modal content
+    if (e.target === e.currentTarget) {
+      // Check if click is inside a Radix Select portal (dropdown)
+      const target = e.target as HTMLElement;
+      let element = target;
+      while (element && element !== document.body) {
+        // Check if element is inside a Radix Select content (has role="listbox" or is inside a portal)
+        if (
+          element.getAttribute("role") === "listbox" ||
+          element.closest('[role="listbox"]') ||
+          element.closest("[data-radix-portal]")
+        ) {
+          return; // Don't close if clicking inside Select dropdown
+        }
+        element = element.parentElement as HTMLElement;
+      }
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 bg-black/80 flex items-center justify-center p-4"
+      onClick={handleBackdropClick}
+    >
       <div
-        ref={modalRef}
         className="bg-pet-card rounded-lg p-6 w-full max-w-3xl"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">
@@ -305,10 +272,17 @@ export default function PetModal({
                 </label>
                 <input
                   type="text"
-                  {...register("name", { required: true })}
+                  {...register("name", {
+                    required: t("form.name") + " is required",
+                  })}
                   placeholder={t("form.namePlaceholder")}
                   className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
                 />
+                {errors.name && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.name.message}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">
@@ -316,9 +290,16 @@ export default function PetModal({
                 </label>
                 <input
                   type="date"
-                  {...register("dob", { required: true })}
+                  {...register("dob", {
+                    required: t("form.dateOfBirth") + " is required",
+                  })}
                   className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
                 />
+                {errors.dob && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.dob.message}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">
@@ -327,9 +308,20 @@ export default function PetModal({
                 <input
                   type="number"
                   step="0.1"
-                  {...register("weight", { required: true })}
+                  {...register("weight", {
+                    required: t("form.weight") + " is required",
+                    min: {
+                      value: 0,
+                      message: t("form.weight") + " must be positive",
+                    },
+                  })}
                   className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
                 />
+                {errors.weight && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.weight.message}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">
@@ -337,9 +329,9 @@ export default function PetModal({
                 </label>
                 <Select
                   key={`type-${pet?.id || "new"}-${watch("type")}`}
-                  value={watch("type") || "DOG"}
+                  value={watch("type") || PetType.DOG}
                   onValueChange={(value) => {
-                    setValue("type", value as "DOG" | "CAT" | "OTHER", {
+                    setValue("type", value as PetType, {
                       shouldValidate: true,
                     });
                   }}
@@ -348,9 +340,11 @@ export default function PetModal({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="DOG">{t("form.dog")}</SelectItem>
-                    <SelectItem value="CAT">{t("form.cat")}</SelectItem>
-                    <SelectItem value="OTHER">{t("form.other")}</SelectItem>
+                    <SelectItem value={PetType.DOG}>{t("form.dog")}</SelectItem>
+                    <SelectItem value={PetType.CAT}>{t("form.cat")}</SelectItem>
+                    <SelectItem value={PetType.OTHER}>
+                      {t("form.other")}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -360,10 +354,17 @@ export default function PetModal({
                 </label>
                 <input
                   type="text"
-                  {...register("breed", { required: true })}
+                  {...register("breed", {
+                    required: t("form.breed") + " is required",
+                  })}
                   placeholder={t("form.breedPlaceholder")}
                   className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
                 />
+                {errors.breed && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.breed.message}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">
@@ -371,9 +372,9 @@ export default function PetModal({
                 </label>
                 <Select
                   key={`gender-${pet?.id || "new"}-${watch("gender")}`}
-                  value={watch("gender") || "FEMALE"}
+                  value={watch("gender") || PetGender.FEMALE}
                   onValueChange={(value) => {
-                    setValue("gender", value as "FEMALE" | "MALE", {
+                    setValue("gender", value as PetGender, {
                       shouldValidate: true,
                     });
                   }}
@@ -382,8 +383,12 @@ export default function PetModal({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="FEMALE">{t("form.female")}</SelectItem>
-                    <SelectItem value="MALE">{t("form.male")}</SelectItem>
+                    <SelectItem value={PetGender.FEMALE}>
+                      {t("form.female")}
+                    </SelectItem>
+                    <SelectItem value={PetGender.MALE}>
+                      {t("form.male")}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -433,8 +438,6 @@ export default function PetModal({
                 </div>
               )}
             </div>
-
-            {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
 
             <div className="flex justify-end gap-4 mt-6">
               <button

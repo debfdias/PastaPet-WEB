@@ -41,16 +41,16 @@ export default function EventsSection({
           <MdEvent size={16} />
         </button>
       </div>
-      <div className="space-y-3">
+      <div className="space-y-2">
         {events.map((event) => (
           <div
             key={event.id}
-            className="p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-avocado-500/10 dark:hover:bg-avocado-500/20 hover:border-avocado-500/50 transition-all cursor-pointer"
+            className="p-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-avocado-500/10 dark:hover:bg-avocado-500/20 hover:border-avocado-500/50 transition-all cursor-pointer"
           >
             <h3 className="font-semibold text-gray-800 dark:text-gray-200">
               {event.title}
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
               {format(parseDateString(event.eventDate), "PPP", {
                 locale: ptBR,
               })}

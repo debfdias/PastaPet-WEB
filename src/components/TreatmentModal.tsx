@@ -1,20 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
 import { useSession } from "next-auth/react";
 import { CgCloseR } from "react-icons/cg";
 import { Stethoscope, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
-
-interface Medication {
-  name: string;
-  dosage: string;
-  frequency: string;
-  notes: string;
-  startDate: string;
-  endDate: string;
-}
+import { TreatmentFormData } from "@/types/treatment";
 
 interface TreatmentModalProps {
   isOpen: boolean;
@@ -31,33 +24,50 @@ export default function TreatmentModal({
 }: TreatmentModalProps) {
   const t = useTranslations();
   const { data: session } = useSession();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    cause: "",
-    description: "",
-    startDate: "",
-    endDate: "",
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    control,
+    formState: { errors },
+  } = useForm<TreatmentFormData>({
+    defaultValues: {
+      cause: "",
+      description: "",
+      startDate: "",
+      endDate: "",
+      medications: [],
+    },
   });
-  const [medications, setMedications] = useState<Medication[]>([]);
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "medications",
+  });
+
+  const startDate = watch("startDate");
+  const endDate = watch("endDate");
 
   useEffect(() => {
     if (isOpen) {
-      // Reset form data when modal opens
-      setFormData({
+      reset({
         cause: "",
         description: "",
         startDate: "",
         endDate: "",
+        medications: [],
       });
-      setMedications([]);
     }
-  }, [isOpen]);
+  }, [isOpen, reset]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  const onSubmit = async (data: TreatmentFormData) => {
+    if (!session?.user?.token) {
+      return;
+    }
+    setIsSubmitting(true);
 
     try {
       const response = await fetch(
@@ -66,12 +76,11 @@ export default function TreatmentModal({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.user?.token}`,
+            Authorization: `Bearer ${session.user.token}`,
           },
           body: JSON.stringify({
             petId,
-            ...formData,
-            medications,
+            ...data,
           }),
         }
       );
@@ -91,51 +100,24 @@ export default function TreatmentModal({
         error instanceof Error
           ? error.message
           : t("treatmentModal.errors.anErrorOccurred");
-      setError(errorMessage);
       toast.error(errorMessage, {
         position: "top-right",
         autoClose: 3000,
       });
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
   const handleAddMedication = () => {
-    setMedications((prev) => [
-      ...prev,
-      {
-        name: "",
-        dosage: "",
-        frequency: "",
-        notes: "",
-        startDate: formData.startDate,
-        endDate: formData.endDate,
-      },
-    ]);
-  };
-
-  const handleRemoveMedication = (index: number) => {
-    setMedications((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleMedicationChange = (
-    index: number,
-    field: keyof Medication,
-    value: string
-  ) => {
-    setMedications((prev) =>
-      prev.map((med, i) => (i === index ? { ...med, [field]: value } : med))
-    );
+    append({
+      name: "",
+      dosage: "",
+      frequency: "",
+      notes: "",
+      startDate: startDate || "",
+      endDate: endDate || "",
+    });
   };
 
   if (!isOpen) return null;
@@ -158,7 +140,7 @@ export default function TreatmentModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">
@@ -166,13 +148,18 @@ export default function TreatmentModal({
               </label>
               <input
                 type="text"
-                name="cause"
-                value={formData.cause}
-                onChange={handleChange}
-                required
+                {...register("cause", {
+                  required:
+                    t("treatmentModal.form.cause.label") + " is required",
+                })}
                 placeholder={t("treatmentModal.form.cause.placeholder")}
                 className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
               />
+              {errors.cause && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.cause.message}
+                </p>
+              )}
             </div>
 
             <div>
@@ -181,13 +168,18 @@ export default function TreatmentModal({
               </label>
               <input
                 type="text"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                required
+                {...register("description", {
+                  required:
+                    t("treatmentModal.form.description.label") + " is required",
+                })}
                 placeholder={t("treatmentModal.form.description.placeholder")}
                 className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
               />
+              {errors.description && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.description.message}
+                </p>
+              )}
             </div>
 
             <div>
@@ -196,12 +188,16 @@ export default function TreatmentModal({
               </label>
               <input
                 type="date"
-                name="startDate"
-                value={formData.startDate}
-                onChange={handleChange}
-                required
+                {...register("startDate", {
+                  required: t("treatmentModal.form.startDate") + " is required",
+                })}
                 className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
               />
+              {errors.startDate && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.startDate.message}
+                </p>
+              )}
             </div>
 
             <div>
@@ -210,12 +206,16 @@ export default function TreatmentModal({
               </label>
               <input
                 type="date"
-                name="endDate"
-                value={formData.endDate}
-                onChange={handleChange}
-                required
+                {...register("endDate", {
+                  required: t("treatmentModal.form.endDate") + " is required",
+                })}
                 className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
               />
+              {errors.endDate && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.endDate.message}
+                </p>
+              )}
             </div>
           </div>
 
@@ -234,9 +234,9 @@ export default function TreatmentModal({
               </button>
             </div>
 
-            {medications.map((medication, index) => (
+            {fields.map((field, index) => (
               <div
-                key={index}
+                key={field.id}
                 className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg mb-4"
               >
                 <div className="flex justify-between items-start mb-4">
@@ -245,7 +245,7 @@ export default function TreatmentModal({
                   </h4>
                   <button
                     type="button"
-                    onClick={() => handleRemoveMedication(index)}
+                    onClick={() => remove(index)}
                     className="text-red-500 hover:text-red-700"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -259,13 +259,18 @@ export default function TreatmentModal({
                     </label>
                     <input
                       type="text"
-                      value={medication.name}
-                      onChange={(e) =>
-                        handleMedicationChange(index, "name", e.target.value)
-                      }
-                      required
+                      {...register(`medications.${index}.name`, {
+                        required:
+                          t("treatmentModal.medications.form.name") +
+                          " is required",
+                      })}
                       className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
                     />
+                    {errors.medications?.[index]?.name && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.medications[index]?.name?.message}
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -274,13 +279,18 @@ export default function TreatmentModal({
                     </label>
                     <input
                       type="text"
-                      value={medication.dosage}
-                      onChange={(e) =>
-                        handleMedicationChange(index, "dosage", e.target.value)
-                      }
-                      required
+                      {...register(`medications.${index}.dosage`, {
+                        required:
+                          t("treatmentModal.medications.form.dosage") +
+                          " is required",
+                      })}
                       className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
                     />
+                    {errors.medications?.[index]?.dosage && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.medications[index]?.dosage?.message}
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -289,17 +299,18 @@ export default function TreatmentModal({
                     </label>
                     <input
                       type="text"
-                      value={medication.frequency}
-                      onChange={(e) =>
-                        handleMedicationChange(
-                          index,
-                          "frequency",
-                          e.target.value
-                        )
-                      }
-                      required
+                      {...register(`medications.${index}.frequency`, {
+                        required:
+                          t("treatmentModal.medications.form.frequency") +
+                          " is required",
+                      })}
                       className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
                     />
+                    {errors.medications?.[index]?.frequency && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.medications[index]?.frequency?.message}
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -308,10 +319,7 @@ export default function TreatmentModal({
                     </label>
                     <input
                       type="text"
-                      value={medication.notes}
-                      onChange={(e) =>
-                        handleMedicationChange(index, "notes", e.target.value)
-                      }
+                      {...register(`medications.${index}.notes`)}
                       className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
                     />
                   </div>
@@ -319,8 +327,6 @@ export default function TreatmentModal({
               </div>
             ))}
           </div>
-
-          {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
 
           <div className="flex justify-end gap-4 mt-6">
             <button
@@ -332,10 +338,10 @@ export default function TreatmentModal({
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={isSubmitting}
               className="px-4 py-2 bg-avocado-500 text-avocado-800 rounded-lg hover:bg-avocado-300 disabled:opacity-50 cursor-pointer font-semibold transition-colors duration-200"
             >
-              {loading
+              {isSubmitting
                 ? t("treatmentModal.buttons.saving")
                 : t("treatmentModal.buttons.save")}
             </button>

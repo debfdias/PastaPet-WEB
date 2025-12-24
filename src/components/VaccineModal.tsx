@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { useSession } from "next-auth/react";
 import { CgCloseR } from "react-icons/cg";
 import { Syringe } from "lucide-react";
@@ -13,16 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-interface VaccineType {
-  id: string;
-  name: string;
-  diseaseCovered: string[];
-  isCore: boolean;
-  boosterRequired: boolean;
-  boosterIntervalMonths?: number;
-  totalRequiredDoses?: number;
-}
+import { VaccineType, VaccineFormData } from "@/types/vaccine";
 
 interface VaccineModalProps {
   isOpen: boolean;
@@ -40,58 +32,31 @@ export default function VaccineModal({
   const t = useTranslations();
   const { data: session } = useSession();
   const [vaccineTypes, setVaccineTypes] = useState<VaccineType[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const modalRef = useRef<HTMLDivElement>(null);
-  const [formData, setFormData] = useState({
-    vaccineTypeId: "",
-    administrationDate: "",
-    nextDueDate: "",
-    validUntil: "",
-    lotNumber: "",
-    administeredBy: "",
-    notes: "",
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<VaccineFormData>({
+    defaultValues: {
+      vaccineTypeId: "",
+      administrationDate: "",
+      nextDueDate: "",
+      validUntil: "",
+      lotNumber: "",
+      administeredBy: "",
+      notes: "",
+    },
   });
-
-  // Add click outside handler
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-
-      // Check if click is outside modal
-      if (modalRef.current && !modalRef.current.contains(target)) {
-        // Check if click is inside a Radix Select portal (dropdown)
-        // Radix Select renders the dropdown in a portal, check if target is inside any portal
-        let element = target;
-        while (element && element !== document.body) {
-          // Check if element is inside a Radix Select content (has role="listbox" or is inside a portal)
-          if (
-            element.getAttribute("role") === "listbox" ||
-            element.closest('[role="listbox"]') ||
-            element.closest("[data-radix-portal]")
-          ) {
-            return; // Don't close if clicking inside Select dropdown
-          }
-          element = element.parentElement as HTMLElement;
-        }
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen, onClose]);
 
   useEffect(() => {
     if (isOpen) {
       fetchVaccineTypes();
-      // Reset form data when modal opens
-      setFormData({
+      reset({
         vaccineTypeId: "",
         administrationDate: "",
         nextDueDate: "",
@@ -101,7 +66,7 @@ export default function VaccineModal({
         notes: "",
       });
     }
-  }, [isOpen]);
+  }, [isOpen, reset]);
 
   const fetchVaccineTypes = async () => {
     try {
@@ -118,7 +83,6 @@ export default function VaccineModal({
       setVaccineTypes(data);
     } catch (error) {
       console.error("Error fetching vaccine types:", error);
-      setError(t("vaccineModal.errors.failedToFetch"));
       toast.error(t("vaccineModal.errors.failedToFetch"), {
         position: "top-right",
         autoClose: 3000,
@@ -126,10 +90,11 @@ export default function VaccineModal({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  const onSubmit = async (data: VaccineFormData) => {
+    if (!session?.user?.token) {
+      return;
+    }
+    setIsSubmitting(true);
 
     try {
       const response = await fetch(
@@ -138,11 +103,11 @@ export default function VaccineModal({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.user?.token}`,
+            Authorization: `Bearer ${session.user.token}`,
           },
           body: JSON.stringify({
             petId,
-            ...formData,
+            ...data,
           }),
         }
       );
@@ -161,33 +126,47 @@ export default function VaccineModal({
       const errorMessage =
         error instanceof Error
           ? error.message
-          : t("petModal.errors.anErrorOccurred");
-      setError(errorMessage);
+          : t("vaccineModal.errors.anErrorOccurred");
       toast.error(errorMessage, {
         position: "top-right",
         autoClose: 3000,
       });
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   if (!isOpen) return null;
 
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Only close if clicking directly on the backdrop, not on modal content
+    if (e.target === e.currentTarget) {
+      // Check if click is inside a Radix Select portal (dropdown)
+      const target = e.target as HTMLElement;
+      let element = target;
+      while (element && element !== document.body) {
+        // Check if element is inside a Radix Select content (has role="listbox" or is inside a portal)
+        if (
+          element.getAttribute("role") === "listbox" ||
+          element.closest('[role="listbox"]') ||
+          element.closest("[data-radix-portal]")
+        ) {
+          return; // Don't close if clicking inside Select dropdown
+        }
+        element = element.parentElement as HTMLElement;
+      }
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 bg-black/80 flex items-center justify-center p-4"
+      onClick={handleBackdropClick}
+    >
       <div
-        ref={modalRef}
         className="bg-pet-card rounded-lg p-6 w-full max-w-2xl"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">
@@ -204,18 +183,20 @@ export default function VaccineModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">
                 {t("vaccineModal.form.vaccineType.label")} *
               </label>
               <Select
-                value={formData.vaccineTypeId}
+                value={watch("vaccineTypeId")}
                 onValueChange={(value) =>
-                  setFormData((prev) => ({ ...prev, vaccineTypeId: value }))
+                  setValue("vaccineTypeId", value, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  })
                 }
-                required
               >
                 <SelectTrigger>
                   <SelectValue
@@ -230,6 +211,18 @@ export default function VaccineModal({
                   ))}
                 </SelectContent>
               </Select>
+              {errors.vaccineTypeId && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.vaccineTypeId.message}
+                </p>
+              )}
+              <input
+                type="hidden"
+                {...register("vaccineTypeId", {
+                  required:
+                    t("vaccineModal.form.vaccineType.label") + " is required",
+                })}
+              />
             </div>
 
             <div>
@@ -238,12 +231,17 @@ export default function VaccineModal({
               </label>
               <input
                 type="date"
-                name="administrationDate"
-                value={formData.administrationDate}
-                onChange={handleChange}
-                required
+                {...register("administrationDate", {
+                  required:
+                    t("vaccineModal.form.administrationDate") + " is required",
+                })}
                 className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
               />
+              {errors.administrationDate && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.administrationDate.message}
+                </p>
+              )}
             </div>
 
             <div>
@@ -252,9 +250,7 @@ export default function VaccineModal({
               </label>
               <input
                 type="date"
-                name="nextDueDate"
-                value={formData.nextDueDate}
-                onChange={handleChange}
+                {...register("nextDueDate")}
                 className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
               />
             </div>
@@ -265,9 +261,7 @@ export default function VaccineModal({
               </label>
               <input
                 type="date"
-                name="validUntil"
-                value={formData.validUntil}
-                onChange={handleChange}
+                {...register("validUntil")}
                 className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
               />
             </div>
@@ -278,9 +272,7 @@ export default function VaccineModal({
               </label>
               <input
                 type="text"
-                name="lotNumber"
-                value={formData.lotNumber}
-                onChange={handleChange}
+                {...register("lotNumber")}
                 className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
               />
             </div>
@@ -291,9 +283,7 @@ export default function VaccineModal({
               </label>
               <input
                 type="text"
-                name="administeredBy"
-                value={formData.administeredBy}
-                onChange={handleChange}
+                {...register("administeredBy")}
                 placeholder={t("vaccineModal.form.administeredBy.placeholder")}
                 className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
               />
@@ -305,15 +295,11 @@ export default function VaccineModal({
               {t("vaccineModal.form.notes")}
             </label>
             <textarea
-              name="notes"
-              value={formData.notes}
-              onChange={handleChange}
+              {...register("notes")}
               rows={3}
               className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
             />
           </div>
-
-          {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
 
           <div className="flex justify-end gap-4 mt-6">
             <button
@@ -325,10 +311,10 @@ export default function VaccineModal({
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={isSubmitting}
               className="px-4 py-2 bg-avocado-500 text-avocado-800 rounded-lg hover:bg-avocado-300 disabled:opacity-50 cursor-pointer font-semibold transition-colors duration-200"
             >
-              {loading
+              {isSubmitting
                 ? t("vaccineModal.buttons.saving")
                 : t("vaccineModal.buttons.save")}
             </button>

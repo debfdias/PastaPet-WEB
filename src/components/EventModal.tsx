@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { useSession } from "next-auth/react";
 import { CgCloseR } from "react-icons/cg";
 import { useTranslations } from "next-intl";
@@ -12,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { EventFormData, EventType } from "@/types/event";
 
 interface EventModalProps {
   isOpen: boolean;
@@ -20,8 +22,6 @@ interface EventModalProps {
   onSuccess: () => void;
 }
 
-type EventType = "normal" | "medical" | "grooming" | "training";
-
 export default function EventModal({
   isOpen,
   onClose,
@@ -29,62 +29,40 @@ export default function EventModal({
   onSuccess,
 }: EventModalProps) {
   const { data: session } = useSession();
-  const [title, setTitle] = useState("");
-  const [type, setType] = useState<EventType>("normal");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const modalRef = useRef<HTMLDivElement>(null);
   const t = useTranslations("eventModal");
 
-  // Add click outside handler
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<EventFormData>({
+    defaultValues: {
+      title: "",
+      type: EventType.NORMAL,
+      eventDate: new Date().toISOString().split("T")[0],
+    },
+  });
+
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-
-      // Check if click is outside modal
-      if (modalRef.current && !modalRef.current.contains(target)) {
-        // Check if click is inside a Radix Select portal (dropdown)
-        // Radix Select renders the dropdown in a portal, check if target is inside any portal
-        let element = target;
-        while (element && element !== document.body) {
-          // Check if element is inside a Radix Select content (has role="listbox" or is inside a portal)
-          if (
-            element.getAttribute("role") === "listbox" ||
-            element.closest('[role="listbox"]') ||
-            element.closest("[data-radix-portal]")
-          ) {
-            return; // Don't close if clicking inside Select dropdown
-          }
-          element = element.parentElement as HTMLElement;
-        }
-        onClose();
-      }
-    };
-
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen, onClose]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!session?.user?.token) {
-      const errorMessage = t("errors.authenticationRequired");
-      setError(errorMessage);
-      toast.error(errorMessage, {
-        position: "top-right",
-        autoClose: 3000,
+      reset({
+        title: "",
+        type: EventType.NORMAL,
+        eventDate: new Date().toISOString().split("T")[0],
       });
+    }
+  }, [isOpen, reset]);
+
+  const onSubmit = async (data: EventFormData) => {
+    if (!session?.user?.token) {
       return;
     }
 
     setIsSubmitting(true);
-    setError(null);
 
     try {
       const response = await fetch(
@@ -96,10 +74,10 @@ export default function EventModal({
             Authorization: `Bearer ${session.user.token}`,
           },
           body: JSON.stringify({
-            title,
-            type,
+            title: data.title,
+            type: data.type,
             petId,
-            eventDate: new Date(date).toISOString(),
+            eventDate: new Date(data.eventDate).toISOString(),
           }),
         }
       );
@@ -114,13 +92,9 @@ export default function EventModal({
       });
       onSuccess();
       onClose();
-      setTitle("");
-      setType("normal");
-      setDate(new Date().toISOString().split("T")[0]);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : t("errors.anErrorOccurred");
-      setError(errorMessage);
       toast.error(errorMessage, {
         position: "top-right",
         autoClose: 3000,
@@ -132,11 +106,35 @@ export default function EventModal({
 
   if (!isOpen) return null;
 
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Only close if clicking directly on the backdrop, not on modal content
+    if (e.target === e.currentTarget) {
+      // Check if click is inside a Radix Select portal (dropdown)
+      const target = e.target as HTMLElement;
+      let element = target;
+      while (element && element !== document.body) {
+        // Check if element is inside a Radix Select content (has role="listbox" or is inside a portal)
+        if (
+          element.getAttribute("role") === "listbox" ||
+          element.closest('[role="listbox"]') ||
+          element.closest("[data-radix-portal]")
+        ) {
+          return; // Don't close if clicking inside Select dropdown
+        }
+        element = element.parentElement as HTMLElement;
+      }
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 bg-black/80 flex items-center justify-center p-4"
+      onClick={handleBackdropClick}
+    >
       <div
-        ref={modalRef}
         className="bg-pet-card rounded-lg p-6 w-full max-w-xl"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">{t("title")}</h2>
@@ -148,7 +146,7 @@ export default function EventModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">
@@ -156,12 +154,17 @@ export default function EventModal({
               </label>
               <input
                 type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                {...register("title", {
+                  required: t("form.eventTitle") + " is required",
+                })}
                 className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
                 placeholder={t("form.eventTitlePlaceholder")}
-                required
               />
+              {errors.title && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.title.message}
+                </p>
+              )}
             </div>
 
             <div>
@@ -169,23 +172,25 @@ export default function EventModal({
                 {t("form.eventType")}
               </label>
               <Select
-                value={type}
-                onValueChange={(value) => setType(value as EventType)}
+                value={watch("type")}
+                onValueChange={(value) =>
+                  setValue("type", value as EventType, { shouldValidate: true })
+                }
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="normal">
+                  <SelectItem value={EventType.NORMAL}>
                     {t("form.types.normal")}
                   </SelectItem>
-                  <SelectItem value="medical">
+                  <SelectItem value={EventType.MEDICAL}>
                     {t("form.types.medical")}
                   </SelectItem>
-                  <SelectItem value="grooming">
+                  <SelectItem value={EventType.GROOMING}>
                     {t("form.types.grooming")}
                   </SelectItem>
-                  <SelectItem value="training">
+                  <SelectItem value={EventType.TRAINING}>
                     {t("form.types.training")}
                   </SelectItem>
                 </SelectContent>
@@ -198,15 +203,18 @@ export default function EventModal({
               </label>
               <input
                 type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
+                {...register("eventDate", {
+                  required: t("form.eventDate") + " is required",
+                })}
                 className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
-                required
               />
+              {errors.eventDate && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.eventDate.message}
+                </p>
+              )}
             </div>
           </div>
-
-          {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
 
           <div className="flex justify-end gap-4 mt-6">
             <button
