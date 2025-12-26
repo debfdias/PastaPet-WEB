@@ -144,7 +144,7 @@
     "update": "Atualizar"
   },
   "vaccineModal": {
-    "title": "Adicionar Registro de Vacina",
+    "title": "Adicionar Vacina",
     "form": {
       "vaccineType": {
         "label": "Tipo de Vacina",
@@ -291,7 +291,7 @@
     }
   },
   "treatmentModal": {
-    "title": "Adicionar Registro de Tratamento",
+    "title": "Adicionar Tratamento",
     "form": {
       "cause": {
         "label": "Causa",

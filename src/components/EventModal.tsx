@@ -116,7 +116,7 @@ export default function EventModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black/80 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-[60]"
       onClick={handleBackdropClick}
     >
       <div
