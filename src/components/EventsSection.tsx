@@ -9,25 +9,11 @@ import { MdEvent, MdEventNote } from "react-icons/md";
 import { FaPlus } from "react-icons/fa";
 import Pagination from "./Pagination";
 import { ClipLoader } from "react-spinners";
-
-interface Event {
-  id: string;
-  title: string;
-  type: string;
-  eventDate: string;
-  petId: string;
-  userId: string;
-}
-
-interface EventsResponse {
-  events: Event[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
+import {
+  getEventsByPet,
+  type Event,
+  type EventsResponse,
+} from "@/services/events.service";
 
 interface EventsSectionProps {
   petId: string;
@@ -55,20 +41,7 @@ export default function EventsSection({
 
     setLoading(true);
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/events/pet/${petId}?page=${page}&limit=5`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.user.token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch events");
-      }
-
-      const data: EventsResponse = await response.json();
+      const data = await getEventsByPet(session.user.token, petId, page, 5);
       setEvents(data.events);
       setPagination(data.pagination);
       setIsInitialLoad(false);
@@ -95,6 +68,7 @@ export default function EventsSection({
     };
     window.addEventListener("refresh-events", handleRefresh);
     return () => window.removeEventListener("refresh-events", handleRefresh);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
 
   const handlePageChange = (page: number) => {
@@ -159,7 +133,9 @@ export default function EventsSection({
           </div>
           {pagination && pagination.totalPages > 1 && (
             <div
-              className={`mt-auto pt-4 ${loading ? "opacity-50 pointer-events-none" : ""}`}
+              className={`mt-auto pt-4 ${
+                loading ? "opacity-50 pointer-events-none" : ""
+              }`}
             >
               <Pagination
                 currentPage={currentPage}

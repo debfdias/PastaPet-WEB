@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
+import { updateUser } from "@/services/users.service";
 
 export default function ProfilePage() {
   const { data: session, update: updateSession } = useSession();
@@ -34,33 +35,20 @@ export default function ProfilePage() {
     setIsSubmitting(true);
     setError(null);
 
-    console.log("aqui");
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/${session.user.id}`,
+      await updateUser(
+        session.user.token,
+        session.user.id,
         {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.user.token}`,
-          },
-          body: JSON.stringify({
-            fullName,
-            ...(password && { password }),
-          }),
+          fullName,
+          ...(password && { password }),
         }
       );
-
-      if (!response.ok) {
-        throw new Error(t("errors.failedToUpdate"));
-      }
 
       // Update the session with new user data
       await updateSession({
         fullName,
       });
-
-      console.log("Session after update:", session);
 
       toast.success(t("success.profileUpdated"), {
         position: "top-right",

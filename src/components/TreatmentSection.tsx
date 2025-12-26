@@ -10,49 +10,11 @@ import { FaPlus } from "react-icons/fa";
 import { ImAidKit } from "react-icons/im";
 import Pagination from "./Pagination";
 import { ClipLoader } from "react-spinners";
-
-interface Medication {
-  id: string;
-  treatmentId: string;
-  name: string;
-  dosage: string;
-  frequency: string;
-  notes: string;
-  startDate: string;
-  endDate: string;
-}
-
-interface Exam {
-  id: string;
-  petId: string;
-  title: string;
-  cause: string;
-  administeredBy: string;
-  fileUrl?: string;
-  resultSummary: string;
-  treatmentId?: string;
-}
-
-interface Treatment {
-  id: string;
-  petId: string;
-  cause: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  medications: Medication[];
-  exams: Exam[];
-}
-
-interface TreatmentsResponse {
-  treatments: Treatment[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
+import {
+  getTreatmentsByPet,
+  type Treatment,
+  type TreatmentsResponse,
+} from "@/services/treatments.service";
 
 interface TreatmentSectionProps {
   petId: string;
@@ -80,20 +42,7 @@ export default function TreatmentSection({
 
     setLoading(true);
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/treatments/pet/${petId}?page=${page}&limit=4`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.user.token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch treatments");
-      }
-
-      const data: TreatmentsResponse = await response.json();
+      const data = await getTreatmentsByPet(session.user.token, petId, page, 4);
       setTreatments(data.treatments);
       setPagination(data.pagination);
       setIsInitialLoad(false);
@@ -121,6 +70,7 @@ export default function TreatmentSection({
     window.addEventListener("refresh-treatments", handleRefresh);
     return () =>
       window.removeEventListener("refresh-treatments", handleRefresh);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
 
   const handlePageChange = (page: number) => {

@@ -15,7 +15,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { VaccineType, VaccineFormData } from "@/types/vaccine";
+import { VaccineFormData } from "@/types/vaccine";
+import {
+  getVaccineTypes,
+  createVaccine,
+  type VaccineType,
+} from "@/services/vaccines.service";
 
 interface VaccineModalProps {
   isOpen: boolean;
@@ -56,17 +61,9 @@ export default function VaccineModal({
   });
 
   const fetchVaccineTypes = async () => {
+    if (!session?.user?.token) return;
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/vaccines/types`,
-        {
-          headers: {
-            Authorization: `Bearer ${session?.user?.token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error(t("vaccineModal.errors.failedToFetch"));
-      const data = await response.json();
+      const data = await getVaccineTypes(session.user.token);
       setVaccineTypes(data);
     } catch (error) {
       console.error("Error fetching vaccine types:", error);
@@ -117,21 +114,7 @@ export default function VaccineModal({
         booster: currentIsBooster, // Use the watched value to ensure it's up to date
       };
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/vaccines`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.user.token}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(t("vaccineModal.errors.failedToCreate"));
-      }
+      await createVaccine(session.user.token, payload);
 
       toast.success(t("vaccineModal.success.vaccineAdded"), {
         position: "top-right",

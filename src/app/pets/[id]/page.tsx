@@ -17,6 +17,7 @@ import VaccineSection from "@/components/VaccineSection";
 import ExamSection from "@/components/ExamSection";
 import TreatmentSection from "@/components/TreatmentSection";
 import { PetGender, PetType } from "@/types/pet";
+import { getPetByIdClient, type PetApiResponse } from "@/services/pets.service";
 
 // interface Event {
 //   id: string;
@@ -83,23 +84,12 @@ interface Exam {
   treatmentId?: string;
 }
 
-interface Pet {
-  id: string;
-  name: string;
-  dob: string;
-  weight: number;
-  type: string;
-  breed: string;
-  gender: string;
-  image: string;
-  createdAt: string;
-  updatedAt: string;
-  userId: string;
-  hasPetPlan: boolean;
-  petPlanName?: string | null;
-  hasFuneraryPlan: boolean;
+type Pet = PetApiResponse & {
+  createdAt?: string;
+  updatedAt?: string;
+  userId?: string;
   funeraryPlanStartDate?: string | null;
-}
+};
 
 export default function PetDetailsPage() {
   const t = useTranslations();
@@ -175,18 +165,10 @@ export default function PetDetailsPage() {
     }
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/pets/${params.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.user.token}`,
-          },
-        }
+      const data = await getPetByIdClient(
+        session.user.token,
+        params.id as string
       );
-      if (!response.ok) {
-        throw new Error(t("pets.errors.failedToFetch"));
-      }
-      const data = await response.json();
       setPet(data);
     } catch (error) {
       setError(
@@ -255,7 +237,10 @@ export default function PetDetailsPage() {
     <div className="container mx-auto py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
         <PetInfo
-          pet={pet}
+          pet={{
+            ...pet,
+            image: pet.image || "",
+          }}
           onEdit={handlePetEdit}
           translateType={translateType}
           translateGender={translateGender}

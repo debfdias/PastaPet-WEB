@@ -8,6 +8,7 @@ import { Stethoscope, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
 import { TreatmentFormData } from "@/types/treatment";
+import { createTreatment } from "@/services/treatments.service";
 
 interface TreatmentModalProps {
   isOpen: boolean;
@@ -70,24 +71,14 @@ export default function TreatmentModal({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/treatments`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.user.token}`,
-          },
-          body: JSON.stringify({
-            petId,
-            ...data,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(t("treatmentModal.errors.failedToCreate"));
-      }
+      await createTreatment(session.user.token, {
+        petId,
+        cause: data.cause,
+        description: data.description,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        medications: data.medications,
+      });
 
       toast.success(t("treatmentModal.success.treatmentAdded"), {
         position: "top-right",

@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { EventFormData, EventType } from "@/types/event";
+import { createEvent } from "@/services/events.service";
 
 interface EventModalProps {
   isOpen: boolean;
@@ -65,26 +66,12 @@ export default function EventModal({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/events`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.user.token}`,
-          },
-          body: JSON.stringify({
-            title: data.title,
-            type: data.type,
-            petId,
-            eventDate: new Date(data.eventDate).toISOString(),
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(t("errors.failedToCreate"));
-      }
+      await createEvent(session.user.token, {
+        title: data.title,
+        type: data.type,
+        petId,
+        eventDate: data.eventDate,
+      });
 
       toast.success(t("success.eventAdded"), {
         position: "top-right",

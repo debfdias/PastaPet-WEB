@@ -12,6 +12,7 @@ import { uploadFile } from "@/lib/storage/client";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { Exam, ExamFormData } from "@/types/exam";
+import { createExam, updateExam } from "@/services/exams.service";
 
 // Dynamically import react-pdf components only on client side
 const Document = dynamic(
@@ -181,39 +182,24 @@ export default function ExamModal({
       }
 
       const isEditing = !!exam;
-      const url = isEditing
-        ? `${process.env.NEXT_PUBLIC_API_URL}/exams/${exam.id}`
-        : `${process.env.NEXT_PUBLIC_API_URL}/exams`;
 
-      const requestBody = isEditing
-        ? {
-            title: data.title,
-            cause: data.cause,
-            ...(data.administeredBy && { administeredBy: data.administeredBy }),
-            ...(fileUrl && { fileUrl }),
-            ...(data.resultSummary && { resultSummary: data.resultSummary }),
-          }
-        : {
-            petId,
-            ...data,
-            fileUrl,
-          };
-
-      const response = await fetch(url, {
-        method: isEditing ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.user.token}`,
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          isEditing
-            ? t("examModal.errors.failedToUpdate")
-            : t("examModal.errors.failedToCreate")
-        );
+      if (isEditing) {
+        await updateExam(session.user.token, exam.id, {
+          title: data.title,
+          cause: data.cause,
+          ...(data.administeredBy && { administeredBy: data.administeredBy }),
+          ...(fileUrl && { fileUrl }),
+          ...(data.resultSummary && { resultSummary: data.resultSummary }),
+        });
+      } else {
+        await createExam(session.user.token, {
+          petId,
+          title: data.title,
+          cause: data.cause,
+          administeredBy: data.administeredBy,
+          fileUrl,
+          resultSummary: data.resultSummary,
+        });
       }
 
       toast.success(

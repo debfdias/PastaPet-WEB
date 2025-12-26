@@ -5,24 +5,11 @@ import { useSession } from "next-auth/react";
 import PetCard from "@/components/PetCard";
 import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
-
-interface Pet {
-  id: string;
-  name: string;
-  dob: string;
-  weight: number;
-  type: string;
-  breed: string;
-  gender: string;
-  image?: string;
-  hasPetPlan: boolean;
-  hasFuneraryPlan: boolean;
-  petPlanName?: string;
-}
+import { getInactivePets, type PetApiResponse } from "@/services/pets.service";
 
 export default function InactivePetsPage() {
   const { data: session, status } = useSession();
-  const [pets, setPets] = useState<Pet[]>([]);
+  const [pets, setPets] = useState<PetApiResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations("inactivePets");
@@ -35,18 +22,7 @@ export default function InactivePetsPage() {
     }
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/pets/inactive`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.user.token}`,
-          },
-        }
-      );
-      if (!response.ok) {
-        throw new Error(t("errors.failedToFetch"));
-      }
-      const data = await response.json();
+      const data = await getInactivePets(session.user.token);
       setPets(data);
     } catch (err) {
       const errorMessage =
@@ -63,7 +39,7 @@ export default function InactivePetsPage() {
     fetchInactivePets();
   }, [session, status, fetchInactivePets]);
 
-  const handleEdit = (pet: Pet) => {
+  const handleEdit = (pet: PetApiResponse) => {
     // Inactive pets might not be editable, but keeping the interface consistent
     console.log("Edit inactive pet:", pet);
   };

@@ -11,29 +11,11 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import Pagination from "./Pagination";
 import { ClipLoader } from "react-spinners";
-
-interface Exam {
-  id: string;
-  petId: string;
-  title: string;
-  cause: string;
-  administeredBy: string;
-  fileUrl?: string;
-  resultSummary: string;
-  treatmentId?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-interface ExamsResponse {
-  exams: Exam[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
+import {
+  getExamsByPet,
+  type Exam,
+  type ExamsResponse,
+} from "@/services/exams.service";
 
 interface ExamSectionProps {
   petId: string;
@@ -61,20 +43,7 @@ export default function ExamSection({
 
     setLoading(true);
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/exams/pet/${petId}?page=${page}&limit=4`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.user.token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch exams");
-      }
-
-      const data: ExamsResponse = await response.json();
+      const data = await getExamsByPet(session.user.token, petId, page, 4);
       setExams(data.exams);
       setPagination(data.pagination);
       setIsInitialLoad(false);
@@ -101,6 +70,7 @@ export default function ExamSection({
     };
     window.addEventListener("refresh-exams", handleRefresh);
     return () => window.removeEventListener("refresh-exams", handleRefresh);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
 
   const handlePageChange = (page: number) => {
@@ -142,7 +112,7 @@ export default function ExamSection({
                   : ""
               }
             >
-              {exams?.map((exam) => {
+              {exams?.map((exam: Exam) => {
                 const examDate = exam.createdAt || exam.updatedAt;
                 return (
                   <div

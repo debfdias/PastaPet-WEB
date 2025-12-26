@@ -8,22 +8,11 @@ import PetFilters from "@/components/PetFilters";
 import { MdPets } from "react-icons/md";
 import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
-import { PetType, PetGender } from "@/types/pet";
-
-// API response type (type and gender are strings from API)
-interface PetApiResponse {
-  id: string;
-  name: string;
-  dob: string;
-  weight: number;
-  type: string;
-  breed: string;
-  gender: string;
-  image?: string;
-  hasPetPlan: boolean;
-  hasFuneraryPlan: boolean;
-  petPlanName?: string;
-}
+import {
+  getPetsClient,
+  type PetApiResponse,
+  convertPetApiResponseToPet,
+} from "@/services/pets.service";
 
 interface Filters {
   name: string;
@@ -53,24 +42,11 @@ export default function PetsPage() {
     }
 
     try {
-      const queryParams = new URLSearchParams();
-      if (filters.name) queryParams.append("name", filters.name);
-      if (filters.type) queryParams.append("type", filters.type);
-      if (filters.orderByAge)
-        queryParams.append("orderByAge", filters.orderByAge);
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/pets?${queryParams.toString()}`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.user.token}`,
-          },
-        }
-      );
-      if (!response.ok) {
-        throw new Error(t("errors.failedToFetch"));
-      }
-      const data = await response.json();
+      const data = await getPetsClient(session.user.token, {
+        ...(filters.name && { name: filters.name }),
+        ...(filters.type && { type: filters.type }),
+        ...(filters.orderByAge && { orderByAge: filters.orderByAge }),
+      });
       setPets(data);
     } catch (err) {
       const errorMessage =
@@ -88,7 +64,6 @@ export default function PetsPage() {
   }, [session, status, fetchPets]);
 
   const handleFilterChange = (newFilters: Filters) => {
-    console.log("New filters:", newFilters);
     setFilters(newFilters);
   };
 
@@ -175,23 +150,7 @@ export default function PetsPage() {
       <PetModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
-        pet={
-          selectedPet
-            ? {
-                id: selectedPet.id,
-                name: selectedPet.name,
-                dob: selectedPet.dob,
-                weight: selectedPet.weight,
-                type: selectedPet.type as PetType,
-                breed: selectedPet.breed,
-                gender: selectedPet.gender as PetGender,
-                image: selectedPet.image,
-                hasPetPlan: selectedPet.hasPetPlan,
-                hasFuneraryPlan: selectedPet.hasFuneraryPlan,
-                petPlanName: selectedPet.petPlanName,
-              }
-            : undefined
-        }
+        pet={selectedPet ? convertPetApiResponseToPet(selectedPet) : undefined}
         onSuccess={handleSuccess}
       />
     </div>

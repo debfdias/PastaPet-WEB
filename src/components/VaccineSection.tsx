@@ -10,41 +10,11 @@ import { FaPlus } from "react-icons/fa";
 import { TbVaccine } from "react-icons/tb";
 import Pagination from "./Pagination";
 import { ClipLoader } from "react-spinners";
-
-interface VaccineType {
-  id: string;
-  name: string;
-  diseaseCovered: string[];
-  isCore: boolean;
-  boosterRequired: boolean;
-  boosterIntervalMonths?: number;
-  totalRequiredDoses?: number;
-}
-
-interface Vaccine {
-  id: string;
-  petId: string;
-  vaccineType: VaccineType;
-  vaccineTypeId: string;
-  administrationDate: string;
-  nextDueDate?: string;
-  validUntil?: string;
-  lotNumber?: string;
-  administeredBy?: string;
-  notes?: string;
-}
-
-interface VaccinesResponse {
-  vaccineRecords: Vaccine[];
-  pagination: {
-    currentPage: number;
-    totalPages: number;
-    totalCount: number;
-    limit: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  };
-}
+import {
+  getVaccinesByPet,
+  type Vaccine,
+  type VaccinesResponse,
+} from "@/services/vaccines.service";
 
 interface VaccineSectionProps {
   petId: string;
@@ -72,20 +42,7 @@ export default function VaccineSection({
 
     setLoading(true);
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/vaccines/pet/${petId}?page=${page}&limit=4`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.user.token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch vaccines");
-      }
-
-      const data: VaccinesResponse = await response.json();
+      const data = await getVaccinesByPet(session.user.token, petId, page, 4);
       setVaccines(data.vaccineRecords);
       setPagination(data.pagination);
       setIsInitialLoad(false);
@@ -112,6 +69,7 @@ export default function VaccineSection({
     };
     window.addEventListener("refresh-vaccines", handleRefresh);
     return () => window.removeEventListener("refresh-vaccines", handleRefresh);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
 
   const handlePageChange = (page: number) => {

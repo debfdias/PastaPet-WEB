@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Pet, PetFormData, PetType, PetGender } from "@/types/pet";
+import { createPet, updatePet } from "@/services/pets.service";
 
 interface PetModalProps {
   isOpen: boolean;
@@ -141,25 +142,23 @@ export default function PetModal({
         imageUrl = uploadedUrl;
       }
 
-      const url = pet
-        ? `${process.env.NEXT_PUBLIC_API_URL}/pets/${pet.id}`
-        : `${process.env.NEXT_PUBLIC_API_URL}/pets`;
+      const petData = {
+        name: data.name,
+        dob: data.dob,
+        weight: data.weight,
+        type: data.type, // PetType enum value (string)
+        breed: data.breed,
+        gender: data.gender, // PetGender enum value (string)
+        image: imageUrl,
+        hasPetPlan: data.hasPetPlan,
+        hasFuneraryPlan: data.hasFuneraryPlan,
+        petPlanName: data.petPlanName,
+      };
 
-      console.log(url);
-      const response = await fetch(url, {
-        method: pet ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.user.token}`,
-        },
-        body: JSON.stringify({
-          ...data,
-          image: imageUrl,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(t("errors.failedToSave"));
+      if (pet) {
+        await updatePet(session.user.token, pet.id, petData);
+      } else {
+        await createPet(session.user.token, petData);
       }
 
       onSuccess();

@@ -18,19 +18,9 @@ import LastEvents from "@/components/LastEvents";
 import { toast } from "react-toastify";
 import { useState } from "react";
 
-interface Pet {
-  id: string;
-  name: string;
-  dob: string;
-  weight: number;
-  type: string;
-  breed: string;
-  gender: string;
-  image?: string;
-  hasPetPlan: boolean;
-  hasFuneraryPlan: boolean;
-  petPlanName?: string;
-}
+import type { PetApiResponse } from "@/services/pets.service";
+
+type Pet = PetApiResponse;
 
 interface DashboardClientProps {
   session: {
