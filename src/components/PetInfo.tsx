@@ -50,7 +50,7 @@ export default function PetInfo({
   const t = useTranslations();
 
   return (
-    <div className="bg-pet-card rounded-lg p-6 relative h-full flex flex-col">
+    <div className="bg-pet-card rounded-lg p-6 relative md:h-full flex flex-col">
       <button
         onClick={onEdit}
         className="absolute top-4 right-4 text-avocado-800 rounded-full bg-avocado-500 hover:bg-avocado-300 p-2 cursor-pointer"
@@ -59,7 +59,7 @@ export default function PetInfo({
         <LuPencil className="w-4 h-4" />
       </button>
       <h2 className="text-2xl font-bold mb-4">{t("petDetails.title")}</h2>
-      <div className="space-y-4 flex-1 min-h-[400px]">
+      <div className="space-y-4 flex-1 md:min-h-[400px] min-h-0">
         <div className="flex items-center space-x-4">
           <div className="w-32 h-32 rounded-full overflow-hidden flex-shrink-0">
             <Image

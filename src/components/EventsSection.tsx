@@ -76,7 +76,7 @@ export default function EventsSection({
   };
 
   return (
-    <div className="bg-pet-card rounded-lg p-6 h-full flex flex-col">
+    <div className="bg-pet-card rounded-lg p-6 md:h-full flex flex-col">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-3">
           <MdEventNote className="text-2xl text-avocado-500" />
@@ -100,7 +100,7 @@ export default function EventsSection({
           {t("noEvents")}
         </p>
       ) : (
-        <div className="flex flex-col flex-1 min-h-[400px]">
+        <div className="flex flex-col flex-1 md:min-h-[400px] min-h-0">
           <div className="space-y-2 relative flex-1 min-h-0">
             <div
               className={

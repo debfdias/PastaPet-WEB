@@ -97,7 +97,7 @@ export function Header({ hideOnHome = false }: HeaderProps) {
   return (
     <div className="pb-16">
       <header className="fixed top-0 z-50 w-full border-b-2 border-text-primary/10 bg-header font-semibold">
-        <div className="px-8 md:px-20 w-full flex h-15 items-center justify-between">
+        <div className="px-2 md:px-20 w-full flex h-15 items-center justify-between">
           {/* Mobile Menu Button */}
           <Button
             variant="ghost"

@@ -77,7 +77,7 @@ export default function VaccineSection({
   };
 
   return (
-    <div className="bg-pet-card rounded-lg p-6 h-full flex flex-col">
+    <div className="bg-pet-card rounded-lg p-6 md:h-full flex flex-col">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-3">
           <TbVaccine className="text-2xl text-avocado-500" />
@@ -101,7 +101,7 @@ export default function VaccineSection({
           {t("noRecords")}
         </p>
       ) : (
-        <div className="flex flex-col flex-1 min-h-[345px]">
+        <div className="flex flex-col flex-1 md:min-h-[345px] min-h-0">
           <div className="relative flex-1 min-h-0">
             <div
               className={

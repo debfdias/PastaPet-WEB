@@ -114,7 +114,7 @@ export default function PetsPage() {
   }
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen pt-8 md:px-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">{t("title")}</h1>
         <button
