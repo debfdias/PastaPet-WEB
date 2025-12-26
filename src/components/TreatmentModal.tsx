@@ -115,7 +115,7 @@ export default function TreatmentModal({
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4">
-      <div className="bg-pet-card rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-pet-card rounded-lg p-6 w-full max-w-4xl max-h-[85vh] md:max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">
             <div className="flex items-center gap-2">

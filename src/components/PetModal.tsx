@@ -200,7 +200,7 @@ export default function PetModal({
       onClick={handleBackdropClick}
     >
       <div
-        className="bg-pet-card rounded-lg p-6 w-full max-w-3xl"
+        className="bg-pet-card rounded-lg p-6 w-full max-w-3xl max-h-[85vh] md:max-h-none overflow-y-auto md:overflow-visible"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-4">
