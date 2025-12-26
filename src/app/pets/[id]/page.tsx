@@ -234,7 +234,7 @@ export default function PetDetailsPage() {
   };
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-8 md:px-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
         <PetInfo
           pet={{
