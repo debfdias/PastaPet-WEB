@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { ClipLoader } from "react-spinners";
+import Pagination from "./Pagination";
+import classNames from "clsx";
 import {
   MdNotifications,
   MdVaccines,
@@ -131,23 +133,32 @@ export default function RemindersSection({ token }: RemindersSectionProps) {
   const t = useTranslations("dashboard.reminders");
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [completingIds, setCompletingIds] = useState<Set<string>>(new Set());
   const [pagination, setPagination] = useState<RemindersPagination | null>(
     null
   );
 
-  const fetchReminders = async () => {
+  const fetchReminders = async (page: number = 1) => {
     setLoading(true);
     try {
-      const data = await getReminders(token, 1, 10);
+      const data = await getReminders(token, page, 10);
       setReminders(data.reminders);
       setPagination(data.pagination);
+      setIsInitialLoad(false);
     } catch (error) {
       console.error("Failed to fetch reminders:", error);
-      setReminders([]);
+      if (isInitialLoad) {
+        setReminders([]);
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   const handleToggleReminder = async (
@@ -210,19 +221,19 @@ export default function RemindersSection({ token }: RemindersSectionProps) {
   };
 
   useEffect(() => {
-    fetchReminders();
+    fetchReminders(currentPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  }, [currentPage, token]);
 
   // Listen for refresh events
   useEffect(() => {
     const handleRefresh = () => {
-      fetchReminders();
+      fetchReminders(currentPage);
     };
     window.addEventListener("refresh-reminders", handleRefresh);
     return () => window.removeEventListener("refresh-reminders", handleRefresh);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentPage]);
 
   return (
     <div className="bg-pet-card rounded-lg p-6 border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 hover:shadow-lg transition-all duration-200">
@@ -236,71 +247,101 @@ export default function RemindersSection({ token }: RemindersSectionProps) {
         )}
       </div>
 
-      {loading ? (
+      {isInitialLoad && loading ? (
         <div className="flex items-center justify-center gap-2 py-8">
           <ClipLoader size={20} color="hsl(148 91% 45%)" />
           <span>{t("loading")}</span>
         </div>
-      ) : reminders.length === 0 ? (
+      ) : reminders.length === 0 && !loading ? (
         <p className="text-gray-500 dark:text-gray-400 text-center py-8">
           {t("noReminders")}
         </p>
       ) : (
-        <div className="space-y-1.5">
-          {reminders.map((reminder) => (
+        <>
+          <div className="relative">
             <div
-              key={reminder.id}
-              className={`px-3 py-2 bg-gray-100/50 dark:bg-gray-600/20 border rounded-lg hover:bg-avocado-500/10 dark:hover:bg-avocado-500/20 hover:border-avocado-500/50 transition-all cursor-pointer ${
-                reminder.isCompleted
-                  ? "border-gray-200 dark:border-gray-700 opacity-60"
-                  : "border-gray-300 dark:border-gray-600"
-              }`}
+              className={classNames(
+                loading &&
+                  !isInitialLoad &&
+                  "blur-sm opacity-60 pointer-events-none"
+              )}
             >
-              <h3
-                className={`font-medium text-base text-gray-800 dark:text-gray-200 truncate ${
-                  reminder.isCompleted ? "line-through" : ""
-                }`}
-              >
-                {reminder.title}
-              </h3>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                  {reminder.pet && (
-                    <>
-                      <span className="font-medium text-gray-600 dark:text-gray-300">
-                        {reminder.pet.name}
-                      </span>
-                      <span>•</span>
-                    </>
-                  )}
-                  <span>
-                    {format(
-                      parseDateString(reminder.reminderDate),
-                      "dd/MM/yy HH:mm"
-                    )}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <TypeTag type={reminder.reminderType} t={t} />
-                  <PriorityTag priority={reminder.priority} t={t} />
-                  <input
-                    type="checkbox"
-                    checked={reminder.isCompleted}
-                    onChange={(e) => {
-                      e.stopPropagation();
-                      if (!completingIds.has(reminder.id)) {
-                        handleToggleReminder(reminder.id, e);
-                      }
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                    disabled={completingIds.has(reminder.id)}
-                    className="w-4 h-4 rounded border-gray-300 text-avocado-500 focus:ring-avocado-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                  />
-                </div>
+              <div className="space-y-1.5">
+                {reminders.map((reminder) => (
+                  <div
+                    key={reminder.id}
+                    className={`px-3 py-2 bg-gray-100/50 dark:bg-gray-600/20 border rounded-lg hover:bg-avocado-500/10 dark:hover:bg-avocado-500/20 hover:border-avocado-500/50 transition-all cursor-pointer ${
+                      reminder.isCompleted
+                        ? "border-gray-200 dark:border-gray-700 opacity-60"
+                        : "border-gray-300 dark:border-gray-600"
+                    }`}
+                  >
+                    <h3
+                      className={`font-medium text-base text-gray-800 dark:text-gray-200 truncate ${
+                        reminder.isCompleted ? "line-through" : ""
+                      }`}
+                    >
+                      {reminder.title}
+                    </h3>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        {reminder.pet && (
+                          <>
+                            <span className="font-medium text-gray-600 dark:text-gray-300">
+                              {reminder.pet.name}
+                            </span>
+                            <span>•</span>
+                          </>
+                        )}
+                        <span>
+                          {format(
+                            parseDateString(reminder.reminderDate),
+                            "dd/MM/yy HH:mm"
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <TypeTag type={reminder.reminderType} t={t} />
+                        <PriorityTag priority={reminder.priority} t={t} />
+                        <input
+                          type="checkbox"
+                          checked={reminder.isCompleted}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            if (!completingIds.has(reminder.id)) {
+                              handleToggleReminder(reminder.id, e);
+                            }
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          disabled={completingIds.has(reminder.id)}
+                          className="w-4 h-4 rounded border-gray-300 text-avocado-500 focus:ring-avocado-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
+            {loading && !isInitialLoad && (
+              <div className="absolute inset-0 flex items-center justify-center bg-pet-card/40 z-10 pointer-events-none">
+                <ClipLoader size={40} color="hsl(148 91% 45%)" />
+              </div>
+            )}
+          </div>
+          {pagination && pagination.totalPages > 1 && (
+            <div
+              className={classNames(
+                loading && "opacity-50 pointer-events-none"
+              )}
+            >
+              <Pagination
+                currentPage={currentPage}
+                totalPages={pagination.totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   );
