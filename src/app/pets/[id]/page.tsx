@@ -16,6 +16,7 @@ import EventsSection from "@/components/EventsSection";
 import VaccineSection from "@/components/VaccineSection";
 import ExamSection from "@/components/ExamSection";
 import TreatmentSection from "@/components/TreatmentSection";
+import RemindersSection from "@/components/RemindersSection";
 import { PetGender, PetType } from "@/types/pet";
 import { getPetByIdClient, type PetApiResponse } from "@/services/pets.service";
 
@@ -276,6 +277,11 @@ export default function PetDetailsPage() {
           petId={pet.id}
           onAddClick={() => setIsTreatmentModalOpen(true)}
           parseDateString={parseDateString}
+        />
+
+        <RemindersSection
+          token={session.user.token}
+          petId={pet.id}
         />
       </div>
 

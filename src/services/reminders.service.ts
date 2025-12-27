@@ -39,6 +39,20 @@ export async function getReminders(
 }
 
 /**
+ * Get reminders by pet ID with pagination
+ */
+export async function getRemindersByPetId(
+  token: string,
+  petId: string,
+  page: number = 1,
+  limit: number = 5
+): Promise<RemindersResponse> {
+  return httpClient.get<RemindersResponse>(token, `/reminders/pet/${petId}`, {
+    queryParams: { page, limit },
+  });
+}
+
+/**
  * Create a new reminder
  */
 export async function createReminder(

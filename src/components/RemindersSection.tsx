@@ -17,6 +17,7 @@ import {
 } from "react-icons/md";
 import {
   getReminders,
+  getRemindersByPetId,
   completeReminder,
   uncompleteReminder,
 } from "@/services/reminders.service";
@@ -29,6 +30,7 @@ import {
 
 interface RemindersSectionProps {
   token: string;
+  petId?: string; // Optional: if provided, fetch reminders for this pet only
 }
 
 interface TypeTagProps {
@@ -129,7 +131,10 @@ const parseDateString = (dateString: string): Date => {
   return new Date(dateString);
 };
 
-export default function RemindersSection({ token }: RemindersSectionProps) {
+export default function RemindersSection({
+  token,
+  petId,
+}: RemindersSectionProps) {
   const t = useTranslations("dashboard.reminders");
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(true);
@@ -143,7 +148,9 @@ export default function RemindersSection({ token }: RemindersSectionProps) {
   const fetchReminders = async (page: number = 1) => {
     setLoading(true);
     try {
-      const data = await getReminders(token, page, 10);
+      const data = petId
+        ? await getRemindersByPetId(token, petId, page, 5)
+        : await getReminders(token, page, 10);
       setReminders(data.reminders);
       setPagination(data.pagination);
       setIsInitialLoad(false);
@@ -223,7 +230,7 @@ export default function RemindersSection({ token }: RemindersSectionProps) {
   useEffect(() => {
     fetchReminders(currentPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, token]);
+  }, [currentPage, token, petId]);
 
   // Listen for refresh events
   useEffect(() => {
@@ -233,7 +240,7 @@ export default function RemindersSection({ token }: RemindersSectionProps) {
     window.addEventListener("refresh-reminders", handleRefresh);
     return () => window.removeEventListener("refresh-reminders", handleRefresh);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage]);
+  }, [currentPage, petId]);
 
   return (
     <div className="bg-pet-card rounded-lg p-6 border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 hover:shadow-lg transition-all duration-200">
