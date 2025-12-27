@@ -77,6 +77,8 @@
   "eventModal": {
     "title": "Add Event",
     "form": {
+      "selectPet": "Select Pet",
+      "selectPetPlaceholder": "Choose a pet",
       "eventTitle": "Event Title",
       "eventTitlePlaceholder": "Enter event title",
       "eventType": "Event Type",
@@ -96,7 +98,8 @@
     "errors": {
       "authenticationRequired": "Authentication required",
       "failedToCreate": "Failed to create event",
-      "anErrorOccurred": "An error occurred"
+      "anErrorOccurred": "An error occurred",
+      "petRequired": "Please select a pet"
     },
     "success": {
       "eventAdded": "Event added successfully!"

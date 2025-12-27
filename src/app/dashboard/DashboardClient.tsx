@@ -14,9 +14,11 @@ import {
   MdList,
 } from "react-icons/md";
 import PetModal from "@/components/PetModal";
+import EventModal from "@/components/EventModal";
 import LastEvents from "@/components/LastEvents";
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getPetsClient } from "@/services/pets.service";
 
 import type { PetApiResponse } from "@/services/pets.service";
 
@@ -43,6 +45,8 @@ export default function DashboardClient({
   const petsT = useTranslations("pets");
   const pets = initialPets;
   const [isPetModalOpen, setIsPetModalOpen] = useState(false);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [allPets, setAllPets] = useState<Pet[]>(initialPets);
 
   const handleAddPet = () => {
     setIsPetModalOpen(true);
@@ -54,6 +58,19 @@ export default function DashboardClient({
     router.refresh();
     toast.success(petsT("success.petAdded"));
   };
+
+  // Fetch all pets when EventModal opens
+  useEffect(() => {
+    if (isEventModalOpen && session.user?.token) {
+      getPetsClient(session.user.token)
+        .then((fetchedPets) => {
+          setAllPets(fetchedPets);
+        })
+        .catch((error) => {
+          console.error("Failed to fetch all pets:", error);
+        });
+    }
+  }, [isEventModalOpen, session.user?.token]);
 
   return (
     <div className="min-h-screen py-8">
@@ -86,7 +103,7 @@ export default function DashboardClient({
 
           {/* Add Event */}
           <button
-            onClick={() => router.push("/pets")}
+            onClick={() => setIsEventModalOpen(true)}
             className="flex flex-col items-center justify-center gap-1 bg-pet-card border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 text-gray-800 dark:text-gray-200 p-2 rounded-lg transition-all cursor-pointer font-medium hover:scale-105 aspect-square w-20 h-20"
           >
             <MdEvent className="text-6xl text-text-primary dark:text-avocado-500" />
@@ -240,6 +257,16 @@ export default function DashboardClient({
         isOpen={isPetModalOpen}
         onClose={() => setIsPetModalOpen(false)}
         onSuccess={handlePetSuccess}
+      />
+
+      {/* Event Modal */}
+      <EventModal
+        isOpen={isEventModalOpen}
+        onClose={() => setIsEventModalOpen(false)}
+        pets={allPets}
+        onSuccess={() => {
+          router.refresh();
+        }}
       />
     </div>
   );

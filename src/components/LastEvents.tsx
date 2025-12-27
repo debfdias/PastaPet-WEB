@@ -169,13 +169,13 @@ export default function LastEvents({ token }: LastEventsProps) {
                               {t("table.title")}
                             </th>
                             <th className="text-left p-3 font-semibold">
-                              {t("table.date")}
+                              {t("table.pet")}
                             </th>
                             <th className="text-left p-3 font-semibold">
                               {t("table.type")}
                             </th>
                             <th className="text-left p-3 font-semibold">
-                              {t("table.pet")}
+                              {t("table.date")}
                             </th>
                           </tr>
                         </thead>
@@ -189,15 +189,18 @@ export default function LastEvents({ token }: LastEventsProps) {
                               className="border-b border-gray-200 dark:border-gray-700 hover:bg-avocado-500/10 dark:hover:bg-avocado-500/20 transition-colors cursor-pointer"
                             >
                               <td className="p-3">{event.title}</td>
-                              <td className="p-3">
-                                {format(parseDateString(event.eventDate), "PP")}
-                              </td>
+                              <td className="p-3">{event.pet.name}</td>
                               <td className="p-3">
                                 <span className="px-2 py-1 rounded-md bg-avocado-500/20 text-avocado-800 dark:text-avocado-300 text-sm">
                                   {formatEventType(event.type)}
                                 </span>
                               </td>
-                              <td className="p-3">{event.pet.name}</td>
+                              <td className="p-3">
+                                {format(
+                                  parseDateString(event.eventDate),
+                                  "dd/MM/yy"
+                                )}
+                              </td>
                             </tr>
                           ))}
                         </tbody>

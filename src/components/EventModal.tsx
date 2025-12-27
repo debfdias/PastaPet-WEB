@@ -15,11 +15,13 @@ import {
 } from "@/components/ui/select";
 import { EventFormData, EventType } from "@/types/event";
 import { createEvent } from "@/services/events.service";
+import type { PetApiResponse } from "@/services/pets.service";
 
 interface EventModalProps {
   isOpen: boolean;
   onClose: () => void;
-  petId: string;
+  petId?: string;
+  pets?: PetApiResponse[];
   onSuccess: () => void;
 }
 
@@ -27,6 +29,7 @@ export default function EventModal({
   isOpen,
   onClose,
   petId,
+  pets,
   onSuccess,
 }: EventModalProps) {
   const { data: session } = useSession();
@@ -40,11 +43,12 @@ export default function EventModal({
     watch,
     setValue,
     formState: { errors },
-  } = useForm<EventFormData>({
+  } = useForm<EventFormData & { selectedPetId?: string }>({
     defaultValues: {
       title: "",
       type: EventType.NORMAL,
       eventDate: new Date().toISOString().split("T")[0],
+      selectedPetId: petId || "",
     },
   });
 
@@ -54,12 +58,25 @@ export default function EventModal({
         title: "",
         type: EventType.NORMAL,
         eventDate: new Date().toISOString().split("T")[0],
+        selectedPetId: petId || "",
       });
     }
-  }, [isOpen, reset]);
+  }, [isOpen, reset, petId]);
 
-  const onSubmit = async (data: EventFormData) => {
+  const onSubmit = async (data: EventFormData & { selectedPetId?: string }) => {
     if (!session?.user?.token) {
+      return;
+    }
+
+    // Use selectedPetId from form if petId prop is not provided
+    const finalPetId = petId || data.selectedPetId;
+
+    if (!finalPetId) {
+      toast.error(t("errors.petRequired"), {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      setIsSubmitting(false);
       return;
     }
 
@@ -69,7 +86,7 @@ export default function EventModal({
       await createEvent(session.user.token, {
         title: data.title,
         type: data.type,
-        petId,
+        petId: finalPetId,
         eventDate: data.eventDate,
       });
 
@@ -135,6 +152,50 @@ export default function EventModal({
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-4">
+            {!petId && pets && pets.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  {t("form.selectPet")}
+                </label>
+                <Select
+                  value={watch("selectedPetId") || undefined}
+                  onValueChange={(value) =>
+                    setValue("selectedPetId", value, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={t("form.selectPetPlaceholder")} />
+                  </SelectTrigger>
+                  <SelectContent
+                    position="popper"
+                    className="z-[100] max-h-48 overflow-y-auto"
+                  >
+                    {pets.map((pet) => (
+                      <SelectItem key={pet.id} value={pet.id}>
+                        {pet.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.selectedPetId && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.selectedPetId.message}
+                  </p>
+                )}
+                <input
+                  type="hidden"
+                  {...register("selectedPetId", {
+                    required: !petId
+                      ? t("form.selectPet") + " is required"
+                      : false,
+                  })}
+                />
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium mb-1">
                 {t("form.eventTitle")}
@@ -164,10 +225,10 @@ export default function EventModal({
                   setValue("type", value as EventType, { shouldValidate: true })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" className="z-[100]">
                   <SelectItem value={EventType.NORMAL}>
                     {t("form.types.normal")}
                   </SelectItem>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { AuthProvider } from "./providers/AuthProvider";
 import { Header } from "@/components/Header";
@@ -34,6 +35,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased text-gray-800 dark:text-gray-300 flex flex-col min-h-screen`}
       >
+        <Analytics />
         <NextIntlClientProvider>
           <ThemeProvider enableSystem={true} defaultTheme="system">
             <AuthProvider>
