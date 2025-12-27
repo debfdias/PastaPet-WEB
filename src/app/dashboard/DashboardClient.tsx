@@ -9,6 +9,7 @@ import PetModal from "@/components/PetModal";
 import EventModal from "@/components/EventModal";
 import ReminderModal from "@/components/ReminderModal";
 import LastEvents from "@/components/LastEvents";
+import RemindersSection from "@/components/RemindersSection";
 import QuickActions from "@/components/QuickActions";
 import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
@@ -175,8 +176,9 @@ export default function DashboardClient({
         </div>
       </div>
 
-      {/* Last Events Section */}
-      <div className="mt-8">
+      {/* Reminders & Events Sections */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+        <RemindersSection token={session.user.token} />
         <LastEvents token={session.user.token} />
       </div>
 
@@ -204,6 +206,7 @@ export default function DashboardClient({
         pets={allPets}
         onSuccess={() => {
           router.refresh();
+          window.dispatchEvent(new CustomEvent("refresh-reminders"));
         }}
       />
     </div>

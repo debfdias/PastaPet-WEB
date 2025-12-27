@@ -416,6 +416,24 @@
         "previous": "Previous page",
         "next": "Next page"
       }
+    },
+    "reminders": {
+      "title": "Reminders",
+      "loading": "Loading reminders...",
+      "noReminders": "No reminders found",
+      "priorities": {
+        "high": "Critical",
+        "medium": "Normal",
+        "low": "Low"
+      },
+      "types": {
+        "vaccine": "Vaccine",
+        "vet": "Vet",
+        "exam": "Exam",
+        "treatment": "Treatment",
+        "medication": "Meds",
+        "custom": "Other"
+      }
     }
   },
   "footer": {

@@ -416,6 +416,24 @@
         "previous": "Página anterior",
         "next": "Próxima página"
       }
+    },
+    "reminders": {
+      "title": "Lembretes",
+      "loading": "Carregando lembretes...",
+      "noReminders": "Nenhum lembrete encontrado",
+      "priorities": {
+        "high": "Crítico",
+        "medium": "Normal",
+        "low": "Baixa"
+      },
+      "types": {
+        "vaccine": "Vacina",
+        "vet": "Vet",
+        "exam": "Exame",
+        "treatment": "Trat.",
+        "medication": "Med.",
+        "custom": "Outro"
+      }
     }
   },
   "footer": {
