@@ -331,6 +331,47 @@
       "treatmentAdded": "Treatment record added successfully!"
     }
   },
+  "reminderModal": {
+    "title": "Add Reminder",
+    "form": {
+      "selectPet": "Select Pet",
+      "selectPetPlaceholder": "Choose a pet",
+      "reminderTitle": "Reminder Title",
+      "reminderTitlePlaceholder": "Enter reminder title",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter reminder description (optional)",
+      "reminderType": "Reminder Type",
+      "priority": "Priority",
+      "reminderDate": "Reminder Date & Time",
+      "types": {
+        "vetAppointment": "Vet Appointment",
+        "vaccineBooster": "Vaccine Booster",
+        "exam": "Exam",
+        "treatmentFollowup": "Treatment Follow-up",
+        "medication": "Medication",
+        "custom": "Custom"
+      },
+      "priorities": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      }
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "addReminder": "Add Reminder",
+      "adding": "Adding..."
+    },
+    "errors": {
+      "authenticationRequired": "Authentication required",
+      "failedToCreate": "Failed to create reminder",
+      "anErrorOccurred": "An error occurred",
+      "petRequired": "Please select a pet"
+    },
+    "success": {
+      "reminderAdded": "Reminder added successfully!"
+    }
+  },
   "dashboard": {
     "welcome": "Welcome",
     "subtitle": "Manage your pets and view reports from your dashboard",
@@ -346,6 +387,7 @@
       "title": "Quick Actions",
       "addPet": "Add Pet",
       "addEvent": "Add Event",
+      "addReminder": "Add Reminder",
       "viewAllPets": "View All Pets",
       "viewReports": "View Reports",
       "viewProfile": "View Profile",

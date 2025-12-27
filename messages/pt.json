@@ -331,6 +331,47 @@
       "treatmentAdded": "Registro de tratamento adicionado com sucesso!"
     }
   },
+  "reminderModal": {
+    "title": "Criar Lembrete",
+    "form": {
+      "selectPet": "Selecionar Pet",
+      "selectPetPlaceholder": "Escolha um pet",
+      "reminderTitle": "Título do Lembrete",
+      "reminderTitlePlaceholder": "Digite o título do lembrete",
+      "description": "Descrição",
+      "descriptionPlaceholder": "Digite a descrição do lembrete (opcional)",
+      "reminderType": "Tipo de Lembrete",
+      "priority": "Prioridade",
+      "reminderDate": "Data e Hora",
+      "types": {
+        "vetAppointment": "Consulta Veterinária",
+        "vaccineBooster": "Reforço de Vacina",
+        "exam": "Exame",
+        "treatmentFollowup": "Acompanhamento de Tratamento",
+        "medication": "Medicação",
+        "custom": "Personalizado"
+      },
+      "priorities": {
+        "high": "Alta",
+        "medium": "Média",
+        "low": "Baixa"
+      }
+    },
+    "buttons": {
+      "cancel": "Cancelar",
+      "addReminder": "Criar Lembrete",
+      "adding": "Criando..."
+    },
+    "errors": {
+      "authenticationRequired": "Autenticação necessária",
+      "failedToCreate": "Falha ao criar lembrete",
+      "anErrorOccurred": "Ocorreu um erro",
+      "petRequired": "Por favor, selecione um pet"
+    },
+    "success": {
+      "reminderAdded": "Lembrete criado com sucesso!"
+    }
+  },
   "dashboard": {
     "welcome": "Bem-vindo",
     "subtitle": "Gerencie seus pets e visualize relatórios do seu painel",
@@ -346,6 +387,7 @@
       "title": "Ações Rápidas",
       "addPet": "Adicionar Pet",
       "addEvent": "Adicionar Evento",
+      "addReminder": "Criar Lembrete",
       "viewAllPets": "Ver Todos Pets",
       "viewReports": "Ver Relatórios",
       "viewProfile": "Ver Perfil",

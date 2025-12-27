@@ -4,18 +4,12 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  MdPets,
-  MdEvent,
-  MdArrowForward,
-  MdBarChart,
-  MdPerson,
-  MdHealthAndSafety,
-  MdList,
-} from "react-icons/md";
+import { MdPets, MdArrowForward, MdBarChart } from "react-icons/md";
 import PetModal from "@/components/PetModal";
 import EventModal from "@/components/EventModal";
+import ReminderModal from "@/components/ReminderModal";
 import LastEvents from "@/components/LastEvents";
+import QuickActions from "@/components/QuickActions";
 import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import { getPetsClient } from "@/services/pets.service";
@@ -46,6 +40,7 @@ export default function DashboardClient({
   const pets = initialPets;
   const [isPetModalOpen, setIsPetModalOpen] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
   const [allPets, setAllPets] = useState<Pet[]>(initialPets);
 
   const handleAddPet = () => {
@@ -59,9 +54,9 @@ export default function DashboardClient({
     toast.success(petsT("success.petAdded"));
   };
 
-  // Fetch all pets when EventModal opens
+  // Fetch all pets when EventModal or ReminderModal opens
   useEffect(() => {
-    if (isEventModalOpen && session.user?.token) {
+    if ((isEventModalOpen || isReminderModalOpen) && session.user?.token) {
       getPetsClient(session.user.token)
         .then((fetchedPets) => {
           setAllPets(fetchedPets);
@@ -70,7 +65,7 @@ export default function DashboardClient({
           console.error("Failed to fetch all pets:", error);
         });
     }
-  }, [isEventModalOpen, session.user?.token]);
+  }, [isEventModalOpen, isReminderModalOpen, session.user?.token]);
 
   return (
     <div className="min-h-screen py-8">
@@ -85,78 +80,11 @@ export default function DashboardClient({
       </div>
 
       {/* Quick Actions */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">
-          {t("quickActions.title")}
-        </h2>
-        <div className="flex flex-wrap gap-4">
-          {/* Add Pet */}
-          <button
-            onClick={handleAddPet}
-            className="flex flex-col items-center justify-center gap-1 bg-pet-card border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 text-gray-800 dark:text-gray-200 p-2 rounded-lg transition-all cursor-pointer font-medium hover:scale-105 aspect-square w-20 h-20"
-          >
-            <MdPets className="text-6xl text-text-primary dark:text-avocado-500" />
-            <span className="text-xs font-semibold text-center leading-tight">
-              {t("quickActions.addPet")}
-            </span>
-          </button>
-
-          {/* Add Event */}
-          <button
-            onClick={() => setIsEventModalOpen(true)}
-            className="flex flex-col items-center justify-center gap-1 bg-pet-card border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 text-gray-800 dark:text-gray-200 p-2 rounded-lg transition-all cursor-pointer font-medium hover:scale-105 aspect-square w-20 h-20"
-          >
-            <MdEvent className="text-6xl text-text-primary dark:text-avocado-500" />
-            <span className="text-xs font-semibold text-center leading-tight">
-              {t("quickActions.addEvent")}
-            </span>
-          </button>
-
-          {/* View All Pets */}
-          <button
-            onClick={() => router.push("/pets")}
-            className="flex flex-col items-center justify-center gap-1 bg-pet-card border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 text-gray-800 dark:text-gray-200 p-2 rounded-lg transition-all cursor-pointer font-medium hover:scale-105 aspect-square w-20 h-20"
-          >
-            <MdList className="text-6xl text-text-primary dark:text-avocado-500" />
-            <span className="text-xs font-semibold text-center leading-tight">
-              {t("quickActions.viewAllPets")}
-            </span>
-          </button>
-
-          {/* View Reports */}
-          <button
-            onClick={() => router.push("/reports")}
-            className="flex flex-col items-center justify-center gap-1 bg-pet-card border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 text-gray-800 dark:text-gray-200 p-2 rounded-lg transition-all cursor-pointer font-medium hover:scale-105 aspect-square w-20 h-20"
-          >
-            <MdBarChart className="text-6xl text-text-primary dark:text-avocado-500" />
-            <span className="text-xs font-semibold text-center leading-tight">
-              {t("quickActions.viewReports")}
-            </span>
-          </button>
-
-          {/* View Profile */}
-          <button
-            onClick={() => router.push("/profile")}
-            className="flex flex-col items-center justify-center gap-1 bg-pet-card border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 text-gray-800 dark:text-gray-200 p-2 rounded-lg transition-all cursor-pointer font-medium hover:scale-105 aspect-square w-20 h-20"
-          >
-            <MdPerson className="text-6xl text-text-primary dark:text-avocado-500" />
-            <span className="text-xs font-semibold text-center leading-tight">
-              {t("quickActions.viewProfile")}
-            </span>
-          </button>
-
-          {/* Health Summary */}
-          <button
-            onClick={() => router.push("/reports")}
-            className="flex flex-col items-center justify-center gap-1 bg-pet-card border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 text-gray-800 dark:text-gray-200 p-2 rounded-lg transition-all cursor-pointer font-medium hover:scale-105 aspect-square w-20 h-20"
-          >
-            <MdHealthAndSafety className="text-6xl text-text-primary dark:text-avocado-500" />
-            <span className="text-xs font-semibold text-center leading-tight">
-              {t("quickActions.healthSummary")}
-            </span>
-          </button>
-        </div>
-      </div>
+      <QuickActions
+        onAddPet={handleAddPet}
+        onAddEvent={() => setIsEventModalOpen(true)}
+        onAddReminder={() => setIsReminderModalOpen(true)}
+      />
 
       {/* Main Sections Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -263,6 +191,16 @@ export default function DashboardClient({
       <EventModal
         isOpen={isEventModalOpen}
         onClose={() => setIsEventModalOpen(false)}
+        pets={allPets}
+        onSuccess={() => {
+          router.refresh();
+        }}
+      />
+
+      {/* Reminder Modal */}
+      <ReminderModal
+        isOpen={isReminderModalOpen}
+        onClose={() => setIsReminderModalOpen(false)}
         pets={allPets}
         onSuccess={() => {
           router.refresh();
