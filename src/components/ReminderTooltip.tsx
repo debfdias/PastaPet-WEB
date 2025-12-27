@@ -1,8 +1,7 @@
 "use client";
 
 import { format } from "date-fns";
-import { useTranslations } from "next-intl";
-import { Reminder, ReminderType, ReminderPriority } from "@/types/reminder";
+import { Reminder } from "@/types/reminder";
 import TypeTag from "./ReminderTypeTag";
 import PriorityTag from "./ReminderPriorityTag";
 
@@ -25,8 +24,6 @@ export default function ReminderTooltip({
   onToggleReminder,
   completingIds,
 }: ReminderTooltipProps) {
-  const t = useTranslations("dashboard.reminders");
-
   return (
     <div
       className="absolute z-50 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-2xl p-4 w-80"

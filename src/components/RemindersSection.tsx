@@ -6,7 +6,6 @@ import {
   startOfMonth,
   endOfMonth,
   eachDayOfInterval,
-  isSameMonth,
   isSameDay,
   getDay,
   addMonths,
@@ -189,20 +188,6 @@ export default function RemindersSection({
       }
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Fetch all reminders for calendar view
-  const fetchAllRemindersForCalendar = async () => {
-    try {
-      // Fetch a large number of reminders for the calendar
-      const data = petId
-        ? await getRemindersByPetId(token, petId, 1, 100)
-        : await getReminders(token, 1, 100);
-      return data.reminders;
-    } catch (error) {
-      console.error("Failed to fetch reminders for calendar:", error);
-      return [];
     }
   };
 
@@ -413,7 +398,7 @@ export default function RemindersSection({
     return { icon, className };
   };
 
-  const handleDayClick = (day: Date, e: React.MouseEvent) => {
+  const handleDayClick = (day: Date) => {
     const dateKey = format(day, "yyyy-MM-dd");
     const dayReminders = remindersByDate[dateKey] || [];
 
@@ -704,7 +689,7 @@ export default function RemindersSection({
                   return (
                     <div key={dateKey} className="relative">
                       <button
-                        onClick={(e) => handleDayClick(day, e)}
+                        onClick={() => handleDayClick(day)}
                         className={classNames(
                           "w-full aspect-square md:h-16 rounded-xl border transition-all relative cursor-pointer flex flex-col items-center justify-center",
                           isToday
