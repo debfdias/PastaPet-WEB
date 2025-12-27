@@ -50,7 +50,7 @@ export default function PetInfo({
   const t = useTranslations();
 
   return (
-    <div className="bg-pet-card rounded-lg p-6 relative md:h-full flex flex-col">
+    <div className="bg-pet-card rounded-lg p-6 border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 hover:shadow-lg transition-all duration-200 relative md:h-full flex flex-col">
       <button
         onClick={onEdit}
         className="absolute top-4 right-4 text-avocado-800 rounded-full bg-avocado-500 hover:bg-avocado-300 p-2 cursor-pointer"

@@ -78,7 +78,7 @@ export default function TreatmentSection({
   };
 
   return (
-    <div className="bg-pet-card rounded-lg p-6 md:h-full flex flex-col">
+    <div className="bg-pet-card rounded-lg p-6 border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 hover:shadow-lg transition-all duration-200 md:h-full flex flex-col">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-3">
           <ImAidKit className="text-2xl text-avocado-500" />

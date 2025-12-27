@@ -249,6 +249,8 @@ export default function PetDetailsPage() {
           getFuneraryPlanStatus={getFuneraryPlanStatus}
         />
 
+        <RemindersSection token={session.user.token} petId={pet.id} />
+
         <EventsSection
           petId={pet.id}
           onAddClick={() => setIsModalOpen(true)}
@@ -277,11 +279,6 @@ export default function PetDetailsPage() {
           petId={pet.id}
           onAddClick={() => setIsTreatmentModalOpen(true)}
           parseDateString={parseDateString}
-        />
-
-        <RemindersSection
-          token={session.user.token}
-          petId={pet.id}
         />
       </div>
 

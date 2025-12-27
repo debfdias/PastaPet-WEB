@@ -177,7 +177,7 @@ export default function DashboardClient({
       </div>
 
       {/* Reminders & Events Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 items-start">
         <RemindersSection token={session.user.token} />
         <LastEvents token={session.user.token} />
       </div>

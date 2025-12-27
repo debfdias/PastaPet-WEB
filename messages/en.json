@@ -421,6 +421,10 @@
       "title": "Reminders",
       "loading": "Loading reminders...",
       "noReminders": "No reminders found",
+      "displayMode": {
+        "list": "List",
+        "calendar": "Calendar"
+      },
       "priorities": {
         "high": "Critical",
         "medium": "Normal",

@@ -421,6 +421,10 @@
       "title": "Lembretes",
       "loading": "Carregando lembretes...",
       "noReminders": "Nenhum lembrete encontrado",
+      "displayMode": {
+        "list": "Lista",
+        "calendar": "Calendário"
+      },
       "priorities": {
         "high": "Crítico",
         "medium": "Normal",
