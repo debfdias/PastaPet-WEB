@@ -68,6 +68,7 @@ export default function ResetPasswordPage() {
       setSuccess(true);
       toast.success(t("success.message"));
     } catch (err) {
+      console.log(err);
       setError(t("errors.resetFailed"));
       toast.error(t("errors.resetFailed"));
     } finally {

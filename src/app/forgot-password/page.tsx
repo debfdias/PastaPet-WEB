@@ -37,6 +37,7 @@ export default function ForgotPasswordPage() {
       setHasSubmitted(true);
       toast.success(t("success"));
     } catch (err) {
+      console.log(err);
       setError(t("error"));
       setHasSubmitted(true);
       toast.error(t("error"));
