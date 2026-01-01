@@ -171,6 +171,9 @@ export default function RemindersSection({
   const [hasFetchedAllReminders, setHasFetchedAllReminders] = useState(false);
   const [hasFetchedListReminders, setHasFetchedListReminders] = useState(false);
   const [fetchedPages, setFetchedPages] = useState<Set<number>>(new Set());
+  const [previousDisplayMode, setPreviousDisplayMode] =
+    useState<DisplayMode | null>(null);
+  const [previousPage, setPreviousPage] = useState<number>(1);
 
   const fetchReminders = async (page: number = 1) => {
     setLoading(true);
@@ -271,18 +274,29 @@ export default function RemindersSection({
   };
 
   useEffect(() => {
+    const modeSwitched =
+      previousDisplayMode !== null && previousDisplayMode !== displayMode;
+    const pageChanged = previousPage !== currentPage;
+
+    // Update previous values
+    setPreviousDisplayMode(displayMode);
+    setPreviousPage(currentPage);
+
     if (displayMode === "list") {
-      // Only fetch for list mode if we haven't already fetched for list mode
-      // or if page/token/petId changed
-      if (!hasFetchedListReminders || currentPage !== 1) {
+      // Always fetch when in list mode:
+      // - When switching to list mode from calendar
+      // - When page changes (including going back to page 1)
+      // - On initial load
+      if (modeSwitched || pageChanged || !hasFetchedListReminders) {
         fetchReminders(currentPage);
         if (currentPage === 1) {
           setHasFetchedListReminders(true);
         }
       }
     } else {
-      // For calendar mode, fetch first 20 reminders initially
-      if (!hasFetchedAllReminders) {
+      // For calendar mode, always fetch when switching from list mode
+      // or if we haven't fetched yet
+      if (modeSwitched || !hasFetchedAllReminders) {
         const loadReminders = async () => {
           setLoading(true);
           try {
@@ -312,6 +326,8 @@ export default function RemindersSection({
     setHasFetchedAllReminders(false);
     setHasFetchedListReminders(false);
     setFetchedPages(new Set());
+    setPreviousDisplayMode(null);
+    setPreviousPage(1);
   }, [token, petId]);
 
   // Listen for refresh events
