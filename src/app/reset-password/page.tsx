@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
 import { Eye, EyeOff } from "lucide-react";
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const t = useTranslations("resetPassword");
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -237,5 +237,27 @@ export default function ResetPasswordPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-md w-full space-y-8">
+            <div
+              className={`p-8 rounded-lg shadow-md dark:bg-card bg-pet-card`}
+            >
+              <div className="flex items-center justify-center">
+                <ClipLoader size={40} color="hsl(148 91% 45%)" />
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    >
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
