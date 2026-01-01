@@ -8,8 +8,12 @@ export async function middleware(request: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-  const isAuthPage = request.nextUrl.pathname.startsWith("/login");
-  const isPublicRoute = request.nextUrl.pathname === "/";
+  const pathname = request.nextUrl.pathname;
+  const isAuthPage = pathname.startsWith("/login");
+  const publicPaths = ["/", "/login", "/forgot-password", "/reset-password"];
+  const isPublicRoute = publicPaths.some((route) =>
+    pathname.startsWith(route)
+  );
 
   if (isAuthPage) {
     if (token) {

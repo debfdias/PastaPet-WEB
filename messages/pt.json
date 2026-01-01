@@ -24,6 +24,48 @@
       "somethingWentWrong": "Algo deu errado. Por favor, tente novamente."
     }
   },
+  "forgotPassword": {
+    "title": "Redefinir senha",
+    "subtitle": "Informe o email para receber instruções de redefinição.",
+    "email": {
+      "label": "Email",
+      "placeholder": "seuemail@exemplo.com"
+    },
+    "submit": "Enviar instruções",
+    "loading": "Enviando...",
+    "success": "Se o email existir, enviamos instruções para redefinir a senha.",
+    "error": "Não foi possível enviar. Tente novamente em instantes.",
+    "backToLogin": "Voltar para login"
+  },
+  "resetPassword": {
+    "title": "Redefinir senha",
+    "newPassword": {
+      "label": "Nova senha",
+      "placeholder": "Mínimo 8 caracteres"
+    },
+    "confirmPassword": {
+      "label": "Confirmar senha",
+      "placeholder": "Repita a senha"
+    },
+    "submit": "Redefinir senha",
+    "loading": "Enviando...",
+    "errors": {
+      "minLength": "A senha deve ter no mínimo 8 caracteres.",
+      "mismatch": "As senhas precisam ser iguais.",
+      "resetFailed": "Não foi possível redefinir a senha. Tente novamente em instantes."
+    },
+    "success": {
+      "title": "Senha redefinida!",
+      "message": "Você pode fazer login com sua nova senha.",
+      "goToLogin": "Ir para login"
+    },
+    "invalidLink": {
+      "title": "Link inválido ou expirado",
+      "message": "O link de redefinição é inválido. Solicite um novo link.",
+      "backToLogin": "Voltar para login"
+    },
+    "backToLogin": "Voltar para login"
+  },
   "header": {
     "home": "Início",
     "pets": "Pets",

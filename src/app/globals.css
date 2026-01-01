@@ -5,7 +5,8 @@
 @theme {
   --color-avocado-300: hsl(148 91% 69%);
   --color-avocado-500: hsl(148 91% 45%);
-  --color-avocado-800: hsl(148 92% 15%);
+  --color-avocado-600: hsl(150 91% 40%);
+  --color-avocado-800: hsl(148 92% 10%);
   --color-card: hsl(160 61% 91%);
   --color-background-light: hsl(360 100% 100%);
   --color-background-dark: oklch(21% 0.034 264.665);

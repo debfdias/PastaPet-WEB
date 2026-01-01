@@ -24,6 +24,48 @@
       "somethingWentWrong": "Something went wrong. Please try again."
     }
   },
+  "forgotPassword": {
+    "title": "Forgot password",
+    "subtitle": "Enter your email to receive reset instructions.",
+    "email": {
+      "label": "Email",
+      "placeholder": "youremail@example.com"
+    },
+    "submit": "Send instructions",
+    "loading": "Sending...",
+    "success": "If the email exists, we sent password reset instructions.",
+    "error": "Could not send. Please try again shortly.",
+    "backToLogin": "Back to login"
+  },
+  "resetPassword": {
+    "title": "Reset password",
+    "newPassword": {
+      "label": "New password",
+      "placeholder": "Minimum 8 characters"
+    },
+    "confirmPassword": {
+      "label": "Confirm password",
+      "placeholder": "Repeat password"
+    },
+    "submit": "Reset password",
+    "loading": "Sending...",
+    "errors": {
+      "minLength": "Password must be at least 8 characters.",
+      "mismatch": "Passwords must match.",
+      "resetFailed": "Could not reset password. Please try again shortly."
+    },
+    "success": {
+      "title": "Password reset!",
+      "message": "You can now log in with your new password.",
+      "goToLogin": "Go to login"
+    },
+    "invalidLink": {
+      "title": "Invalid or expired link",
+      "message": "The reset link is invalid. Please request a new link.",
+      "backToLogin": "Back to login"
+    },
+    "backToLogin": "Back to login"
+  },
   "header": {
     "home": "Home",
     "pets": "Pets",

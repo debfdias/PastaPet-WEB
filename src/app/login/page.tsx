@@ -6,12 +6,14 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { ClipLoader } from "react-spinners";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const t = useTranslations("login");
 
@@ -64,7 +66,7 @@ export default function LoginPage() {
                   type="email"
                   autoComplete="email"
                   required
-                  className={`appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md`}
+                  className={`appearance-none bg-background-light/50 dark:bg-background-dark relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md`}
                   placeholder={t("email.placeholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -78,17 +80,30 @@ export default function LoginPage() {
                 >
                   {t("password.label")}
                 </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  className={`appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none  focus:border-avocado-500 focus:z-10 sm:text-md`}
-                  placeholder={t("password.placeholder")}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <div className="relative">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    required
+                    className={`appearance-none bg-background-light/50 dark:bg-background-dark relative block w-full p-3 pr-10 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none  focus:border-avocado-500 focus:z-10 sm:text-md`}
+                    placeholder={t("password.placeholder")}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -98,7 +113,7 @@ export default function LoginPage() {
 
             <div className="flex items-center justify-end">
               <Link
-                href="/reset-password"
+                href="/forgot-password"
                 className={`text-sm hover:dark:text-avocado-500`}
               >
                 {t("forgotPassword")}
@@ -108,7 +123,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className={`cursor-pointer w-full flex justify-center p-3 border border-transparent text-md font-medium rounded-lg text-gray-800 bg-avocado-500 hover:bg-green-300 focus:outline-none focus:ring-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed items-center gap-2`}
+              className={`cursor-pointer w-full flex justify-center p-3 border border-transparent text-md font-medium rounded-lg text-avocado-800 bg-avocado-500 hover:bg-avocado-600 focus:outline-none focus:ring-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed items-center gap-2`}
             >
               {isLoading ? (
                 <>
