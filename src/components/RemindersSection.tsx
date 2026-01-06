@@ -143,7 +143,11 @@ const PriorityTag = ({ priority, t }: PriorityTagProps) => {
 };
 
 const parseDateString = (dateString: string): Date => {
-  return new Date(dateString);
+  // Extract just the date part (YYYY-MM-DD) to avoid timezone issues
+  // This ensures dates like "2026-01-27T00:00:00.000Z" are treated as Jan 27, not Jan 26
+  const dateOnly = dateString.split("T")[0];
+  const [year, month, day] = dateOnly.split("-").map(Number);
+  return new Date(year, month - 1, day);
 };
 
 type DisplayMode = "list" | "calendar";

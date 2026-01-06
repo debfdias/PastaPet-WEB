@@ -126,7 +126,7 @@ export default function VaccineSection({
                       {record.vaccineType.name}
                     </h3>
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center">
+                      <div className="flex items-center gap-[5px]">
                         {record.administeredBy && (
                           <>
                             <p className="text-xs text-gray-600 dark:text-gray-400">

@@ -203,7 +203,10 @@ export default function VaccineModal({
                     placeholder={t("vaccineModal.form.vaccineType.placeholder")}
                   />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent
+                  position="popper"
+                  className="z-[100] max-h-48 overflow-y-auto"
+                >
                   {vaccineTypes?.map((type) => (
                     <SelectItem key={type.id} value={type.id}>
                       {type.name}
