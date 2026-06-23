@@ -174,7 +174,6 @@ export default function RemindersSection({
   } | null>(null);
   const [hasFetchedAllReminders, setHasFetchedAllReminders] = useState(false);
   const [hasFetchedListReminders, setHasFetchedListReminders] = useState(false);
-  const [fetchedPages, setFetchedPages] = useState<Set<number>>(new Set());
   const [previousDisplayMode, setPreviousDisplayMode] =
     useState<DisplayMode | null>(null);
   const [previousPage, setPreviousPage] = useState<number>(1);
@@ -196,6 +195,28 @@ export default function RemindersSection({
     } finally {
       setLoading(false);
     }
+  };
+
+  // Calendar mode spans multiple months, so it needs every reminder, not just
+  // the first page. The API returns reminders ordered by date ascending from the
+  // start of the current month onward, so we page through until all are fetched.
+  const fetchAllRemindersForCalendar = async (): Promise<Reminder[]> => {
+    const pageSize = 50;
+    const firstPage = petId
+      ? await getRemindersByPetId(token, petId, 1, pageSize)
+      : await getReminders(token, 1, pageSize);
+
+    const all = [...firstPage.reminders];
+    const totalPages = firstPage.pagination?.totalPages ?? 1;
+
+    for (let page = 2; page <= totalPages; page++) {
+      const data = petId
+        ? await getRemindersByPetId(token, petId, page, pageSize)
+        : await getReminders(token, page, pageSize);
+      all.push(...data.reminders);
+    }
+
+    return all;
   };
 
   // Group reminders by date (YYYY-MM-DD)
@@ -304,13 +325,9 @@ export default function RemindersSection({
         const loadReminders = async () => {
           setLoading(true);
           try {
-            const data = petId
-              ? await getRemindersByPetId(token, petId, 1, 20)
-              : await getReminders(token, 1, 20);
-
-            setReminders(data.reminders);
+            const allReminders = await fetchAllRemindersForCalendar();
+            setReminders(allReminders);
             setHasFetchedAllReminders(true);
-            setFetchedPages(new Set([1]));
             setIsInitialLoad(false);
           } catch (error) {
             console.error("Failed to fetch reminders for calendar:", error);
@@ -329,7 +346,6 @@ export default function RemindersSection({
   useEffect(() => {
     setHasFetchedAllReminders(false);
     setHasFetchedListReminders(false);
-    setFetchedPages(new Set());
     setPreviousDisplayMode(null);
     setPreviousPage(1);
   }, [token, petId]);
@@ -340,15 +356,12 @@ export default function RemindersSection({
       if (displayMode === "list") {
         fetchReminders(currentPage);
       } else {
-        // Reload reminders for calendar (first 20)
+        // Reload all reminders for calendar
         const loadReminders = async () => {
           setLoading(true);
           try {
-            const data = petId
-              ? await getRemindersByPetId(token, petId, 1, 20)
-              : await getReminders(token, 1, 20);
-
-            setReminders(data.reminders);
+            const allReminders = await fetchAllRemindersForCalendar();
+            setReminders(allReminders);
             setHasFetchedAllReminders(true);
           } catch (error) {
             console.error("Failed to fetch reminders for calendar:", error);
@@ -431,61 +444,6 @@ export default function RemindersSection({
       });
     }
   };
-
-  // Check if we have reminders for the current month being viewed
-  const hasRemindersForMonth = useMemo(() => {
-    if (reminders.length === 0) return false;
-    const monthStart = startOfMonth(currentMonth);
-    const monthEnd = endOfMonth(currentMonth);
-
-    return reminders.some((reminder) => {
-      const reminderDate = parseDateString(reminder.reminderDate);
-      return reminderDate >= monthStart && reminderDate <= monthEnd;
-    });
-  }, [reminders, currentMonth]);
-
-  // Fetch more reminders when navigating to a month that doesn't have data
-  useEffect(() => {
-    if (
-      displayMode === "calendar" &&
-      hasFetchedAllReminders &&
-      !hasRemindersForMonth &&
-      reminders.length > 0
-    ) {
-      const loadMoreReminders = async () => {
-        try {
-          // Calculate next page to fetch
-          const nextPage = Math.floor(reminders.length / 20) + 1;
-
-          // Limit to prevent fetching too many pages
-          if (nextPage > 10) return; // Max 10 pages (200 reminders)
-
-          // Don't fetch if we've already fetched this page
-          if (fetchedPages.has(nextPage)) return;
-
-          const data = petId
-            ? await getRemindersByPetId(token, petId, nextPage, 20)
-            : await getReminders(token, nextPage, 20);
-
-          // Append new reminders to existing ones, filtering out duplicates by ID
-          setReminders((prev) => {
-            const existingIds = new Set(prev.map((r) => r.id));
-            const newReminders = data.reminders.filter(
-              (r) => !existingIds.has(r.id)
-            );
-            return [...prev, ...newReminders];
-          });
-
-          // Mark this page as fetched
-          setFetchedPages((prev) => new Set([...prev, nextPage]));
-        } catch (error) {
-          console.error("Failed to fetch more reminders:", error);
-        }
-      };
-      loadMoreReminders();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentMonth, displayMode, hasFetchedAllReminders, hasRemindersForMonth]);
 
   const handlePreviousMonth = () => {
     setCurrentMonth(subMonths(currentMonth, 1));
