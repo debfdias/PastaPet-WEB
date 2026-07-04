@@ -8,6 +8,7 @@ export interface Exam {
   administeredBy: string;
   fileUrl?: string;
   resultSummary: string;
+  examDate?: string;
   treatmentId?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -51,6 +52,7 @@ export async function createExam(
     administeredBy: string;
     fileUrl: string;
     resultSummary: string;
+    examDate?: string;
   }
 ): Promise<Exam> {
   return httpClient.post<Exam>(token, "/exams", data);
@@ -68,6 +70,7 @@ export async function updateExam(
     administeredBy?: string;
     fileUrl?: string;
     resultSummary?: string;
+    examDate?: string;
   }
 ): Promise<Exam> {
   return httpClient.put<Exam>(token, `/exams/${examId}`, data);

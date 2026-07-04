@@ -26,6 +26,7 @@ export interface GetPetsOptions {
   name?: string;
   type?: string;
   orderByAge?: string;
+  underTreatment?: boolean;
 }
 
 /**

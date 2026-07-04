@@ -75,6 +75,7 @@ export default function ExamModal({
       administeredBy: "",
       fileUrl: "",
       resultSummary: "",
+      examDate: "",
     },
   });
 
@@ -88,6 +89,7 @@ export default function ExamModal({
           administeredBy: exam.administeredBy || "",
           fileUrl: exam.fileUrl || "",
           resultSummary: exam.resultSummary || "",
+          examDate: (exam.examDate || exam.createdAt || "").slice(0, 10),
         });
         if (exam.fileUrl) {
           setPreviewUrl(exam.fileUrl);
@@ -111,6 +113,7 @@ export default function ExamModal({
           administeredBy: "",
           fileUrl: "",
           resultSummary: "",
+          examDate: new Date().toISOString().slice(0, 10),
         });
         setSelectedFile(null);
         setPreviewUrl(null);
@@ -190,6 +193,7 @@ export default function ExamModal({
           ...(data.administeredBy && { administeredBy: data.administeredBy }),
           ...(fileUrl && { fileUrl }),
           ...(data.resultSummary && { resultSummary: data.resultSummary }),
+          ...(data.examDate && { examDate: data.examDate }),
         });
       } else {
         await createExam(session.user.token, {
@@ -199,6 +203,7 @@ export default function ExamModal({
           administeredBy: data.administeredBy,
           fileUrl,
           resultSummary: data.resultSummary,
+          ...(data.examDate && { examDate: data.examDate }),
         });
       }
 
@@ -297,6 +302,17 @@ export default function ExamModal({
                   type="text"
                   {...register("administeredBy")}
                   placeholder={t("examModal.form.administeredBy.placeholder")}
+                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  {t("examModal.form.examDate.label")}
+                </label>
+                <input
+                  type="date"
+                  {...register("examDate")}
                   className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
                 />
               </div>

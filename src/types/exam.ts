@@ -5,6 +5,8 @@ export interface Exam {
   administeredBy: string;
   fileUrl?: string;
   resultSummary: string;
+  examDate?: string;
+  createdAt?: string;
 }
 
 export interface ExamFormData {
@@ -13,6 +15,7 @@ export interface ExamFormData {
   administeredBy: string;
   fileUrl: string;
   resultSummary: string;
+  examDate: string;
 }
 
 

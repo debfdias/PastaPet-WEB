@@ -113,7 +113,19 @@ export default function ExamSection({
               }
             >
               {exams?.map((exam: Exam) => {
-                const examDate = exam.createdAt || exam.updatedAt;
+                // examDate is a calendar date (stored at UTC midnight): build it
+                // from its parts to avoid a timezone shift. Fall back to the
+                // record timestamps, which are real instants shown in local time.
+                let examDate: Date | null = null;
+                if (exam.examDate) {
+                  const [y, m, d] = exam.examDate
+                    .slice(0, 10)
+                    .split("-")
+                    .map(Number);
+                  examDate = new Date(y, m - 1, d);
+                } else if (exam.createdAt || exam.updatedAt) {
+                  examDate = new Date((exam.createdAt || exam.updatedAt)!);
+                }
                 return (
                   <div
                     key={exam.id}
@@ -132,7 +144,7 @@ export default function ExamSection({
                         )}
                         {examDate && (
                           <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {format(new Date(examDate), "dd/MM/yy", {
+                            {format(examDate, "dd/MM/yy", {
                               locale: ptBR,
                             })}
                           </p>

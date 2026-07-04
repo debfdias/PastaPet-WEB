@@ -111,14 +111,17 @@ export default function LastEvents({ token }: LastEventsProps) {
   };
 
   return (
-    <div className="bg-pet-card rounded-lg border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 hover:shadow-lg transition-all duration-200">
+    <div className="bg-pet-card rounded-lg border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 hover:shadow-lg transition-all duration-200 h-full flex flex-col">
       <Accordion.Root
         type="single"
         collapsible
         defaultValue="last-events"
-        className="w-full"
+        className="w-full flex-1 flex flex-col"
       >
-        <Accordion.Item value="last-events" className="overflow-hidden">
+        <Accordion.Item
+          value="last-events"
+          className="overflow-hidden flex-1 flex flex-col"
+        >
           <div className="p-8">
             <Accordion.Header className="AccordionHeader ">
               <Accordion.Trigger

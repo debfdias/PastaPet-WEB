@@ -4,18 +4,20 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import Image from "next/image";
-import { MdPets, MdArrowForward, MdBarChart } from "react-icons/md";
+import { MdPets, MdArrowForward } from "react-icons/md";
 import PetModal from "@/components/PetModal";
 import EventModal from "@/components/EventModal";
 import ReminderModal from "@/components/ReminderModal";
 import LastEvents from "@/components/LastEvents";
 import RemindersSection from "@/components/RemindersSection";
 import QuickActions from "@/components/QuickActions";
+import PetsUnderTreatment from "@/components/PetsUnderTreatment";
 import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import { getPetsClient } from "@/services/pets.service";
 
 import type { PetApiResponse } from "@/services/pets.service";
+import type { ActiveTreatmentsResponse } from "@/services/treatments.service";
 
 type Pet = PetApiResponse;
 
@@ -29,11 +31,13 @@ interface DashboardClientProps {
     };
   };
   initialPets: Pet[];
+  initialTreatmentPets: ActiveTreatmentsResponse;
 }
 
 export default function DashboardClient({
   session,
   initialPets,
+  initialTreatmentPets,
 }: DashboardClientProps) {
   const router = useRouter();
   const t = useTranslations("dashboard");
@@ -150,34 +154,15 @@ export default function DashboardClient({
           )}
         </div>
 
-        {/* My Reports Card */}
-        <div className="bg-pet-card rounded-lg p-6 border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 hover:shadow-lg transition-all duration-200">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <MdBarChart className="text-3xl text-avocado-500" />
-              <h2 className="text-2xl font-bold">{t("myReports.title")}</h2>
-            </div>
-            <Link
-              href="/reports"
-              className="flex items-center gap-1 text-avocado-500 hover:text-avocado-300 transition-colors font-medium"
-            >
-              {t("viewAll")}
-              <MdArrowForward />
-            </Link>
-          </div>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            {t("myReports.description")}
-          </p>
-          <div className="flex items-center justify-center py-12 bg-gray-100 dark:bg-gray-800 rounded-lg">
-            <p className="text-gray-500 dark:text-gray-400 text-center">
-              Reports feature coming soon
-            </p>
-          </div>
-        </div>
+        {/* Pets Under Treatment Card */}
+        <PetsUnderTreatment
+          pets={initialTreatmentPets.pets}
+          totalCount={initialTreatmentPets.totalCount}
+        />
       </div>
 
       {/* Reminders & Events Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 items-stretch">
         <RemindersSection token={session.user.token} />
         <LastEvents token={session.user.token} />
       </div>

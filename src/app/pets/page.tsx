@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import PetCard from "@/components/PetCard";
 import PetModal from "@/components/PetModal";
 import PetFilters from "@/components/PetFilters";
@@ -18,10 +19,12 @@ interface Filters {
   name: string;
   type: string;
   orderByAge?: string;
+  underTreatment: boolean;
 }
 
-export default function PetsPage() {
+function PetsPageContent() {
   const { data: session, status } = useSession();
+  const searchParams = useSearchParams();
   const [pets, setPets] = useState<PetApiResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,6 +34,8 @@ export default function PetsPage() {
     name: "",
     type: "",
     orderByAge: "",
+    // Seed from the URL so the dashboard's "View All" lands here pre-filtered.
+    underTreatment: searchParams.get("underTreatment") === "true",
   });
   const t = useTranslations("pets");
 
@@ -46,6 +51,7 @@ export default function PetsPage() {
         ...(filters.name && { name: filters.name }),
         ...(filters.type && { type: filters.type }),
         ...(filters.orderByAge && { orderByAge: filters.orderByAge }),
+        ...(filters.underTreatment && { underTreatment: true }),
       });
       setPets(data);
     } catch (err) {
@@ -126,7 +132,10 @@ export default function PetsPage() {
         </button>
       </div>
 
-      <PetFilters onFilterChange={handleFilterChange} />
+      <PetFilters
+        onFilterChange={handleFilterChange}
+        initialUnderTreatment={filters.underTreatment}
+      />
 
       {pets?.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-[50vh]">
@@ -154,5 +163,13 @@ export default function PetsPage() {
         onSuccess={handleSuccess}
       />
     </div>
+  );
+}
+
+export default function PetsPage() {
+  return (
+    <Suspense fallback={null}>
+      <PetsPageContent />
+    </Suspense>
   );
 }

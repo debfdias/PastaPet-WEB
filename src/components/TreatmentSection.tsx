@@ -42,7 +42,7 @@ export default function TreatmentSection({
 
     setLoading(true);
     try {
-      const data = await getTreatmentsByPet(session.user.token, petId, page, 4);
+      const data = await getTreatmentsByPet(session.user.token, petId, page, 2);
       setTreatments(data.treatments);
       setPagination(data.pagination);
       setIsInitialLoad(false);
@@ -102,8 +102,8 @@ export default function TreatmentSection({
           {t("noRecords")}
         </p>
       ) : (
-        <div className="flex flex-col flex-1 md:min-h-[250px] min-h-0">
-          <div className="space-y-3 relative flex-1 min-h-0">
+        <div className="flex flex-col flex-1 md:min-h-[345px] min-h-0">
+          <div className="space-y-2 relative flex-1 min-h-0">
             <div
               className={
                 loading && !isInitialLoad
@@ -114,7 +114,7 @@ export default function TreatmentSection({
               {treatments?.map((treatment) => (
                 <div
                   key={treatment.id}
-                  className="p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-avocado-500/10 dark:hover:bg-avocado-500/20 hover:border-avocado-500/50 transition-all cursor-pointer"
+                  className="mt-2 bg-gray-100/50 dark:bg-gray-600/20 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-avocado-500/10 dark:hover:bg-avocado-500/20 hover:border-avocado-500/50 transition-all cursor-pointer"
                 >
                   <h3 className="font-semibold text-gray-800 dark:text-gray-200">
                     {treatment.cause}

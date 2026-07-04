@@ -83,6 +83,8 @@ interface Exam {
   fileUrl?: string;
   resultSummary: string;
   treatmentId?: string;
+  examDate?: string;
+  createdAt?: string;
 }
 
 type Pet = PetApiResponse & {

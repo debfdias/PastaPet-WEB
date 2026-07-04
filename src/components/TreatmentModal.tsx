@@ -9,6 +9,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
 import { TreatmentFormData } from "@/types/treatment";
 import { createTreatment } from "@/services/treatments.service";
+import { revalidateTreatments } from "@/app/actions/revalidate";
 
 interface TreatmentModalProps {
   isOpen: boolean;
@@ -79,6 +80,9 @@ export default function TreatmentModal({
         endDate: data.endDate,
         medications: data.medications,
       });
+
+      // Invalidate the dashboard's cached "under treatment" data.
+      await revalidateTreatments();
 
       toast.success(t("treatmentModal.success.treatmentAdded"), {
         position: "top-right",

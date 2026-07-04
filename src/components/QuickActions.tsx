@@ -1,16 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import {
-  MdPets,
-  MdEvent,
-  MdBarChart,
-  MdPerson,
-  MdHealthAndSafety,
-  MdList,
-  MdNotifications,
-} from "react-icons/md";
+import { MdPets, MdEvent, MdNotifications } from "react-icons/md";
 import { IconType } from "react-icons";
 
 interface QuickAction {
@@ -31,7 +22,6 @@ export default function QuickActions({
   onAddEvent,
   onAddReminder,
 }: QuickActionsProps) {
-  const router = useRouter();
   const t = useTranslations("dashboard.quickActions");
 
   const actions: QuickAction[] = [
@@ -52,30 +42,6 @@ export default function QuickActions({
       icon: MdNotifications,
       labelKey: "addReminder",
       onClick: onAddReminder,
-    },
-    {
-      id: "view-pets",
-      icon: MdList,
-      labelKey: "viewAllPets",
-      onClick: () => router.push("/pets"),
-    },
-    {
-      id: "view-reports",
-      icon: MdBarChart,
-      labelKey: "viewReports",
-      onClick: () => router.push("/reports"),
-    },
-    {
-      id: "view-profile",
-      icon: MdPerson,
-      labelKey: "viewProfile",
-      onClick: () => router.push("/profile"),
-    },
-    {
-      id: "health-summary",
-      icon: MdHealthAndSafety,
-      labelKey: "healthSummary",
-      onClick: () => router.push("/reports"),
     },
   ];
 

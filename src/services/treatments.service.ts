@@ -33,6 +33,19 @@ export interface TreatmentsResponse {
   pagination: Pagination;
 }
 
+export interface PetUnderTreatment {
+  id: string;
+  name: string;
+  image?: string | null;
+  cause: string;
+  activeTreatmentCount: number;
+}
+
+export interface ActiveTreatmentsResponse {
+  pets: PetUnderTreatment[];
+  totalCount: number;
+}
+
 /**
  * Get treatments for a specific pet with pagination
  */
@@ -45,6 +58,37 @@ export async function getTreatmentsByPet(
   return httpClient.get<TreatmentsResponse>(token, `/treatments/pet/${petId}`, {
     queryParams: { page, limit },
   });
+}
+
+/**
+ * Get the user's pets that are currently under treatment (ongoing/open-ended),
+ * grouped by pet with a count of active treatments.
+ *
+ * Server Component version: uses Next.js caching so it is not refetched on every
+ * dashboard visit (mirrors getPets). Falls back to an empty result on error.
+ */
+export async function getActiveTreatments(
+  token: string,
+  options?: { limit?: number; revalidate?: number; tags?: string[] }
+): Promise<ActiveTreatmentsResponse> {
+  try {
+    return await httpClient.get<ActiveTreatmentsResponse>(
+      token,
+      "/treatments/active",
+      {
+        // Omit limit to fetch every pet under treatment (the dashboard slices
+        // the preview client-side and shows the rest in a modal).
+        queryParams: options?.limit ? { limit: options.limit } : {},
+        next: {
+          revalidate: options?.revalidate ?? 86400, // Default: 1 day
+          tags: options?.tags ?? ["treatments"],
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Failed to fetch active treatments:", error);
+    return { pets: [], totalCount: 0 };
+  }
 }
 
 /**

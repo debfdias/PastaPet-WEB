@@ -158,7 +158,8 @@
     "clearFilter": "Limpar Filtro",
     "orderByAge": {
       "label": "Idade"
-    }
+    },
+    "underTreatment": "Em Tratamento"
   },
   "pets": {
     "title": "Meus Pets",
@@ -308,6 +309,9 @@
         "label": "Realizado Por",
         "placeholder": "Digite quem realizou o exame"
       },
+      "examDate": {
+        "label": "Data do Exame"
+      },
       "fileUrl": {
         "label": "Arquivo do Exame",
         "clickToUpload": "Clique para fazer upload do arquivo",
@@ -421,19 +425,16 @@
       "title": "Meus Pets",
       "description": "Gerencie e visualize todas as informações, registros de saúde e eventos dos seus pets."
     },
-    "myReports": {
-      "title": "Meus Relatórios",
-      "description": "Visualize relatórios e análises abrangentes sobre a saúde e atividades dos seus pets."
+    "underTreatment": {
+      "title": "Em Tratamento",
+      "activeCount": "{count} ativo(s)",
+      "empty": "Nenhum pet em tratamento 🎉"
     },
     "quickActions": {
       "title": "Ações Rápidas",
       "addPet": "Adicionar Pet",
       "addEvent": "Adicionar Evento",
-      "addReminder": "Criar Lembrete",
-      "viewAllPets": "Ver Todos Pets",
-      "viewReports": "Ver Relatórios",
-      "viewProfile": "Ver Perfil",
-      "healthSummary": "Resumo de Saúde"
+      "addReminder": "Criar Lembrete"
     },
     "viewAll": "Ver Todos",
     "noPets": "Você ainda não tem nenhum pet",

@@ -158,7 +158,8 @@
     "clearFilter": "Clear Filter",
     "orderByAge": {
       "label": "Age"
-    }
+    },
+    "underTreatment": "Under Treatment"
   },
   "pets": {
     "title": "My Pets",
@@ -308,6 +309,9 @@
         "label": "Administered By",
         "placeholder": "Enter who administered the exam"
       },
+      "examDate": {
+        "label": "Exam Date"
+      },
       "fileUrl": {
         "label": "Exam File",
         "clickToUpload": "Click to upload exam file",
@@ -421,19 +425,16 @@
       "title": "My Pets",
       "description": "Manage and view all your pets' information, health records, and events."
     },
-    "myReports": {
-      "title": "My Reports",
-      "description": "View comprehensive reports and analytics about your pets' health and activities."
+    "underTreatment": {
+      "title": "Under Treatment",
+      "activeCount": "{count} active",
+      "empty": "No pets under treatment 🎉"
     },
     "quickActions": {
       "title": "Quick Actions",
       "addPet": "Add Pet",
       "addEvent": "Add Event",
-      "addReminder": "Add Reminder",
-      "viewAllPets": "View All Pets",
-      "viewReports": "View Reports",
-      "viewProfile": "View Profile",
-      "healthSummary": "Health Summary"
+      "addReminder": "Add Reminder"
     },
     "viewAll": "View All",
     "noPets": "You don't have any pets yet",

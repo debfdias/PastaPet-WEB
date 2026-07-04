@@ -4,33 +4,54 @@ import {
   MdSearch,
   MdArrowUpward,
   MdArrowDownward,
+  MdMedicalServices,
 } from "react-icons/md";
 import { useTranslations } from "next-intl";
 
-interface PetFiltersProps {
-  onFilterChange: (filters: {
-    name: string;
-    type: string;
-    orderByAge?: string;
-  }) => void;
+interface Filters {
+  name: string;
+  type: string;
+  orderByAge?: string;
+  underTreatment: boolean;
 }
 
-export default function PetFilters({ onFilterChange }: PetFiltersProps) {
+interface PetFiltersProps {
+  onFilterChange: (filters: Filters) => void;
+  initialUnderTreatment?: boolean;
+}
+
+export default function PetFilters({
+  onFilterChange,
+  initialUnderTreatment = false,
+}: PetFiltersProps) {
   const [selectedType, setSelectedType] = useState<string>("");
   const [nameInput, setNameInput] = useState<string>("");
   const [ageOrder, setAgeOrder] = useState<string>("");
+  const [underTreatment, setUnderTreatment] = useState<boolean>(
+    initialUnderTreatment
+  );
   const t = useTranslations("petFilters");
 
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
     setNameInput(newName);
-    onFilterChange({ name: newName, type: selectedType, orderByAge: ageOrder });
+    onFilterChange({
+      name: newName,
+      type: selectedType,
+      orderByAge: ageOrder,
+      underTreatment,
+    });
   };
 
   const handleTypeChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newType = e.target.value;
     setSelectedType(newType);
-    onFilterChange({ name: nameInput, type: newType, orderByAge: ageOrder });
+    onFilterChange({
+      name: nameInput,
+      type: newType,
+      orderByAge: ageOrder,
+      underTreatment,
+    });
   };
 
   const handleAgeOrderClick = () => {
@@ -46,6 +67,18 @@ export default function PetFilters({ onFilterChange }: PetFiltersProps) {
       name: nameInput,
       type: selectedType,
       orderByAge: newOrder,
+      underTreatment,
+    });
+  };
+
+  const handleUnderTreatmentToggle = () => {
+    const next = !underTreatment;
+    setUnderTreatment(next);
+    onFilterChange({
+      name: nameInput,
+      type: selectedType,
+      orderByAge: ageOrder,
+      underTreatment: next,
     });
   };
 
@@ -53,7 +86,13 @@ export default function PetFilters({ onFilterChange }: PetFiltersProps) {
     setNameInput("");
     setSelectedType("");
     setAgeOrder("");
-    onFilterChange({ name: "", type: "", orderByAge: "" });
+    setUnderTreatment(false);
+    onFilterChange({
+      name: "",
+      type: "",
+      orderByAge: "",
+      underTreatment: false,
+    });
   };
 
   return (
@@ -120,6 +159,21 @@ export default function PetFilters({ onFilterChange }: PetFiltersProps) {
             <span>{t("orderByAge.label")}</span>
             {ageOrder === "asc" && <MdArrowUpward className="w-5 h-5" />}
             {ageOrder === "desc" && <MdArrowDownward className="w-5 h-5" />}
+          </button>
+        </div>
+
+        <div className="w-full md:w-auto">
+          <button
+            onClick={handleUnderTreatmentToggle}
+            aria-pressed={underTreatment}
+            className={`w-full flex items-center justify-center gap-2 px-4 py-2 cursor-pointer rounded-lg border transition-colors duration-200 ${
+              underTreatment
+                ? "bg-avocado-500 text-gray-800 border-avocado-500 hover:bg-avocado-300"
+                : "bg-gray-50 dark:bg-gray-700 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600"
+            }`}
+          >
+            <MdMedicalServices className="w-5 h-5" />
+            <span>{t("underTreatment")}</span>
           </button>
         </div>
 
