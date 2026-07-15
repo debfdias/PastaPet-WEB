@@ -90,24 +90,25 @@ function TreatmentCard({
     <div className="relative overflow-hidden rounded-card bg-surface p-6 pl-8 shadow-card">
       <div className="absolute left-0 top-0 h-full w-1.5 bg-sky" />
 
-      <div className="mb-4 flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-sky-bg text-sky-fg">
-            <MedkitIcon className="text-2xl" />
-          </span>
-          <div>
+      <div className="mb-4 flex items-start gap-3">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-sky-bg text-sky-fg">
+          <MedkitIcon className="text-2xl" />
+        </span>
+        <div className="min-w-0 flex-1">
+          {/* label + day badge share the top row, so the title gets full width */}
+          <div className="flex items-center justify-between gap-2">
             <p className="text-[11px] font-extrabold uppercase tracking-wide text-sky-fg">
               {t("activeLabel")}
             </p>
-            <h2 className="font-display text-2xl font-extrabold text-ink">
-              {treatment.cause}
-            </h2>
+            <span className="shrink-0 rounded-chip bg-sky-bg px-3 py-1 text-sm font-extrabold text-sky-fg">
+              {t("day")} {elapsed}
+              {total ? ` / ${total}` : ""}
+            </span>
           </div>
+          <h2 className="font-display text-2xl font-extrabold text-ink">
+            {treatment.cause}
+          </h2>
         </div>
-        <span className="shrink-0 rounded-chip bg-sky-bg px-3 py-1 text-sm font-extrabold text-sky-fg">
-          {t("day")} {elapsed}
-          {total ? ` / ${total}` : ""}
-        </span>
       </div>
 
       {/* date range */}
@@ -136,25 +137,28 @@ function TreatmentCard({
         {treatment.medications.map((med, i) => (
           <div
             key={med.id ?? i}
-            className="flex items-center gap-3 rounded-2xl border border-transparent bg-panel p-3 transition-all hover:border-mint hover:bg-tint"
+            className="flex items-start gap-3 rounded-2xl border border-transparent bg-panel p-3 transition-all hover:border-mint hover:bg-tint md:items-center"
           >
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-sky-fg/30 bg-sky-bg text-sky-fg">
               <MdMedication className="text-lg" />
             </span>
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-extrabold text-ink">
-                {med.name}
-                {med.dosage ? ` — ${med.dosage}` : ""}
-              </p>
-              {med.notes && (
-                <p className="truncate text-xs text-muted">{med.notes}</p>
+            {/* mobile: name+dosage then frequency stacked (left); desktop: side by side */}
+            <div className="min-w-0 flex-1 md:flex md:items-center md:justify-between md:gap-3">
+              <div className="min-w-0">
+                <p className="font-extrabold text-ink md:truncate">
+                  {med.name}
+                  {med.dosage ? ` · ${med.dosage}` : ""}
+                </p>
+                {med.notes && (
+                  <p className="truncate text-xs text-muted">{med.notes}</p>
+                )}
+              </div>
+              {med.frequency && (
+                <span className="mt-1 block text-sm font-bold text-muted md:mt-0 md:shrink-0">
+                  {med.frequency}
+                </span>
               )}
             </div>
-            {med.frequency && (
-              <span className="shrink-0 text-sm font-bold text-muted">
-                {med.frequency}
-              </span>
-            )}
           </div>
         ))}
       </div>
