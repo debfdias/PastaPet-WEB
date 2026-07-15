@@ -482,12 +482,20 @@
     },
     "quickActions": {
       "title": "Ações Rápidas",
+      "subtitle": "Adicione ou registre pets, tratamentos, eventos, lembretes.",
       "addPet": "Adicionar Pet",
       "addEvent": "Adicionar Evento",
       "addReminder": "Criar Lembrete",
+      "addTreatment": "Adicionar Tratamento",
       "addPetDesc": "Novo amigo",
+      "addTreatmentDesc": "Diagnóstico, medicação…",
       "addEventDesc": "Consulta, banho…",
-      "addReminderDesc": "Medicação, reforço…"
+      "addReminderDesc": "Medicação, reforço…",
+      "pet": "Pet",
+      "treatment": "Tratamento",
+      "event": "Evento",
+      "reminder": "Lembrete",
+      "new": "novo"
     },
     "viewAll": "Ver Todos",
     "noPets": "Você ainda não tem nenhum pet",

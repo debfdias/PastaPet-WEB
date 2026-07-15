@@ -11,11 +11,20 @@ import { toast } from "react-toastify";
 import { TreatmentFormData } from "@/types/treatment";
 import { createTreatment } from "@/services/treatments.service";
 import { revalidateTreatments } from "@/app/actions/revalidate";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { PetApiResponse } from "@/services/pets.service";
 
 interface TreatmentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  petId: string;
+  petId?: string;
+  pets?: PetApiResponse[];
   onSuccess: () => void;
 }
 
@@ -23,11 +32,13 @@ export default function TreatmentModal({
   isOpen,
   onClose,
   petId,
+  pets,
   onSuccess,
 }: TreatmentModalProps) {
   const t = useTranslations();
   const { data: session } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedPetId, setSelectedPetId] = useState<string>(petId || "");
 
   const {
     register,
@@ -63,18 +74,27 @@ export default function TreatmentModal({
         endDate: "",
         medications: [],
       });
+      setSelectedPetId(petId || "");
     }
-  }, [isOpen, reset]);
+  }, [isOpen, reset, petId]);
 
   const onSubmit = async (data: TreatmentFormData) => {
     if (!session?.user?.token) {
+      return;
+    }
+    const finalPetId = petId || selectedPetId;
+    if (!finalPetId) {
+      toast.error(t("eventModal.errors.petRequired"), {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return;
     }
     setIsSubmitting(true);
 
     try {
       await createTreatment(session.user.token, {
-        petId,
+        petId: finalPetId,
         cause: data.cause,
         description: data.description,
         startDate: data.startDate,
@@ -137,6 +157,33 @@ export default function TreatmentModal({
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {!petId && pets && pets.length > 0 && (
+            <div>
+              <label className="block text-sm font-bold text-ink mb-1">
+                {t("eventModal.form.selectPet")}
+              </label>
+              <Select
+                value={selectedPetId || undefined}
+                onValueChange={setSelectedPetId}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={t("eventModal.form.selectPetPlaceholder")}
+                  />
+                </SelectTrigger>
+                <SelectContent
+                  position="popper"
+                  className="z-[100] max-h-48 overflow-y-auto"
+                >
+                  {pets.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold text-ink mb-1">

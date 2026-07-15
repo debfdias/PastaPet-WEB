@@ -1,7 +1,12 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { MdPets, MdEvent, MdNotifications } from "react-icons/md";
+import {
+  MdPets,
+  MdEvent,
+  MdNotifications,
+  MdMedicalServices,
+} from "react-icons/md";
 import { ChevronRight } from "lucide-react";
 import { IconType } from "react-icons";
 import { cn } from "@/lib/utils";
@@ -9,20 +14,24 @@ import { cn } from "@/lib/utils";
 interface QuickAction {
   id: string;
   icon: IconType;
-  labelKey: string;
-  descKey: string;
-  chip: string;
+  short: string; // short label (mobile squares)
+  title: string; // full title (desktop list)
+  desc: string; // description (desktop list)
+  color: string; // filled tile bg/text/border (mobile)
+  chip: string; // soft icon chip (desktop)
   onClick: () => void;
 }
 
 interface QuickActionsProps {
   onAddPet: () => void;
+  onAddTreatment: () => void;
   onAddEvent: () => void;
   onAddReminder: () => void;
 }
 
 export default function QuickActions({
   onAddPet,
+  onAddTreatment,
   onAddEvent,
   onAddReminder,
 }: QuickActionsProps) {
@@ -30,26 +39,42 @@ export default function QuickActions({
 
   const actions: QuickAction[] = [
     {
-      id: "add-pet",
+      id: "pet",
       icon: MdPets,
-      labelKey: "addPet",
-      descKey: "addPetDesc",
-      chip: "bg-mint text-white",
+      short: "pet",
+      title: "addPet",
+      desc: "addPetDesc",
+      color: "bg-success-bg text-success-fg border-success-fg/40",
+      chip: "bg-success-bg text-success-fg",
       onClick: onAddPet,
     },
     {
-      id: "add-event",
-      icon: MdEvent,
-      labelKey: "addEvent",
-      descKey: "addEventDesc",
+      id: "treatment",
+      icon: MdMedicalServices,
+      short: "treatment",
+      title: "addTreatment",
+      desc: "addTreatmentDesc",
+      color: "bg-sky-bg text-sky-fg border-sky-fg/40",
       chip: "bg-sky-bg text-sky-fg",
+      onClick: onAddTreatment,
+    },
+    {
+      id: "event",
+      icon: MdEvent,
+      short: "event",
+      title: "addEvent",
+      desc: "addEventDesc",
+      color: "bg-grape-bg text-grape-fg border-grape-fg/40",
+      chip: "bg-grape-bg text-grape-fg",
       onClick: onAddEvent,
     },
     {
-      id: "add-reminder",
+      id: "reminder",
       icon: MdNotifications,
-      labelKey: "addReminder",
-      descKey: "addReminderDesc",
+      short: "reminder",
+      title: "addReminder",
+      desc: "addReminderDesc",
+      color: "bg-amber-bg text-amber-fg border-amber-fg/40",
       chip: "bg-amber-bg text-amber-fg",
       onClick: onAddReminder,
     },
@@ -57,10 +82,36 @@ export default function QuickActions({
 
   return (
     <div className="flex h-full flex-col rounded-card bg-surface p-6 shadow-card">
-      <h2 className="mb-4 text-2xl font-display font-extrabold text-ink">
+      <h2 className="text-2xl font-display font-extrabold text-ink">
         {t("title")}
       </h2>
-      <div className="space-y-2">
+      <p className="mt-1 text-sm text-muted lg:hidden">{t("subtitle")}</p>
+
+      {/* Mobile: colored square buttons */}
+      <div className="mt-4 grid grid-cols-4 gap-2 lg:hidden">
+        {actions.map((action) => {
+          const Icon = action.icon;
+          return (
+            <button
+              key={action.id}
+              onClick={action.onClick}
+              aria-label={t(action.title)}
+              className={cn(
+                "group flex aspect-square cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border p-2 transition-all hover:-translate-y-0.5 hover:shadow-card",
+                action.color
+              )}
+            >
+              <Icon className="text-3xl transition-transform group-hover:scale-110" />
+              <span className="text-center text-[11px] font-extrabold leading-tight">
+                {t(action.short)}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Desktop: vertical list */}
+      <div className="mt-4 hidden space-y-2 lg:block">
         {actions.map((action) => {
           const Icon = action.icon;
           return (
@@ -78,10 +129,8 @@ export default function QuickActions({
                 <Icon className="text-2xl" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="font-extrabold text-ink">{t(action.labelKey)}</p>
-                <p className="truncate text-xs text-muted">
-                  {t(action.descKey)}
-                </p>
+                <p className="font-extrabold text-ink">{t(action.title)}</p>
+                <p className="truncate text-xs text-muted">{t(action.desc)}</p>
               </div>
               <ChevronRight
                 className="h-5 w-5 shrink-0 text-faint transition-transform group-hover:translate-x-0.5"

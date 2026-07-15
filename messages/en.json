@@ -482,12 +482,20 @@
     },
     "quickActions": {
       "title": "Quick Actions",
+      "subtitle": "Add or log pets, treatments, events, reminders.",
       "addPet": "Add Pet",
       "addEvent": "Add Event",
       "addReminder": "Add Reminder",
+      "addTreatment": "Add Treatment",
       "addPetDesc": "New friend",
+      "addTreatmentDesc": "Diagnosis, medication…",
       "addEventDesc": "Visit, grooming…",
-      "addReminderDesc": "Medication, booster…"
+      "addReminderDesc": "Medication, booster…",
+      "pet": "Pet",
+      "treatment": "Treatment",
+      "event": "Event",
+      "reminder": "Reminder",
+      "new": "new"
     },
     "viewAll": "View All",
     "noPets": "You don't have any pets yet",

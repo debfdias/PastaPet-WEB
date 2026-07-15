@@ -27,7 +27,7 @@ export default function PetsUnderTreatment({
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-sky-bg text-sky-fg">
             <ImAidKit className="text-2xl" />
           </span>
-          <h2 className="truncate text-2xl font-display font-extrabold text-ink">
+          <h2 className="whitespace-nowrap text-2xl font-display font-extrabold text-ink">
             {t("underTreatment.title")}
           </h2>
           {totalCount > 0 && (
@@ -38,9 +38,10 @@ export default function PetsUnderTreatment({
         </div>
         <Link
           href="/pets?underTreatment=true"
+          aria-label={t("viewAll")}
           className="flex shrink-0 items-center gap-1 whitespace-nowrap text-sm font-extrabold text-deep transition-all hover:gap-2"
         >
-          {t("viewAll")}
+          <span className="hidden md:inline">{t("viewAll")}</span>
           <MdArrowForward />
         </Link>
       </div>

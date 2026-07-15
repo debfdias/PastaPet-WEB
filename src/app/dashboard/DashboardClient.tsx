@@ -14,6 +14,7 @@ import LastEvents from "@/components/LastEvents";
 import PetModal from "@/components/PetModal";
 import EventModal from "@/components/EventModal";
 import ReminderModal from "@/components/ReminderModal";
+import TreatmentModal from "@/components/TreatmentModal";
 
 import { getPetsClient, type PetApiResponse } from "@/services/pets.service";
 import { getReminders } from "@/services/reminders.service";
@@ -47,6 +48,7 @@ export default function DashboardClient({
   const [isPetModalOpen, setIsPetModalOpen] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
+  const [isTreatmentModalOpen, setIsTreatmentModalOpen] = useState(false);
 
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [remindersLoading, setRemindersLoading] = useState(true);
@@ -77,13 +79,17 @@ export default function DashboardClient({
     }
   }, [token]);
 
-  useEffect(() => {
-    refreshReminders();
-    // Full set of under-treatment pet ids → drives per-tile status + donut.
+  // Full set of under-treatment pet ids → drives the donut + "Em tratamento".
+  const refreshTreatmentIds = useCallback(() => {
     getPetsClient(token, { underTreatment: true })
       .then((pets) => setTreatmentIds(new Set(pets.map((p) => p.id))))
       .catch((e) => console.error("Failed to fetch treatment pets:", e));
-  }, [token, refreshReminders]);
+  }, [token]);
+
+  useEffect(() => {
+    refreshReminders();
+    refreshTreatmentIds();
+  }, [refreshReminders, refreshTreatmentIds]);
 
   // Derived counts for the hero.
   const totalPets = initialPets.length;
@@ -111,6 +117,7 @@ export default function DashboardClient({
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <QuickActions
           onAddPet={handleAddPet}
+          onAddTreatment={() => setIsTreatmentModalOpen(true)}
           onAddEvent={() => setIsEventModalOpen(true)}
           onAddReminder={() => setIsReminderModalOpen(true)}
         />
@@ -155,6 +162,16 @@ export default function DashboardClient({
         pets={initialPets}
         onSuccess={() => {
           refreshReminders();
+          router.refresh();
+        }}
+      />
+
+      <TreatmentModal
+        isOpen={isTreatmentModalOpen}
+        onClose={() => setIsTreatmentModalOpen(false)}
+        pets={initialPets}
+        onSuccess={() => {
+          refreshTreatmentIds();
           router.refresh();
         }}
       />
