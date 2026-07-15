@@ -1,12 +1,8 @@
 import { ChangeEvent, useState } from "react";
-import {
-  MdFilterAltOff,
-  MdSearch,
-  MdArrowUpward,
-  MdArrowDownward,
-  MdMedicalServices,
-} from "react-icons/md";
+import { ArrowUp, ArrowDown } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { icons } from "@/lib/icons";
+import { cn } from "@/lib/utils";
 
 interface Filters {
   name: string;
@@ -20,6 +16,14 @@ interface PetFiltersProps {
   initialUnderTreatment?: boolean;
 }
 
+const TYPES = ["", "DOG", "CAT", "OTHER"] as const;
+const TYPE_KEY: Record<string, string> = {
+  "": "all",
+  DOG: "dog",
+  CAT: "cat",
+  OTHER: "other",
+};
+
 export default function PetFilters({
   onFilterChange,
   initialUnderTreatment = false,
@@ -32,54 +36,36 @@ export default function PetFilters({
   );
   const t = useTranslations("petFilters");
 
-  const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const newName = e.target.value;
-    setNameInput(newName);
+  // Single place to emit the current filter state to the parent.
+  const emit = (next: Partial<Filters>) =>
     onFilterChange({
-      name: newName,
+      name: nameInput,
       type: selectedType,
       orderByAge: ageOrder,
       underTreatment,
+      ...next,
     });
+
+  const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setNameInput(e.target.value);
+    emit({ name: e.target.value });
   };
 
-  const handleTypeChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const newType = e.target.value;
-    setSelectedType(newType);
-    onFilterChange({
-      name: nameInput,
-      type: newType,
-      orderByAge: ageOrder,
-      underTreatment,
-    });
+  const selectType = (type: string) => {
+    setSelectedType(type);
+    emit({ type });
   };
 
   const handleAgeOrderClick = () => {
-    let newOrder = "";
-    if (ageOrder === "") {
-      newOrder = "asc";
-    } else if (ageOrder === "asc") {
-      newOrder = "desc";
-    }
-    // if it's desc, clicking again will clear the order
-    setAgeOrder(newOrder);
-    onFilterChange({
-      name: nameInput,
-      type: selectedType,
-      orderByAge: newOrder,
-      underTreatment,
-    });
+    const next = ageOrder === "" ? "asc" : ageOrder === "asc" ? "desc" : "";
+    setAgeOrder(next);
+    emit({ orderByAge: next });
   };
 
   const handleUnderTreatmentToggle = () => {
     const next = !underTreatment;
     setUnderTreatment(next);
-    onFilterChange({
-      name: nameInput,
-      type: selectedType,
-      orderByAge: ageOrder,
-      underTreatment: next,
-    });
+    emit({ underTreatment: next });
   };
 
   const handleReset = () => {
@@ -95,94 +81,87 @@ export default function PetFilters({
     });
   };
 
+  const SearchIcon = icons.search;
+  const SortIcon = icons.sort;
+  const TreatmentIcon = icons.medical_services;
+  const ClearIcon = icons.filter_alt_off;
+
   return (
-    <div className="mb-6">
-      <div className="flex flex-col md:flex-row items-center gap-4">
-        <div className="w-full md:flex-1">
-          <div className="relative">
-            <input
-              type="text"
-              id="name"
-              placeholder={t("searchPlaceholder")}
-              value={nameInput}
-              onChange={handleNameChange}
-              className="appearance-none relative block w-full p-3 pr-10 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 sm:text-md bg-gray-100 dark:bg-gray-700"
-            />
-            <MdSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-          </div>
-        </div>
+    <div className="mb-6 flex flex-col gap-2.5 rounded-card bg-surface p-3 shadow-card lg:flex-row lg:flex-wrap lg:items-center">
+      {/* search */}
+      <div className="relative w-full lg:flex-1 lg:min-w-[200px]">
+        <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-faint" />
+        <input
+          type="text"
+          id="name"
+          placeholder={t("searchPlaceholder")}
+          value={nameInput}
+          onChange={handleNameChange}
+          className="w-full rounded-ctrl border border-hair bg-panel py-2.5 pl-10 pr-3 text-sm text-ink placeholder:text-faint focus:border-mint focus:outline-none focus:ring-2 focus:ring-mint/30"
+        />
+      </div>
 
-        <div className="w-full md:flex-1">
-          <label className="block text-sm font-medium mb-2">{t("type")}</label>
-          <div className="flex gap-4">
-            <label className="inline-flex items-center">
-              <input
-                type="radio"
-                name="type"
-                value="DOG"
-                checked={selectedType === "DOG"}
-                onChange={handleTypeChange}
-                className="w-4 h-4 text-avocado-500 bg-gray-100 border-gray-300 focus:ring-avocado-500 cursor-pointer"
-              />
-              <span className="ml-2">{t("types.dog")}</span>
-            </label>
-            <label className="inline-flex items-center">
-              <input
-                type="radio"
-                name="type"
-                value="CAT"
-                checked={selectedType === "CAT"}
-                onChange={handleTypeChange}
-                className="w-4 h-4 text-avocado-500 bg-gray-100 border-gray-300 focus:ring-avocado-500 cursor-pointer"
-              />
-              <span className="ml-2">{t("types.cat")}</span>
-            </label>
-            <label className="inline-flex items-center">
-              <input
-                type="radio"
-                name="type"
-                value="OTHER"
-                checked={selectedType === "OTHER"}
-                onChange={handleTypeChange}
-                className="w-4 h-4 text-avocado-500 bg-gray-100 border-gray-300 focus:ring-avocado-500 cursor-pointer"
-              />
-              <span className="ml-2">{t("types.other")}</span>
-            </label>
-          </div>
-        </div>
+      {/* type — segmented, single select (Todos default) */}
+      <div className="flex gap-1 rounded-ctrl bg-panel p-1">
+        {TYPES.map((type) => {
+          const active = selectedType === type;
+          return (
+            <button
+              key={type || "all"}
+              onClick={() => selectType(type)}
+              aria-pressed={active}
+              className={cn(
+                "flex-1 cursor-pointer rounded-[9px] px-3 py-1.5 text-sm font-bold transition-colors lg:flex-none",
+                active
+                  ? "bg-mint text-white"
+                  : "text-muted hover:bg-tint hover:text-deep"
+              )}
+            >
+              {t(`types.${TYPE_KEY[type]}`)}
+            </button>
+          );
+        })}
+      </div>
 
-        <div className="w-full md:w-auto">
-          <button
-            onClick={handleAgeOrderClick}
-            className="flex items-center gap-2 px-4 py-2 cursor-pointer bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
-          >
-            <span>{t("orderByAge.label")}</span>
-            {ageOrder === "asc" && <MdArrowUpward className="w-5 h-5" />}
-            {ageOrder === "desc" && <MdArrowDownward className="w-5 h-5" />}
-          </button>
-        </div>
+      {/* actions — single row on mobile, inline on desktop (lg:contents) */}
+      <div className="flex gap-2.5 lg:contents">
+        {/* sort by age */}
+        <button
+          onClick={handleAgeOrderClick}
+          className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-ctrl border border-hair bg-panel px-3.5 py-2.5 text-sm font-bold text-muted transition-colors hover:bg-tint hover:text-deep lg:flex-none"
+        >
+          <SortIcon className="h-[18px] w-[18px]" strokeWidth={2.5} />
+          <span>{t("orderByAge.label")}</span>
+          {ageOrder === "asc" && (
+            <ArrowUp className="h-4 w-4" strokeWidth={2.5} />
+          )}
+          {ageOrder === "desc" && (
+            <ArrowDown className="h-4 w-4" strokeWidth={2.5} />
+          )}
+        </button>
 
-        <div className="w-full md:w-auto">
-          <button
-            onClick={handleUnderTreatmentToggle}
-            aria-pressed={underTreatment}
-            className={`w-full flex items-center justify-center gap-2 px-4 py-2 cursor-pointer rounded-lg border transition-colors duration-200 ${
-              underTreatment
-                ? "bg-avocado-500 text-gray-800 border-avocado-500 hover:bg-avocado-300"
-                : "bg-gray-50 dark:bg-gray-700 border-transparent hover:bg-gray-200 dark:hover:bg-gray-600"
-            }`}
-          >
-            <MdMedicalServices className="w-5 h-5" />
-            <span>{t("underTreatment")}</span>
-          </button>
-        </div>
+        {/* under-treatment toggle — mint when on */}
+        <button
+          onClick={handleUnderTreatmentToggle}
+          aria-pressed={underTreatment}
+          className={cn(
+            "flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-ctrl border px-3.5 py-2.5 text-sm font-bold transition-colors lg:flex-none",
+            underTreatment
+              ? "border-mint bg-mint text-white"
+              : "border-hair bg-panel text-muted hover:bg-tint hover:text-deep"
+          )}
+        >
+          <TreatmentIcon className="h-[18px] w-[18px]" strokeWidth={2.5} />
+          <span>{t("underTreatment")}</span>
+        </button>
 
+        {/* reset */}
         <button
           onClick={handleReset}
-          className="w-full md:w-auto px-4 py-2 cursor-pointer bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center justify-center"
+          className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-ctrl px-3.5 py-2.5 text-sm font-bold text-muted transition-colors hover:bg-tint hover:text-deep lg:flex-none"
         >
-          <div>{t("clearFilter")}</div>
-          <MdFilterAltOff className="ml-2" />
+          <ClearIcon className="h-[18px] w-[18px]" strokeWidth={2.5} />
+          <span>{t("clearFilter")}</span>
         </button>
       </div>
     </div>

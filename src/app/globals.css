@@ -3,6 +3,10 @@
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @theme {
+  /* ================================================================
+     LEGACY tokens (avocado) — kept while screens migrate to Mint.
+     Don't add NEW usages of these; prefer the Mint tokens below.
+     ================================================================ */
   --color-avocado-300: hsl(148 91% 69%);
   --color-avocado-500: hsl(148 91% 45%);
   --color-avocado-600: hsl(150 91% 40%);
@@ -18,9 +22,63 @@
   --color-green-300: hsl(96 71.6% 80%);
   --color-green-500: hsl(96 71.6% 63%);
   --color-green-600: hsl(86 71.6% 58%);
+
+  /* ================================================================
+     PASTA PET — MINT DESIGN SYSTEM  (design handoff, source of truth)
+     Usage: bg-mint, text-ink, bg-panel, rounded-card, shadow-card, ...
+     No gradients are defined here by design (solid fills only).
+     ================================================================ */
+
+  /* Greens */
+  --color-forest:  #0B5A3A;
+  --color-deep:    #0E7A4A;  /* primary action color */
+  --color-leaf:    #16A866;
+  --color-mint:    #38CD83;
+  --color-tint:    #DCF4E7;
+  --color-tint2:   #C4ECD6;
+  --color-canvas:  #EEF6F0;  /* page background */
+  --color-panel:   #F1F8F4;  /* subtle inner fills */
+  --color-surface: #FFFFFF;  /* card surfaces (flips in dark) */
+  --color-ink:     #123329;  /* primary text */
+  --color-muted:   #5E7A6E;  /* secondary text */
+  --color-faint:   #86A093;  /* tertiary text */
+  --color-hair:    #E1EDE6;  /* hairlines / borders */
+
+  /* Semantic chip pairs (bg / fg) */
+  --color-coral: #FF6F61; --color-coral-bg: #FFE7E3; --color-coral-fg: #C74A3D;
+  --color-grape: #9B6ED8; --color-grape-bg: #EFE6FB; --color-grape-fg: #6E45A8;
+  --color-sky:   #3FA7D6; --color-sky-bg:   #DFF1F8; --color-sky-fg:   #24708C;
+  --color-amber: #F6B93B; --color-amber-bg: #FEF1D8; --color-amber-fg: #9A6B10;
+  --color-success-bg: #DCF4E7; --color-success-fg: #16A866;
+
+  /* Status accents — pink = healthy (loved), orange = under treatment (attention) */
+  --color-pink:   #FF5C9A; --color-pink-bg:   #FFE3EE; --color-pink-fg:   #C43E77;
+  --color-orange: #F5833E; --color-orange-bg: #FFE7D3; --color-orange-fg: #B85C1A;
+
+  /* Plan chips */
+  --color-plan-health-bg: #EAF2FB; --color-plan-health-fg: #2C5F9E;
+  --color-plan-fun-bg:    #F3ECFB; --color-plan-fun-fg:    #6E45A8;
+  --color-plan-off-bg:    #F1F1EF; --color-plan-off-fg:    #B0B8AE;
+
+  /* Type — Baloo 2 (display) + Nunito (body), loaded via next/font */
+  --font-display: var(--font-baloo), "Baloo 2", system-ui, sans-serif;
+  --font-sans:    var(--font-nunito), "Nunito", system-ui, sans-serif;
+
+  /* Radii */
+  --radius-chip: 9999px;
+  --radius-ctrl: 12px;
+  --radius-btn:  16px;
+  --radius-tile: 18px;
+  --radius-card: 24px;
+
+  /* Shadows */
+  --shadow-card:       0 8px 22px rgba(14, 110, 70, 0.08);
+  --shadow-card-hover: 0 18px 34px rgba(14, 110, 70, 0.16);
+  --shadow-btn:        0 10px 20px rgba(14, 122, 74, 0.28);
 }
 
 @layer base {
+  /* ---- legacy theme overrides (retained until screens migrate) ---- */
   [data-theme="light"] {
     --color-pet-card: hsl(84 13.5% 92.7%);
     --color-card: hsl(148 58% 56%);
@@ -36,16 +94,35 @@
     --color-text-secondary: hsl(138 91% 66%);
     --color-header: oklch(27.8% 0.033 256);
     --color-header2: hsl(96 71.6% 67%);
+
+    /* ---- Mint dark palette (handoff dark map) ---- */
+    --color-canvas:  #0F1A14;
+    --color-panel:   #18291F;
+    --color-surface: #18291F;
+    --color-ink:     #EDF6EF;
+    --color-muted:   #8FAE9C;
+    --color-faint:   #6E8A7C;
+    --color-hair:    #24352B;
+    --color-tint:    #14241B;
+    --color-tint2:   #1B2E22;
+    /* mint accent stays; semantic chip pairs are tuned per-component later */
   }
 }
 
-:root[data-theme="light"] {
-  background-color: var(--color-background-light);
+@layer base {
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+  }
 }
 
-:root[data-theme="dark"] {
-  background-color: var(--color-background-dark);
-}
+:root[data-theme="light"] { background-color: var(--color-canvas); }
+:root[data-theme="dark"]  { background-color: var(--color-canvas); }
 
 /* Accordion Styles */
 .AccordionHeader {

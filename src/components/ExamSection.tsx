@@ -78,16 +78,20 @@ export default function ExamSection({
   };
 
   return (
-    <div className="bg-pet-card rounded-lg p-6 border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 hover:shadow-lg transition-all duration-200 md:h-full flex flex-col">
+    <div className="rounded-card bg-surface p-6 shadow-card md:h-full flex flex-col">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-3">
-          <ImLab className="text-xl text-avocado-500" />
-          <h2 className="text-2xl font-bold">{t("title")}</h2>
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-tint text-deep">
+            <ImLab className="text-xl" />
+          </span>
+          <h2 className="text-2xl font-display font-extrabold text-ink">
+            {t("title")}
+          </h2>
         </div>
 
         <button
           onClick={onAddClick}
-          className="flex items-center justify-center gap-1 px-3 py-3 rounded-lg bg-avocado-500 hover:bg-avocado-300 text-gray-800 transition-colors cursor-pointer"
+          className="flex items-center justify-center gap-1 px-3 py-3 rounded-btn bg-mint hover:bg-leaf text-white transition-colors cursor-pointer"
         >
           <FaPlus size={12} />
           <MdAssignment size={16} />
@@ -95,11 +99,11 @@ export default function ExamSection({
       </div>
       {isInitialLoad && loading ? (
         <div className="flex items-center justify-center gap-2 py-8">
-          <ClipLoader size={20} color="hsl(148 91% 45%)" />
+          <ClipLoader size={20} color="#0E7A4A" />
           <span>{t("loading") || "Loading..."}</span>
         </div>
       ) : exams?.length === 0 && !loading ? (
-        <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+        <p className="text-muted text-center py-4">
           {t("noRecords")}
         </p>
       ) : (
@@ -130,20 +134,20 @@ export default function ExamSection({
                   <div
                     key={exam.id}
                     onClick={() => onEditClick?.(exam)}
-                    className="mt-2 bg-gray-100/50 dark:bg-gray-600/20 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-avocado-500/10 dark:hover:bg-avocado-500/20 hover:border-avocado-500/50 transition-all cursor-pointer flex items-center justify-between gap-3"
+                    className="mt-2 bg-panel py-2 px-3 border border-hair rounded-2xl hover:bg-tint hover:border-mint transition-all cursor-pointer flex items-center justify-between gap-3"
                   >
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-800 dark:text-gray-200 truncate">
+                      <h3 className="font-extrabold text-ink truncate">
                         {exam.title}
                       </h3>
                       <div className="flex items-center gap-2 mt-1">
                         {exam.administeredBy && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-muted">
                             {exam.administeredBy} •
                           </p>
                         )}
                         {examDate && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-muted">
                             {format(examDate, "dd/MM/yy", {
                               locale: ptBR,
                             })}
@@ -157,7 +161,7 @@ export default function ExamSection({
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="flex-shrink-0 text-avocado-600 dark:text-avocado-400 hover:text-avocado-700 dark:hover:text-avocado-300 transition-colors"
+                        className="flex-shrink-0 text-deep hover:text-forest transition-colors"
                         title={t("viewFile")}
                       >
                         <FaFilePdf className="w-5 h-5" />
@@ -168,8 +172,8 @@ export default function ExamSection({
               })}
             </div>
             {loading && !isInitialLoad && (
-              <div className="absolute inset-0 flex items-center justify-center bg-pet-card/40 z-10 pointer-events-none">
-                <ClipLoader size={40} color="hsl(148 91% 45%)" />
+              <div className="absolute inset-0 flex items-center justify-center bg-surface/60 z-10 pointer-events-none">
+                <ClipLoader size={40} color="#0E7A4A" />
               </div>
             )}
           </div>

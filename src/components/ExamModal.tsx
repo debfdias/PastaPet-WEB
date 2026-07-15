@@ -7,6 +7,7 @@ import { CgCloseR } from "react-icons/cg";
 import { Microscope, Upload } from "lucide-react";
 import { FaFilePdf } from "react-icons/fa6";
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { uploadFile } from "@/lib/storage/client";
 import Image from "next/image";
@@ -236,9 +237,9 @@ export default function ExamModal({
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-[60]">
-      <div className="bg-pet-card rounded-lg p-6 w-full max-w-3xl max-h-[85vh] md:max-h-none overflow-y-auto md:overflow-visible">
+      <div className="bg-surface rounded-card p-6 w-full max-w-3xl max-h-[85vh] md:max-h-none overflow-y-auto md:overflow-visible">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">
+          <h2 className="text-2xl font-display font-extrabold text-ink">
             <div className="flex items-center gap-2">
               <Microscope className="w-5 h-5" />
               {exam ? t("examModal.editTitle") : t("examModal.title")}
@@ -246,9 +247,9 @@ export default function ExamModal({
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 cursor-pointer"
+            className="text-muted hover:text-ink cursor-pointer"
           >
-            <CgCloseR className="w-6 h-6 dark:hover:text-avocado-300" />
+            <CgCloseR className="w-6 h-6 dark:hover:text-mint" />
           </button>
         </div>
 
@@ -257,7 +258,7 @@ export default function ExamModal({
             {/* Left column - Form fields */}
             <div className="flex-1 space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-sm font-bold text-ink mb-1">
                   {t("examModal.form.title.label")} *
                 </label>
                 <input
@@ -266,17 +267,17 @@ export default function ExamModal({
                     required: t("examModal.form.title.label") + " is required",
                   })}
                   placeholder={t("examModal.form.title.placeholder")}
-                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-hair border rounded-ctrl focus:outline-none focus:border-mint focus:z-10 sm:text-md bg-panel text-ink placeholder:text-faint"
                 />
                 {errors.title && (
-                  <p className="text-red-500 text-xs mt-1">
+                  <p className="text-coral-fg text-xs mt-1">
                     {errors.title.message}
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-sm font-bold text-ink mb-1">
                   {t("examModal.form.cause.label")} *
                 </label>
                 <input
@@ -285,62 +286,69 @@ export default function ExamModal({
                     required: t("examModal.form.cause.label") + " is required",
                   })}
                   placeholder={t("examModal.form.cause.placeholder")}
-                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-hair border rounded-ctrl focus:outline-none focus:border-mint focus:z-10 sm:text-md bg-panel text-ink placeholder:text-faint"
                 />
                 {errors.cause && (
-                  <p className="text-red-500 text-xs mt-1">
+                  <p className="text-coral-fg text-xs mt-1">
                     {errors.cause.message}
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-sm font-bold text-ink mb-1">
                   {t("examModal.form.administeredBy.label")}
                 </label>
                 <input
                   type="text"
                   {...register("administeredBy")}
                   placeholder={t("examModal.form.administeredBy.placeholder")}
-                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-hair border rounded-ctrl focus:outline-none focus:border-mint focus:z-10 sm:text-md bg-panel text-ink placeholder:text-faint"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-sm font-bold text-ink mb-1">
                   {t("examModal.form.examDate.label")}
                 </label>
                 <input
                   type="date"
                   {...register("examDate")}
-                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-hair border rounded-ctrl focus:outline-none focus:border-mint focus:z-10 sm:text-md bg-panel text-ink placeholder:text-faint"
                 />
               </div>
             </div>
 
             {/* Right column - File upload */}
             <div className="flex-1">
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-sm font-bold text-ink mb-1">
                 {t("examModal.form.fileUrl.label")}
               </label>
               <div className="flex items-center justify-center w-full h-[231px]">
-                <label className="flex flex-col items-center justify-center w-full h-full border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 relative">
+                <label className="flex flex-col items-center justify-center w-full h-full border-2 border-hair border-dashed rounded-ctrl cursor-pointer bg-panel hover:bg-tint transition-colors duration-200 relative">
                   {previewUrl && isPdf ? (
                     <div className="w-full h-full overflow-auto p-2">
                       <Document
+                        key={previewUrl}
                         file={previewUrl}
                         onLoadSuccess={onDocumentLoadSuccess}
+                        onLoadError={(err) =>
+                          console.error("PDF load error:", err)
+                        }
+                        onSourceError={(err) =>
+                          console.error("PDF source error:", err)
+                        }
                         loading={
                           <div className="flex items-center justify-center h-full">
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-muted">
                               {t("common.loading")}
                             </p>
                           </div>
                         }
                         error={
                           <div className="flex flex-col items-center justify-center h-full">
-                            <FaFilePdf className="w-12 h-12 mb-2 dark:text-gray-300 text-red-400" />
-                            <p className="text-sm text-gray-500 text-center px-2">
+                            <FaFilePdf className="w-12 h-12 mb-2 text-coral" />
+                            <p className="text-sm text-muted text-center px-2">
                               {t("examModal.errors.failedToLoadPdf")}
                             </p>
                           </div>
@@ -362,11 +370,11 @@ export default function ExamModal({
                               setPageNumber((prev) => Math.max(1, prev - 1));
                             }}
                             disabled={pageNumber <= 1}
-                            className="px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50 cursor-pointer"
+                            className="px-2 py-1 text-xs bg-panel rounded disabled:opacity-50 cursor-pointer"
                           >
                             Previous
                           </button>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-muted">
                             {pageNumber} / {numPages}
                           </span>
                           <button
@@ -378,7 +386,7 @@ export default function ExamModal({
                               );
                             }}
                             disabled={pageNumber >= numPages}
-                            className="px-2 py-1 text-xs bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50 cursor-pointer"
+                            className="px-2 py-1 text-xs bg-panel rounded disabled:opacity-50 cursor-pointer"
                           >
                             Next
                           </button>
@@ -396,23 +404,23 @@ export default function ExamModal({
                   ) : selectedFile ? (
                     <div className="flex flex-col items-center justify-center">
                       {selectedFileName?.toLowerCase().endsWith(".pdf") ? (
-                        <FaFilePdf className="w-12 h-12 mb-2 dark:text-gray-300 text-red-400" />
+                        <FaFilePdf className="w-12 h-12 mb-2 text-coral" />
                       ) : (
-                        <Upload className="w-8 h-8 mb-2 text-gray-500" />
+                        <Upload className="w-8 h-8 mb-2 text-muted" />
                       )}
-                      <p className="mb-2 text-sm text-gray-500 text-center px-2">
+                      <p className="mb-2 text-sm text-muted text-center px-2">
                         {selectedFileName || t("examModal.form.fileSelected")}
                       </p>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center">
-                      <Upload className="w-8 h-8 mb-2 text-gray-500" />
-                      <p className="mb-2 text-sm text-gray-500">
+                      <Upload className="w-8 h-8 mb-2 text-muted" />
+                      <p className="mb-2 text-sm text-muted">
                         <span className="font-semibold">
                           {t("examModal.form.fileUrl.clickToUpload")}
                         </span>
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-muted">
                         {t("examModal.form.fileUrl.fileTypes")}
                       </p>
                     </div>
@@ -430,34 +438,26 @@ export default function ExamModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="block text-sm font-bold text-ink mb-1">
               {t("examModal.form.resultSummary.label")}
             </label>
             <textarea
               {...register("resultSummary")}
               rows={3}
               placeholder={t("examModal.form.resultSummary.placeholder")}
-              className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+              className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-hair border rounded-ctrl focus:outline-none focus:border-mint focus:z-10 sm:text-md bg-panel text-ink placeholder:text-faint"
             />
           </div>
 
           <div className="flex justify-end gap-4 mt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 cursor-pointer bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
-            >
+            <Button type="button" variant="ghost" onClick={onClose}>
               {t("examModal.buttons.cancel")}
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-4 py-2 bg-avocado-500 text-avocado-800 rounded-lg hover:bg-avocado-300 disabled:opacity-50 cursor-pointer font-semibold transition-colors duration-200"
-            >
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
               {isSubmitting
                 ? t("examModal.buttons.saving")
                 : t("examModal.buttons.save")}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

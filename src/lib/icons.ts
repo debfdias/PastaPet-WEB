@@ -1,0 +1,75 @@
+// Icon map — bridges the design handoff's Material Symbols Rounded names to
+// lucide-react components (we chose lucide over the icon font). Import from
+// here so screens reference the same semantic name the design doc uses:
+//
+//   import { icons } from "@/lib/icons";
+//   <icons.pets className="h-5 w-5" />
+//
+// A few names fall back to react-icons/md where lucide has no close match.
+import {
+  PawPrint,
+  Pencil,
+  Plus,
+  Search,
+  Moon,
+  User,
+  LogOut,
+  Bell,
+  CalendarDays,
+  Weight,
+  Cake,
+  Mars,
+  Venus,
+  ShieldPlus,
+  Flower2,
+  Syringe,
+  Pill,
+  Stethoscope,
+  HeartPulse,
+  CheckCircle2,
+  Heart,
+  FlaskConical,
+  ArrowUpDown,
+  FilterX,
+  SlidersHorizontal,
+  Camera,
+  MessageSquare,
+  Mail,
+  Activity,
+  Home,
+  type LucideIcon,
+} from "lucide-react";
+
+// Keyed by the handoff's Material Symbol name → lucide component.
+export const icons: Record<string, LucideIcon> = {
+  home: Home,
+  pets: PawPrint,
+  edit: Pencil,
+  add: Plus,
+  search: Search,
+  dark_mode: Moon,
+  person: User,
+  logout: LogOut,
+  notifications: Bell,
+  calendar_month: CalendarDays,
+  monitor_weight: Weight,
+  cake: Cake,
+  male: Mars,
+  female: Venus,
+  health_and_safety: ShieldPlus,
+  local_florist: Flower2,
+  vaccines: Syringe,
+  medication: Pill,
+  medical_services: Stethoscope,
+  monitor_heart: HeartPulse,
+  check_circle: CheckCircle2,
+  favorite: Heart,
+  science: FlaskConical,
+  sort: ArrowUpDown,
+  filter_alt_off: FilterX,
+  tune: SlidersHorizontal,
+  photo_camera: Camera,
+  forum: MessageSquare,
+  mail: Mail,
+  monitoring: Activity,
+};

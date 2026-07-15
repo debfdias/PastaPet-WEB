@@ -1,176 +1,165 @@
 "use client";
 
 import Link from "next/link";
-import { User, LogOut, Menu, X } from "lucide-react";
-import { Button } from "./ui/button";
 import { signOut, useSession } from "next-auth/react";
-import { ThemeButtons } from "./ui/ThemeButtons";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useState, useEffect } from "react";
+import { icons } from "@/lib/icons";
+import { cn } from "@/lib/utils";
+import { ThemeButtons } from "./ui/ThemeButtons";
 
 interface HeaderProps {
   hideOnHome?: boolean;
 }
 
+const NAV = [
+  { href: "/dashboard", key: "home", icon: icons.home },
+  { href: "/pets", key: "pets", icon: icons.pets },
+  { href: "/reports", key: "reports", icon: icons.monitoring },
+] as const;
+
 export function Header({ hideOnHome = false }: HeaderProps) {
   const { data: session } = useSession();
   const pathname = usePathname();
   const t = useTranslations("header");
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // Close mobile menu when route changes
-  useEffect(() => {
-    setIsMobileMenuOpen(false);
-  }, [pathname]);
-
-  const handleLogout = async () => {
-    await signOut({ redirect: true, callbackUrl: "/" });
-  };
 
   if (!session || (hideOnHome && pathname === "/")) {
     return null;
   }
 
-  const NavLinks = ({ isMobile = false }) => (
-    <>
-      <Link
-        href="/dashboard"
-        className={`flex items-center rounded-md transition-all duration-200 dark:hover:text-avocado-500 relative ${
-          isMobile ? "text-2xl" : ""
-        }`}
-      >
-        <span
-          className={
-            pathname === "/dashboard"
-              ? "dark:text-avocado-500 text-text-primary font-semibold"
-              : ""
-          }
-        >
-          {t("home")}
-        </span>
-        {pathname === "/dashboard" && !isMobile && (
-          <div className="absolute -bottom-[18px] left-1/2 -translate-x-1/2 w-16 h-1 bg-text-primary dark:bg-avocado-500 rounded-t-md md:block hidden" />
-        )}
-      </Link>
-      <Link
-        href="/pets"
-        className={`flex items-center rounded-md transition-all duration-200 dark:hover:text-avocado-500 relative ${
-          isMobile ? "text-2xl" : ""
-        }`}
-      >
-        <span
-          className={
-            pathname === "/pets"
-              ? "dark:text-avocado-500 text-text-primary font-semibold"
-              : ""
-          }
-        >
-          {t("pets")}
-        </span>
-        {pathname === "/pets" && !isMobile && (
-          <div className="absolute -bottom-[18px] left-1/2 -translate-x-1/2 w-18 h-1 bg-text-primary dark:bg-avocado-500 rounded-t-md md:block hidden" />
-        )}
-      </Link>
-      <Link
-        href="/reports"
-        className={`flex items-center rounded-md transition-all duration-200 dark:hover:text-avocado-500 relative ${
-          isMobile ? "text-2xl" : ""
-        }`}
-      >
-        <span
-          className={
-            pathname === "/reports"
-              ? "dark:text-avocado-500 text-text-primary"
-              : ""
-          }
-        >
-          {t("reports")}
-        </span>
-        {pathname === "/reports" && !isMobile && (
-          <div className="absolute -bottom-[18px] left-1/2 -translate-x-1/2 w-24 h-1 bg-text-primary dark:bg-avocado-500 rounded-t-md md:block hidden" />
-        )}
-      </Link>
-    </>
-  );
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(`${href}/`);
+
+  const handleLogout = () => signOut({ redirect: true, callbackUrl: "/" });
+
+  const initial = (session.user?.name || session.user?.email || "?")
+    .charAt(0)
+    .toUpperCase();
+
+  const LogoutIcon = icons.logout;
+  const PersonIcon = icons.person;
 
   return (
-    <div className="pb-16">
-      <header className="fixed top-0 z-50 w-full border-b-2 border-text-primary/10 bg-header font-semibold">
-        <div className="px-2 md:px-20 w-full flex h-15 items-center justify-between">
-          {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full hover:bg-text-primary/20 transition-colors duration-200 cursor-pointer dark:hover:text-avocado-500 md:hidden"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </Button>
+    <>
+      {/* ---------- Desktop: floating pill header ---------- */}
+      <header className="sticky top-0 z-40 hidden bg-canvas px-4 pb-2 pt-4 md:block md:px-12">
+        <div className="flex items-center gap-4 rounded-[20px] bg-surface p-3 shadow-card">
+          <Logo />
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-16 text-xl">
-            <NavLinks />
-          </div>
+          <nav className="ml-2 flex gap-1 rounded-[14px] bg-panel p-[5px]">
+            {NAV.map((n) => {
+              const Icon = n.icon;
+              const active = isActive(n.href);
+              return (
+                <Link
+                  key={n.href}
+                  href={n.href}
+                  className={cn(
+                    "flex items-center gap-2 rounded-[11px] px-4 py-2 text-sm font-extrabold transition-colors",
+                    active
+                      ? "bg-mint text-white"
+                      : "text-muted hover:bg-tint hover:text-deep"
+                  )}
+                >
+                  <Icon className="h-[18px] w-[18px]" strokeWidth={2.5} />
+                  {t(n.key)}
+                </Link>
+              );
+            })}
+          </nav>
 
-          {/* Right Side Buttons */}
-          <div className="flex items-center space-x-2">
+          <div className="ml-auto flex items-center gap-1.5">
             <ThemeButtons />
-            <Link href="/profile">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-full hover:bg-text-primary/20 transition-colors duration-200 cursor-pointer dark:hover:text-avocado-500"
-              >
-                <User className="h-5 w-5" />
-                <span className="sr-only">{t("profile")}</span>
-              </Button>
-            </Link>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleLogout}
-              className="rounded-full hover:bg-text-primary/20 dark:hover:text-red-400 hover:text-red-600 transition-colors duration-200 cursor-pointer"
+            <Link
+              href="/profile"
+              aria-label={t("profile")}
+              className={cn(
+                "flex h-10 w-10 items-center justify-center rounded-full border-2 border-tint2 bg-tint font-extrabold text-deep transition-colors hover:bg-tint2",
+                isActive("/profile") && "ring-2 ring-mint"
+              )}
             >
-              <LogOut className="h-5 w-5" />
-              <span className="sr-only">{t("logout")}</span>
-            </Button>
+              {initial}
+            </Link>
+            <button
+              onClick={handleLogout}
+              aria-label={t("logout")}
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-muted transition-colors hover:bg-coral-bg hover:text-coral-fg"
+            >
+              <LogoutIcon className="h-5 w-5" strokeWidth={2.5} />
+            </button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <>
-            {/* Overlay */}
-            <div
-              className="md:hidden fixed inset-0 bg-black/80 z-40"
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
-            {/* Drawer */}
-            <div className="md:hidden fixed inset-y-0 left-0 w-64 max-w-sm bg-header z-50 transform transition-transform duration-300 ease-in-out">
-              <nav className="h-full flex flex-col py-6 px-6">
-                <div className="flex justify-end mb-8">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="rounded-full hover:bg-text-primary/20 transition-colors duration-200 cursor-pointer dark:hover:text-avocado-500"
-                  >
-                    <X className="h-6 w-6" />
-                  </Button>
-                </div>
-                <div className="space-y-8">
-                  <NavLinks isMobile />
-                </div>
-              </nav>
-            </div>
-          </>
-        )}
       </header>
-    </div>
+
+      {/* ---------- Mobile: slim top bar ---------- */}
+      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-hair bg-surface px-4 py-3 md:hidden">
+        <Logo />
+        <div className="flex items-center gap-1">
+          <ThemeButtons />
+          <button
+            onClick={handleLogout}
+            aria-label={t("logout")}
+            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-muted transition-colors hover:bg-coral-bg hover:text-coral-fg"
+          >
+            <LogoutIcon className="h-5 w-5" strokeWidth={2.5} />
+          </button>
+        </div>
+      </header>
+
+      {/* ---------- Mobile: bottom tab bar ---------- */}
+      <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-hair bg-surface px-2 pb-3 pt-2 shadow-[0_-6px_20px_rgba(14,110,70,0.06)] md:hidden">
+        <Tab href="/dashboard" label={t("home")} icon={icons.home} active={isActive("/dashboard")} />
+        <Tab href="/pets" label={t("pets")} icon={icons.pets} active={isActive("/pets")} />
+        <Tab href="/reports" label={t("reports")} icon={icons.monitoring} active={isActive("/reports")} />
+        <Tab href="/profile" label={t("profile")} icon={PersonIcon} active={isActive("/profile")} />
+      </nav>
+    </>
+  );
+}
+
+function Logo() {
+  const PawIcon = icons.pets;
+  return (
+    <Link href="/dashboard" className="flex items-center gap-2.5">
+      <span className="flex h-[38px] w-[38px] items-center justify-center rounded-[13px] bg-mint text-white">
+        <PawIcon className="h-[22px] w-[22px]" strokeWidth={2.5} />
+      </span>
+      <span className="font-display text-[20px] font-extrabold text-ink">
+        Pasta Pet
+      </span>
+    </Link>
+  );
+}
+
+function Tab({
+  href,
+  label,
+  icon: Icon,
+  active,
+}: {
+  href: string;
+  label: string;
+  icon: (typeof icons)[string];
+  active: boolean;
+}) {
+  return (
+    <Link href={href} className="flex flex-1 flex-col items-center gap-1">
+      <span
+        className={cn(
+          "flex h-11 w-11 items-center justify-center rounded-[14px] transition-colors",
+          active ? "bg-mint text-white" : "text-faint"
+        )}
+      >
+        <Icon className="h-6 w-6" strokeWidth={active ? 2.75 : 2} />
+      </span>
+      <span
+        className={cn(
+          "whitespace-nowrap text-[13px] font-extrabold",
+          active ? "text-deep" : "text-faint"
+        )}
+      >
+        {label}
+      </span>
+    </Link>
   );
 }

@@ -78,9 +78,38 @@
     "age": "Idade",
     "months": "meses",
     "years": "anos",
+    "yearShort": "a",
+    "monthShort": "m",
     "editPet": "Editar pet",
     "petPlan": "Plano Pet",
-    "funeraryPlan": "Plano Funerário"
+    "funeraryPlan": "Plano Funerário",
+    "species": {
+      "dog": "Cão",
+      "cat": "Gato",
+      "other": "Outro"
+    },
+    "sex": {
+      "male": "Macho",
+      "female": "Fêmea"
+    },
+    "status": {
+      "healthy": "Saudável",
+      "treatment": "Em tratamento",
+      "watch": "Acompanhar"
+    },
+    "flags": {
+      "fiv": "FIV+",
+      "felv": "FeLV+"
+    },
+    "vaccine": {
+      "ok": "Vacinas em dia",
+      "due": "Vacina próxima",
+      "booster": "Reforço próximo"
+    },
+    "plans": {
+      "healthOff": "Saúde —",
+      "funeralOff": "Funeral —"
+    }
   },
   "petModal": {
     "addNewPet": "Adicionar Novo Pet",
@@ -151,6 +180,7 @@
     "searchPlaceholder": "Buscar por nome do pet...",
     "type": "Tipo",
     "types": {
+      "all": "Todos",
       "dog": "Cachorro",
       "cat": "Gato",
       "other": "Outro"
@@ -244,6 +274,7 @@
     "events": {
       "title": "Eventos",
       "addButton": "Adicionar Evento",
+      "add": "Adicionar",
       "noEvents": "Nenhum evento ainda",
       "loading": "Carregando eventos..."
     },
@@ -266,6 +297,10 @@
       "addButton": "Adicionar Tratamento",
       "noRecords": "Nenhum registro de tratamento ainda",
       "medications": "Medicamentos",
+      "activeLabel": "Tratamento ativo",
+      "active": "ativo",
+      "day": "Dia",
+      "noActive": "Nenhum tratamento ativo",
       "loading": "Carregando tratamentos..."
     }
   },
@@ -421,6 +456,21 @@
   "dashboard": {
     "welcome": "Bem-vindo",
     "subtitle": "Gerencie seus pets e visualize relatórios do seu painel",
+    "hero": {
+      "datePattern": "EEEE, d 'de' MMMM",
+      "allGood": "Tudo sob controle",
+      "attention": "{count, plural, one {# item pede atenção hoje} other {# itens pedem atenção hoje}}",
+      "nothingToday": "nada pendente hoje",
+      "statPets": "pets",
+      "statTreatment": "em tratamento",
+      "healthy": "saudáveis"
+    },
+    "upcoming": {
+      "title": "Lembretes",
+      "today": "HOJE",
+      "tomorrow": "AMANHÃ",
+      "empty": "Nada nos próximos dias"
+    },
     "myPets": {
       "title": "Meus Pets",
       "description": "Gerencie e visualize todas as informações, registros de saúde e eventos dos seus pets."
@@ -434,7 +484,10 @@
       "title": "Ações Rápidas",
       "addPet": "Adicionar Pet",
       "addEvent": "Adicionar Evento",
-      "addReminder": "Criar Lembrete"
+      "addReminder": "Criar Lembrete",
+      "addPetDesc": "Novo amigo",
+      "addEventDesc": "Consulta, banho…",
+      "addReminderDesc": "Medicação, reforço…"
     },
     "viewAll": "Ver Todos",
     "noPets": "Você ainda não tem nenhum pet",

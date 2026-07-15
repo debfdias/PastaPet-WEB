@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { useSession } from "next-auth/react";
 import { CgCloseR } from "react-icons/cg";
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import {
   Select,
@@ -137,16 +138,16 @@ export default function EventModal({
       onClick={handleBackdropClick}
     >
       <div
-        className="bg-pet-card rounded-lg p-6 w-full max-w-xl max-h-[85vh] md:max-h-none overflow-y-auto md:overflow-visible"
+        className="bg-surface rounded-card p-6 w-full max-w-xl max-h-[85vh] md:max-h-none overflow-y-auto md:overflow-visible"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">{t("title")}</h2>
+          <h2 className="text-2xl font-display font-extrabold text-ink">{t("title")}</h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 cursor-pointer"
+            className="text-muted hover:text-ink cursor-pointer"
           >
-            <CgCloseR className="w-6 h-6 dark:hover:text-avocado-300" />
+            <CgCloseR className="w-6 h-6 dark:hover:text-mint" />
           </button>
         </div>
 
@@ -154,7 +155,7 @@ export default function EventModal({
           <div className="space-y-4">
             {!petId && pets && pets.length > 0 && (
               <div>
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-sm font-bold text-ink mb-1">
                   {t("form.selectPet")}
                 </label>
                 <Select
@@ -181,7 +182,7 @@ export default function EventModal({
                   </SelectContent>
                 </Select>
                 {errors.selectedPetId && (
-                  <p className="text-red-500 text-xs mt-1">
+                  <p className="text-coral-fg text-xs mt-1">
                     {errors.selectedPetId.message}
                   </p>
                 )}
@@ -197,7 +198,7 @@ export default function EventModal({
             )}
 
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-sm font-bold text-ink mb-1">
                 {t("form.eventTitle")}
               </label>
               <input
@@ -205,18 +206,18 @@ export default function EventModal({
                 {...register("title", {
                   required: t("form.eventTitle") + " is required",
                 })}
-                className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-hair border rounded-ctrl focus:outline-none focus:border-mint focus:z-10 sm:text-md bg-panel text-ink placeholder:text-faint"
                 placeholder={t("form.eventTitlePlaceholder")}
               />
               {errors.title && (
-                <p className="text-red-500 text-xs mt-1">
+                <p className="text-coral-fg text-xs mt-1">
                   {errors.title.message}
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-sm font-bold text-ink mb-1">
                 {t("form.eventType")}
               </label>
               <Select
@@ -246,7 +247,7 @@ export default function EventModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-sm font-bold text-ink mb-1">
                 {t("form.eventDate")}
               </label>
               <input
@@ -254,10 +255,10 @@ export default function EventModal({
                 {...register("eventDate", {
                   required: t("form.eventDate") + " is required",
                 })}
-                className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-hair border rounded-ctrl focus:outline-none focus:border-mint focus:z-10 sm:text-md bg-panel text-ink placeholder:text-faint"
               />
               {errors.eventDate && (
-                <p className="text-red-500 text-xs mt-1">
+                <p className="text-coral-fg text-xs mt-1">
                   {errors.eventDate.message}
                 </p>
               )}
@@ -265,20 +266,12 @@ export default function EventModal({
           </div>
 
           <div className="flex justify-end gap-4 mt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 cursor-pointer bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
-            >
-              <div className="">{t("buttons.cancel")}</div>
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-4 py-2 bg-avocado-500 text-avocado-800 rounded-lg hover:bg-avocado-300 disabled:opacity-50 cursor-pointer font-semibold transition-colors duration-200"
-            >
+            <Button type="button" variant="ghost" onClick={onClose}>
+              {t("buttons.cancel")}
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? t("buttons.adding") : t("buttons.addEvent")}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

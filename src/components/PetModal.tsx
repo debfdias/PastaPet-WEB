@@ -8,6 +8,7 @@ import { uploadImage } from "@/lib/storage/client";
 import Image from "next/image";
 import { CgCloseR } from "react-icons/cg";
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
 import { Switch } from "radix-ui";
 import {
   Select,
@@ -200,11 +201,11 @@ export default function PetModal({
       onClick={handleBackdropClick}
     >
       <div
-        className="bg-pet-card rounded-lg p-6 w-full max-w-3xl max-h-[85vh] md:max-h-none overflow-y-auto md:overflow-visible"
+        className="bg-surface rounded-card p-6 w-full max-w-3xl max-h-[85vh] md:max-h-none overflow-y-auto md:overflow-visible"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">
+          <h2 className="text-2xl font-display font-extrabold text-ink">
             {pet ? (
               <div className="flex items-center gap-2">
                 <Pencil className="w-5 h-5" />
@@ -216,9 +217,9 @@ export default function PetModal({
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 cursor-pointer "
+            className="text-muted hover:text-ink cursor-pointer "
           >
-            <CgCloseR className="w-6 h-6 dark:hover:text-avocado-300" />
+            <CgCloseR className="w-6 h-6 dark:hover:text-mint" />
           </button>
         </div>
 
@@ -229,7 +230,7 @@ export default function PetModal({
           {/* Image upload - Full width on mobile, 1/3 on desktop */}
           <div className="w-full lg:w-1/3">
             <div className="flex items-center justify-center w-full">
-              <label className="flex flex-col items-center justify-center w-full h-48 lg:h-64 border-2 border-gray-300 dark:border-gray-700 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-800">
+              <label className="flex flex-col items-center justify-center w-full h-48 lg:h-64 border-2 border-hair border-dashed rounded-ctrl cursor-pointer bg-panel">
                 {previewUrl ? (
                   <Image
                     src={previewUrl}
@@ -240,13 +241,13 @@ export default function PetModal({
                   />
                 ) : (
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Upload className="w-8 h-8 mb-2 text-gray-500" />
-                    <p className="mb-2 text-sm text-gray-500 ">
+                    <Upload className="w-8 h-8 mb-2 text-muted" />
+                    <p className="mb-2 text-sm text-muted ">
                       <span className="font-semibold">
                         {t("imageUpload.clickToUpload")}
                       </span>{" "}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted">
                       {t("imageUpload.fileTypes")}
                     </p>
                   </div>
@@ -266,7 +267,7 @@ export default function PetModal({
           <div className="w-full lg:w-2/3">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-sm font-bold text-ink mb-1">
                   {t("form.name")}
                 </label>
                 <input
@@ -275,16 +276,16 @@ export default function PetModal({
                     required: t("form.name") + " is required",
                   })}
                   placeholder={t("form.namePlaceholder")}
-                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-hair border rounded-ctrl focus:outline-none focus:border-mint focus:z-10 sm:text-md bg-panel text-ink placeholder:text-faint"
                 />
                 {errors.name && (
-                  <p className="text-red-500 text-xs mt-1">
+                  <p className="text-coral-fg text-xs mt-1">
                     {errors.name.message}
                   </p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-sm font-bold text-ink mb-1">
                   {t("form.dateOfBirth")}
                 </label>
                 <input
@@ -292,16 +293,16 @@ export default function PetModal({
                   {...register("dob", {
                     required: t("form.dateOfBirth") + " is required",
                   })}
-                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-hair border rounded-ctrl focus:outline-none focus:border-mint focus:z-10 sm:text-md bg-panel text-ink placeholder:text-faint"
                 />
                 {errors.dob && (
-                  <p className="text-red-500 text-xs mt-1">
+                  <p className="text-coral-fg text-xs mt-1">
                     {errors.dob.message}
                   </p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-sm font-bold text-ink mb-1">
                   {t("form.weight")}
                 </label>
                 <input
@@ -314,16 +315,16 @@ export default function PetModal({
                       message: t("form.weight") + " must be positive",
                     },
                   })}
-                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-hair border rounded-ctrl focus:outline-none focus:border-mint focus:z-10 sm:text-md bg-panel text-ink placeholder:text-faint"
                 />
                 {errors.weight && (
-                  <p className="text-red-500 text-xs mt-1">
+                  <p className="text-coral-fg text-xs mt-1">
                     {errors.weight.message}
                   </p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-sm font-bold text-ink mb-1">
                   {t("form.type")}
                 </label>
                 <Select
@@ -348,7 +349,7 @@ export default function PetModal({
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-sm font-bold text-ink mb-1">
                   {t("form.breed")}
                 </label>
                 <input
@@ -357,16 +358,16 @@ export default function PetModal({
                     required: t("form.breed") + " is required",
                   })}
                   placeholder={t("form.breedPlaceholder")}
-                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                  className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-hair border rounded-ctrl focus:outline-none focus:border-mint focus:z-10 sm:text-md bg-panel text-ink placeholder:text-faint"
                 />
                 {errors.breed && (
-                  <p className="text-red-500 text-xs mt-1">
+                  <p className="text-coral-fg text-xs mt-1">
                     {errors.breed.message}
                   </p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
+                <label className="block text-sm font-bold text-ink mb-1">
                   {t("form.gender")}
                 </label>
                 <Select
@@ -397,7 +398,7 @@ export default function PetModal({
                     {t("form.hasPetPlan")}
                   </label>
                   <Switch.Root
-                    className="w-[42px] h-[25px] bg-gray-300 rounded-full relative data-[state=checked]:bg-avocado-500 outline-none cursor-pointer"
+                    className="w-[42px] h-[25px] bg-hair rounded-full relative data-[state=checked]:bg-mint outline-none cursor-pointer"
                     checked={hasPetPlan}
                     onCheckedChange={(checked: boolean) => {
                       setValue("hasPetPlan", checked);
@@ -413,7 +414,7 @@ export default function PetModal({
                     {t("form.hasFuneraryPlan")}
                   </label>
                   <Switch.Root
-                    className="w-[42px] h-[25px] bg-gray-300 rounded-full relative data-[state=checked]:bg-avocado-500 outline-none cursor-pointer"
+                    className="w-[42px] h-[25px] bg-hair rounded-full relative data-[state=checked]:bg-mint outline-none cursor-pointer"
                     checked={watch("hasFuneraryPlan")}
                     onCheckedChange={(checked: boolean) => {
                       setValue("hasFuneraryPlan", checked);
@@ -425,38 +426,30 @@ export default function PetModal({
               </div>
               {hasPetPlan && (
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium mb-1">
+                  <label className="block text-sm font-bold text-ink mb-1">
                     {t("form.petPlanName")}
                   </label>
                   <input
                     type="text"
                     {...register("petPlanName")}
                     placeholder={t("form.petPlanNamePlaceholder")}
-                    className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-gray-300 border rounded-lg focus:outline-none focus:border-avocado-500 focus:z-10 sm:text-md bg-gray-100 dark:bg-gray-700"
+                    className="appearance-none relative block w-full p-3 dark:border-text-primary/20 border-hair border rounded-ctrl focus:outline-none focus:border-mint focus:z-10 sm:text-md bg-panel text-ink placeholder:text-faint"
                   />
                 </div>
               )}
             </div>
 
             <div className="flex justify-end gap-4 mt-6">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 cursor-pointer bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
-              >
-                <div className="">{commonT("cancel")}</div>
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="px-4 py-2 bg-avocado-500 text-avocado-800 rounded-lg hover:bg-avocado-300 disabled:opacity-50 cursor-pointer font-semibold transition-colors duration-200"
-              >
+              <Button type="button" variant="ghost" onClick={onClose}>
+                {commonT("cancel")}
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting
                   ? commonT("loading")
                   : pet
                   ? commonT("update")
                   : commonT("save")}
-              </button>
+              </Button>
             </div>
           </div>
         </form>

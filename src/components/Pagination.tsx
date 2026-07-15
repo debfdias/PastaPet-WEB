@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
 
 interface PaginationProps {
   currentPage: number;
@@ -58,7 +59,7 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-hair bg-surface text-muted hover:bg-tint hover:text-deep disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
         aria-label={t("previous")}
       >
         <ChevronLeft className="w-4 h-4" />
@@ -67,7 +68,7 @@ export default function Pagination({
       {getPageNumbers().map((page, index) => {
         if (page === "...") {
           return (
-            <span key={`ellipsis-${index}`} className="px-2 text-gray-500">
+            <span key={`ellipsis-${index}`} className="px-1 text-faint">
               ...
             </span>
           );
@@ -78,11 +79,12 @@ export default function Pagination({
           <button
             key={pageNumber}
             onClick={() => onPageChange(pageNumber)}
-            className={`px-4 py-2 rounded-md border transition-colors cursor-pointer ${
+            className={cn(
+              "flex h-9 min-w-9 items-center justify-center rounded-full border px-3 text-sm font-bold transition-colors cursor-pointer",
               currentPage === pageNumber
-                ? "bg-avocado-500 text-gray-800 border-avocado-500 font-semibold"
-                : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
-            }`}
+                ? "border-mint bg-mint text-white"
+                : "border-hair bg-surface text-ink hover:bg-tint hover:text-deep"
+            )}
           >
             {pageNumber}
           </button>
@@ -92,7 +94,7 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-hair bg-surface text-muted hover:bg-tint hover:text-deep disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
         aria-label={t("next")}
       >
         <ChevronRight className="w-4 h-4" />

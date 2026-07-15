@@ -13,16 +13,16 @@ export default async function Dashboard() {
   }
 
   // Fetch dashboard data on the server with caching so it isn't refetched on
-  // every visit. Get first 6 pets for the My Pets preview and a 2-pet preview of
-  // those under treatment (the full list lives on /pets?underTreatment=true).
+  // every visit. Load all pets (owners have few) so the hero stats, healthy
+  // donut, and My Pets count are accurate; plus a 2-pet preview of those under
+  // treatment (the full list lives on /pets?underTreatment=true).
   const [pets, activeTreatments] = await Promise.all([
     getPets(session.user.token, {
-      limit: 6,
       revalidate: 86400, // 1 day in seconds
       tags: ["pets"],
     }),
     getActiveTreatments(session.user.token, {
-      limit: 2,
+      limit: 3,
       revalidate: 86400,
       tags: ["treatments"],
     }),

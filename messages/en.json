@@ -78,9 +78,38 @@
     "age": "Age",
     "months": "months",
     "years": "years",
+    "yearShort": "y",
+    "monthShort": "mo",
     "editPet": "Edit pet",
     "petPlan": "Pet Plan",
-    "funeraryPlan": "Funerary Plan"
+    "funeraryPlan": "Funerary Plan",
+    "species": {
+      "dog": "Dog",
+      "cat": "Cat",
+      "other": "Other"
+    },
+    "sex": {
+      "male": "Male",
+      "female": "Female"
+    },
+    "status": {
+      "healthy": "Healthy",
+      "treatment": "Under treatment",
+      "watch": "Monitor"
+    },
+    "flags": {
+      "fiv": "FIV+",
+      "felv": "FeLV+"
+    },
+    "vaccine": {
+      "ok": "Vaccines up to date",
+      "due": "Vaccine due",
+      "booster": "Booster due"
+    },
+    "plans": {
+      "healthOff": "Health —",
+      "funeralOff": "Funeral —"
+    }
   },
   "petModal": {
     "addNewPet": "Add New Pet",
@@ -151,6 +180,7 @@
     "searchPlaceholder": "Search by pet name...",
     "type": "Type",
     "types": {
+      "all": "All",
       "dog": "Dog",
       "cat": "Cat",
       "other": "Other"
@@ -244,6 +274,7 @@
     "events": {
       "title": "Events",
       "addButton": "Add Event",
+      "add": "Add",
       "noEvents": "No events yet",
       "loading": "Loading events..."
     },
@@ -266,6 +297,10 @@
       "addButton": "Add Treatment",
       "noRecords": "No treatment records yet",
       "medications": "Medications",
+      "activeLabel": "Active treatment",
+      "active": "active",
+      "day": "Day",
+      "noActive": "No active treatment",
       "loading": "Loading treatments..."
     }
   },
@@ -421,6 +456,21 @@
   "dashboard": {
     "welcome": "Welcome",
     "subtitle": "Manage your pets and view reports from your dashboard",
+    "hero": {
+      "datePattern": "EEEE, MMMM d",
+      "allGood": "All under control",
+      "attention": "{count, plural, one {# item needs attention today} other {# items need attention today}}",
+      "nothingToday": "nothing pending today",
+      "statPets": "pets",
+      "statTreatment": "in treatment",
+      "healthy": "healthy"
+    },
+    "upcoming": {
+      "title": "Upcoming reminders",
+      "today": "TODAY",
+      "tomorrow": "TOMORROW",
+      "empty": "Nothing in the next few days"
+    },
     "myPets": {
       "title": "My Pets",
       "description": "Manage and view all your pets' information, health records, and events."
@@ -434,7 +484,10 @@
       "title": "Quick Actions",
       "addPet": "Add Pet",
       "addEvent": "Add Event",
-      "addReminder": "Add Reminder"
+      "addReminder": "Add Reminder",
+      "addPetDesc": "New friend",
+      "addEventDesc": "Visit, grooming…",
+      "addReminderDesc": "Medication, booster…"
     },
     "viewAll": "View All",
     "noPets": "You don't have any pets yet",

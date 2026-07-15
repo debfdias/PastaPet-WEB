@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import * as Accordion from "@radix-ui/react-accordion";
-import { ChevronDown } from "lucide-react";
-import classNames from "clsx";
 import { format } from "date-fns";
+import { History, Scissors, GraduationCap } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import Pagination from "./Pagination";
 import { ClipLoader } from "react-spinners";
-import { MdEventNote } from "react-icons/md";
+import { icons } from "@/lib/icons";
+import { cn } from "@/lib/utils";
 
 interface Pet {
   id: string;
@@ -40,6 +40,14 @@ interface LastEventsProps {
   token: string;
 }
 
+// Icon + soft tone per event type.
+const TYPE: Record<string, { icon: LucideIcon; tone: string }> = {
+  normal: { icon: icons.calendar_month, tone: "bg-sky-bg text-sky-fg" },
+  medical: { icon: icons.medical_services, tone: "bg-grape-bg text-grape-fg" },
+  grooming: { icon: Scissors, tone: "bg-success-bg text-success-fg" },
+  training: { icon: GraduationCap, tone: "bg-amber-bg text-amber-fg" },
+};
+
 export default function LastEvents({ token }: LastEventsProps) {
   const router = useRouter();
   const t = useTranslations("dashboard.lastEvents");
@@ -55,27 +63,17 @@ export default function LastEvents({ token }: LastEventsProps) {
     setLoading(true);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/events?page=${page}&limit=10`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        `${process.env.NEXT_PUBLIC_API_URL}/events?page=${page}&limit=6`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch events");
-      }
-
+      if (!response.ok) throw new Error("Failed to fetch events");
       const data: EventsResponse = await response.json();
       setEvents(data.events);
       setPagination(data.pagination);
       setIsInitialLoad(false);
     } catch (error) {
       console.error("Failed to fetch events:", error);
-      if (isInitialLoad) {
-        setEvents([]);
-      }
+      if (isInitialLoad) setEvents([]);
     } finally {
       setLoading(false);
     }
@@ -86,17 +84,12 @@ export default function LastEvents({ token }: LastEventsProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+  const handlePageChange = (page: number) => setCurrentPage(page);
 
-  // Helper function to parse date strings and avoid timezone issues
+  // Parse date strings, avoiding timezone shifts.
   const parseDateString = (dateString: string): Date => {
-    // Handle formats like "2025-12-12 00:00:00" or "2025-12-12T00:00:00"
-    // Extract just the date part (YYYY-MM-DD) and create a local date
     const dateOnly = dateString.split(" ")[0].split("T")[0];
     const [year, month, day] = dateOnly.split("-").map(Number);
-    // Create date in local timezone (month is 0-indexed in JS Date)
     return new Date(year, month - 1, day);
   };
 
@@ -111,129 +104,94 @@ export default function LastEvents({ token }: LastEventsProps) {
   };
 
   return (
-    <div className="bg-pet-card rounded-lg border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 hover:shadow-lg transition-all duration-200 h-full flex flex-col">
-      <Accordion.Root
-        type="single"
-        collapsible
-        defaultValue="last-events"
-        className="w-full flex-1 flex flex-col"
-      >
-        <Accordion.Item
-          value="last-events"
-          className="overflow-hidden flex-1 flex flex-col"
-        >
-          <div className="p-8">
-            <Accordion.Header className="AccordionHeader ">
-              <Accordion.Trigger
-                className={classNames(
-                  "AccordionTrigger w-full flex items-center justify-between p-6 hover:bg-pet-card/80 transition-colors",
-                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-avocado-500"
-                )}
-              >
-                <div className="flex items-center gap-3">
-                  <MdEventNote className="text-3xl text-avocado-500" />
-                  <h3 className="text-2xl font-bold">{t("title")}</h3>
-                </div>
-                <ChevronDown
-                  className="AccordionChevron w-5 h-5 transition-transform duration-300 flex-shrink-0"
-                  aria-hidden
-                />
-              </Accordion.Trigger>
-            </Accordion.Header>
-          </div>
+    <div className="flex h-full flex-col rounded-card bg-surface p-6 shadow-card">
+      <div className="mb-4 flex items-center gap-3">
+        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-tint text-deep">
+          <History className="h-5 w-5" strokeWidth={2.5} />
+        </span>
+        <h2 className="text-2xl font-display font-extrabold text-ink">
+          {t("title")}
+        </h2>
+      </div>
 
-          <Accordion.Content
-            className={classNames(
-              "AccordionContent overflow-hidden",
-              "data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
-            )}
-          >
-            <div className="px-6 pb-6 relative">
-              {isInitialLoad && loading ? (
-                <div className="text-center py-8">{t("loading")}</div>
-              ) : events?.length === 0 && !loading ? (
-                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                  {t("noEvents")}
-                </div>
-              ) : (
-                <>
-                  <div className="overflow-x-auto relative">
-                    <div
-                      className={classNames(
-                        loading &&
-                          !isInitialLoad &&
-                          "blur-sm opacity-60 pointer-events-none"
-                      )}
-                    >
-                      <table className="w-full border-collapse text-sm">
-                        <thead>
-                          <tr className="border-b-2 border-gray-300 dark:border-gray-600">
-                            <th className="text-left p-3 font-semibold">
-                              {t("table.title")}
-                            </th>
-                            <th className="text-left p-3 font-semibold">
-                              {t("table.pet")}
-                            </th>
-                            <th className="text-left p-3 font-semibold">
-                              {t("table.type")}
-                            </th>
-                            <th className="text-left p-3 font-semibold">
-                              {t("table.date")}
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {events.map((event) => (
-                            <tr
-                              key={event.id}
-                              onClick={() =>
-                                router.push(`/pets/${event.petId}`)
-                              }
-                              className="border-b border-gray-200 dark:border-gray-700 hover:bg-avocado-500/10 dark:hover:bg-avocado-500/20 transition-colors cursor-pointer"
-                            >
-                              <td className="p-3">{event.title}</td>
-                              <td className="p-3">{event.pet.name}</td>
-                              <td className="p-3">
-                                <span className="px-2 py-1 rounded-md bg-avocado-500/20 text-avocado-800 dark:text-avocado-300 text-sm">
-                                  {formatEventType(event.type)}
-                                </span>
-                              </td>
-                              <td className="p-3">
-                                {format(
-                                  parseDateString(event.eventDate),
-                                  "dd/MM/yy"
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                    {loading && !isInitialLoad && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-pet-card/40 z-10 pointer-events-none">
-                        <ClipLoader size={40} color="hsl(148 91% 45%)" />
-                      </div>
-                    )}
-                  </div>
-                  {pagination && pagination.totalPages > 1 && (
-                    <div
-                      className={classNames(
-                        loading && "opacity-50 pointer-events-none"
-                      )}
-                    >
-                      <Pagination
-                        currentPage={currentPage}
-                        totalPages={pagination.totalPages}
-                        onPageChange={handlePageChange}
-                      />
-                    </div>
-                  )}
-                </>
+      {isInitialLoad && loading ? (
+        <div className="flex items-center justify-center gap-2 py-8">
+          <ClipLoader size={20} color="#0E7A4A" />
+          <span className="text-muted">{t("loading")}</span>
+        </div>
+      ) : events?.length === 0 && !loading ? (
+        <div className="flex flex-1 items-center justify-center py-8">
+          <p className="text-center text-muted">{t("noEvents")}</p>
+        </div>
+      ) : (
+        <div className="flex flex-1 flex-col">
+          <div className="relative flex-1">
+            <div
+              className={cn(
+                "space-y-2",
+                loading && !isInitialLoad && "blur-sm opacity-60 pointer-events-none"
               )}
+            >
+              {events.map((event) => {
+                const cfg = TYPE[event.type] ?? TYPE.normal;
+                const Icon = cfg.icon;
+                return (
+                  <div
+                    key={event.id}
+                    onClick={() => router.push(`/pets/${event.petId}`)}
+                    className="flex cursor-pointer items-center gap-3 rounded-2xl bg-panel p-3 transition-colors hover:bg-tint"
+                  >
+                    <span
+                      className={cn(
+                        "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+                        cfg.tone
+                      )}
+                    >
+                      <Icon className="h-5 w-5" strokeWidth={2.5} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-extrabold text-ink">
+                        {event.title}
+                      </p>
+                      <p className="truncate text-xs text-muted">
+                        {event.pet.name} ·{" "}
+                        {format(parseDateString(event.eventDate), "dd/MM")}
+                      </p>
+                    </div>
+                    <span
+                      className={cn(
+                        "shrink-0 rounded-chip px-2.5 py-1 text-xs font-extrabold",
+                        cfg.tone
+                      )}
+                    >
+                      {formatEventType(event.type)}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
-          </Accordion.Content>
-        </Accordion.Item>
-      </Accordion.Root>
+            {loading && !isInitialLoad && (
+              <div className="absolute inset-0 flex items-center justify-center bg-surface/60 pointer-events-none">
+                <ClipLoader size={40} color="#0E7A4A" />
+              </div>
+            )}
+          </div>
+          {pagination && pagination.totalPages > 1 && (
+            <div
+              className={cn(
+                "mt-auto pt-4",
+                loading && "opacity-50 pointer-events-none"
+              )}
+            >
+              <Pagination
+                currentPage={currentPage}
+                totalPages={pagination.totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

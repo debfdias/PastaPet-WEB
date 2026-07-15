@@ -15,10 +15,16 @@ import { toast } from "react-toastify";
 import EventsSection from "@/components/EventsSection";
 import VaccineSection from "@/components/VaccineSection";
 import ExamSection from "@/components/ExamSection";
-import TreatmentSection from "@/components/TreatmentSection";
-import RemindersSection from "@/components/RemindersSection";
+import ActiveTreatment from "@/components/ActiveTreatment";
+import UpcomingReminders from "@/components/UpcomingReminders";
 import { PetGender, PetType } from "@/types/pet";
 import { getPetByIdClient, type PetApiResponse } from "@/services/pets.service";
+import {
+  getTreatmentsByPet,
+  type Treatment,
+} from "@/services/treatments.service";
+import { getRemindersByPetId } from "@/services/reminders.service";
+import type { Reminder } from "@/types/reminder";
 
 // interface Event {
 //   id: string;
@@ -108,6 +114,10 @@ export default function PetDetailsPage() {
   const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
   const [isTreatmentModalOpen, setIsTreatmentModalOpen] = useState(false);
   const [isPetModalOpen, setIsPetModalOpen] = useState(false);
+  const [treatments, setTreatments] = useState<Treatment[]>([]);
+  const [treatmentsLoading, setTreatmentsLoading] = useState(true);
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [remindersLoading, setRemindersLoading] = useState(true);
 
   const translateType = (type: string) => {
     const typeMap: Record<string, string> = {
@@ -184,10 +194,55 @@ export default function PetDetailsPage() {
     }
   }, [session?.user?.token, params.id, t]);
 
+  const fetchTreatments = useCallback(async () => {
+    if (!session?.user?.token) return;
+    setTreatmentsLoading(true);
+    try {
+      const data = await getTreatmentsByPet(
+        session.user.token,
+        params.id as string,
+        1,
+        50
+      );
+      setTreatments(data.treatments);
+    } catch (error) {
+      console.error("Failed to fetch treatments:", error);
+    } finally {
+      setTreatmentsLoading(false);
+    }
+  }, [session?.user?.token, params.id]);
+
+  const fetchReminders = useCallback(async () => {
+    if (!session?.user?.token) return;
+    setRemindersLoading(true);
+    try {
+      const token = session.user.token;
+      const petId = params.id as string;
+      const pageSize = 50;
+      const first = await getRemindersByPetId(token, petId, 1, pageSize);
+      const all = [...first.reminders];
+      const totalPages = first.pagination?.totalPages ?? 1;
+      for (let p = 2; p <= totalPages; p++) {
+        const d = await getRemindersByPetId(token, petId, p, pageSize);
+        all.push(...d.reminders);
+      }
+      setReminders(all);
+    } catch (error) {
+      console.error("Failed to fetch reminders:", error);
+    } finally {
+      setRemindersLoading(false);
+    }
+  }, [session?.user?.token, params.id]);
+
   useEffect(() => {
     if (status === "loading") return;
     fetchPetDetails();
-  }, [session, status, fetchPetDetails]);
+    fetchTreatments();
+    fetchReminders();
+    // Depend on the memoized fetchers (keyed on the stable token), NOT the
+    // `session` object — next-auth swaps its reference on window focus, which
+    // would otherwise refetch everything and flash the loading states.
+  }, [status, fetchPetDetails, fetchTreatments, fetchReminders]);
 
   if (status === "loading" || loading) {
     return (
@@ -236,50 +291,69 @@ export default function PetDetailsPage() {
     toast.success(t("pets.success.petUpdated"));
   };
 
+  const now = new Date();
+  const activeTreatments = treatments.filter((tr) => {
+    const s = parseDateString(tr.startDate);
+    const e = tr.endDate ? parseDateString(tr.endDate) : null;
+    return s <= now && (!e || e >= now);
+  });
+
   return (
-    <div className="container mx-auto py-8 md:px-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
-        <PetInfo
-          pet={{
-            ...pet,
-            image: pet.image || "",
-          }}
-          onEdit={handlePetEdit}
-          translateType={translateType}
-          translateGender={translateGender}
+    <div className="py-8">
+      <div className="space-y-8">
+        {/* Row 1: hero + reminders */}
+        <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2">
+          <PetInfo
+            pet={{ ...pet, image: pet.image || "" }}
+            onEdit={handlePetEdit}
+            translateType={translateType}
+            translateGender={translateGender}
+            parseDateString={parseDateString}
+            getFuneraryPlanStatus={getFuneraryPlanStatus}
+            activeTreatmentCauses={activeTreatments.map((tr) => tr.cause)}
+          />
+          <UpcomingReminders
+            reminders={reminders}
+            token={session.user.token}
+            loading={remindersLoading}
+            onChange={fetchReminders}
+            checkAll
+            pageSize={6}
+          />
+        </div>
+
+        {/* Row 2: active treatment */}
+        <ActiveTreatment
+          treatments={activeTreatments}
+          loading={treatmentsLoading}
           parseDateString={parseDateString}
-          getFuneraryPlanStatus={getFuneraryPlanStatus}
+          onAdd={() => setIsTreatmentModalOpen(true)}
         />
 
-        <RemindersSection token={session.user.token} petId={pet.id} />
+        {/* Row 3: vaccines + exams */}
+        <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2">
+          <VaccineSection
+            petId={pet.id}
+            onAddClick={() => setIsVaccineModalOpen(true)}
+            parseDateString={parseDateString}
+          />
+          <ExamSection
+            petId={pet.id}
+            onAddClick={() => {
+              setSelectedExam(null);
+              setIsExamModalOpen(true);
+            }}
+            onEditClick={(exam) => {
+              setSelectedExam(exam);
+              setIsExamModalOpen(true);
+            }}
+          />
+        </div>
 
+        {/* Row 4: events timeline */}
         <EventsSection
           petId={pet.id}
           onAddClick={() => setIsModalOpen(true)}
-          parseDateString={parseDateString}
-        />
-
-        <VaccineSection
-          petId={pet.id}
-          onAddClick={() => setIsVaccineModalOpen(true)}
-          parseDateString={parseDateString}
-        />
-
-        <ExamSection
-          petId={pet.id}
-          onAddClick={() => {
-            setSelectedExam(null);
-            setIsExamModalOpen(true);
-          }}
-          onEditClick={(exam) => {
-            setSelectedExam(exam);
-            setIsExamModalOpen(true);
-          }}
-        />
-
-        <TreatmentSection
-          petId={pet.id}
-          onAddClick={() => setIsTreatmentModalOpen(true)}
           parseDateString={parseDateString}
         />
       </div>
@@ -322,10 +396,7 @@ export default function PetDetailsPage() {
         isOpen={isTreatmentModalOpen}
         onClose={() => setIsTreatmentModalOpen(false)}
         petId={pet.id}
-        onSuccess={() => {
-          // Trigger refetch in TreatmentSection
-          window.dispatchEvent(new CustomEvent("refresh-treatments"));
-        }}
+        onSuccess={() => fetchTreatments()}
       />
 
       <PetModal

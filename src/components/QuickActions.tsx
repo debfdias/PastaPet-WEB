@@ -2,12 +2,16 @@
 
 import { useTranslations } from "next-intl";
 import { MdPets, MdEvent, MdNotifications } from "react-icons/md";
+import { ChevronRight } from "lucide-react";
 import { IconType } from "react-icons";
+import { cn } from "@/lib/utils";
 
 interface QuickAction {
   id: string;
   icon: IconType;
   labelKey: string;
+  descKey: string;
+  chip: string;
   onClick: () => void;
 }
 
@@ -29,38 +33,60 @@ export default function QuickActions({
       id: "add-pet",
       icon: MdPets,
       labelKey: "addPet",
+      descKey: "addPetDesc",
+      chip: "bg-mint text-white",
       onClick: onAddPet,
     },
     {
       id: "add-event",
       icon: MdEvent,
       labelKey: "addEvent",
+      descKey: "addEventDesc",
+      chip: "bg-sky-bg text-sky-fg",
       onClick: onAddEvent,
     },
     {
       id: "add-reminder",
       icon: MdNotifications,
       labelKey: "addReminder",
+      descKey: "addReminderDesc",
+      chip: "bg-amber-bg text-amber-fg",
       onClick: onAddReminder,
     },
   ];
 
   return (
-    <div className="mb-12">
-      <h2 className="text-2xl font-semibold mb-4">{t("title")}</h2>
-      <div className="grid grid-cols-4 sm:grid-cols-6 md:flex md:flex-wrap gap-2 sm:gap-4">
+    <div className="flex h-full flex-col rounded-card bg-surface p-6 shadow-card">
+      <h2 className="mb-4 text-2xl font-display font-extrabold text-ink">
+        {t("title")}
+      </h2>
+      <div className="space-y-2">
         {actions.map((action) => {
           const Icon = action.icon;
           return (
             <button
               key={action.id}
               onClick={action.onClick}
-              className="flex flex-col items-center justify-center gap-1 bg-pet-card border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 text-gray-800 dark:text-gray-200 p-2 rounded-lg transition-all cursor-pointer font-medium hover:scale-105 aspect-square w-full sm:w-20 sm:h-20"
+              className="group flex w-full cursor-pointer items-center gap-3 rounded-2xl bg-panel p-3 text-left transition-all hover:bg-tint"
             >
-              <Icon className="text-4xl sm:text-6xl text-text-primary dark:text-avocado-500" />
-              <span className="text-[10px] sm:text-xs font-semibold text-center leading-tight">
-                {t(action.labelKey)}
+              <span
+                className={cn(
+                  "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl",
+                  action.chip
+                )}
+              >
+                <Icon className="text-2xl" />
               </span>
+              <div className="min-w-0 flex-1">
+                <p className="font-extrabold text-ink">{t(action.labelKey)}</p>
+                <p className="truncate text-xs text-muted">
+                  {t(action.descKey)}
+                </p>
+              </div>
+              <ChevronRight
+                className="h-5 w-5 shrink-0 text-faint transition-transform group-hover:translate-x-0.5"
+                strokeWidth={2.5}
+              />
             </button>
           );
         })}
@@ -68,4 +94,3 @@ export default function QuickActions({
     </div>
   );
 }
-

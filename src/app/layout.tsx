@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { baloo, nunito } from "./fonts";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { AuthProvider } from "./providers/AuthProvider";
@@ -10,16 +10,6 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Pasta Pet",
@@ -34,10 +24,12 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased text-gray-800 dark:text-gray-300 flex flex-col min-h-screen`}
-      >
+    <html
+      lang="pt-BR"
+      suppressHydrationWarning
+      className={`${baloo.variable} ${nunito.variable}`}
+    >
+      <body className="antialiased text-ink flex flex-col min-h-screen">
         <Analytics />
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider enableSystem={true} defaultTheme="system">

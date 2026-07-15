@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { useTranslations } from "next-intl";
+import { ptBR, enUS } from "date-fns/locale";
+import { useTranslations, useLocale } from "next-intl";
 import { useSession } from "next-auth/react";
-import { MdEvent, MdEventNote } from "react-icons/md";
-import { FaPlus } from "react-icons/fa";
+import { History, Plus, Bath, GraduationCap } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import Pagination from "./Pagination";
 import { ClipLoader } from "react-spinners";
+import { icons } from "@/lib/icons";
+import { cn } from "@/lib/utils";
 import {
   getEventsByPet,
   type Event,
@@ -21,6 +23,14 @@ interface EventsSectionProps {
   parseDateString: (dateString: string) => Date;
 }
 
+// Icon + colors per event type.
+const TYPE: Record<string, { icon: LucideIcon; fill: string; ring: string; text: string }> = {
+  normal: { icon: icons.calendar_month, fill: "bg-sky-bg text-sky-fg", ring: "ring-sky", text: "text-sky-fg" },
+  medical: { icon: icons.medical_services, fill: "bg-grape-bg text-grape-fg", ring: "ring-grape", text: "text-grape-fg" },
+  grooming: { icon: Bath, fill: "bg-success-bg text-success-fg", ring: "ring-mint", text: "text-success-fg" },
+  training: { icon: GraduationCap, fill: "bg-amber-bg text-amber-fg", ring: "ring-amber", text: "text-amber-fg" },
+};
+
 export default function EventsSection({
   petId,
   onAddClick,
@@ -28,6 +38,8 @@ export default function EventsSection({
 }: EventsSectionProps) {
   const { data: session } = useSession();
   const t = useTranslations("petDetails.events");
+  const locale = useLocale();
+  const dateLocale = locale === "en" ? enUS : ptBR;
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -38,7 +50,6 @@ export default function EventsSection({
 
   const fetchEvents = async (page: number = 1) => {
     if (!session?.user?.token) return;
-
     setLoading(true);
     try {
       const data = await getEventsByPet(session.user.token, petId, page, 5);
@@ -47,105 +58,109 @@ export default function EventsSection({
       setIsInitialLoad(false);
     } catch (error) {
       console.error("Failed to fetch events:", error);
-      if (isInitialLoad) {
-        setEvents([]);
-      }
+      if (isInitialLoad) setEvents([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (session?.user?.token) {
-      fetchEvents(currentPage);
-    }
+    if (session?.user?.token) fetchEvents(currentPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, petId, session?.user?.token]);
 
   useEffect(() => {
-    const handleRefresh = () => {
-      fetchEvents(currentPage);
-    };
+    const handleRefresh = () => fetchEvents(currentPage);
     window.addEventListener("refresh-events", handleRefresh);
     return () => window.removeEventListener("refresh-events", handleRefresh);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
   return (
-    <div className="bg-pet-card rounded-lg p-6 border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 hover:shadow-lg transition-all duration-200 md:h-full flex flex-col">
-      <div className="flex justify-between items-center mb-4">
+    <div className="flex h-full flex-col rounded-card bg-surface p-6 shadow-card">
+      <div className="mb-4 flex items-center justify-between gap-2">
         <div className="flex items-center gap-3">
-          <MdEventNote className="text-2xl text-avocado-500" />
-          <h2 className="text-2xl font-bold">{t("title")}</h2>
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-tint text-deep">
+            <History className="h-5 w-5" strokeWidth={2.5} />
+          </span>
+          <h2 className="text-2xl font-display font-extrabold text-ink">
+            {t("title")}
+          </h2>
         </div>
         <button
           onClick={onAddClick}
-          className="flex items-center justify-center gap-1 px-3 py-3 rounded-lg bg-avocado-500 hover:bg-avocado-300 text-gray-800 transition-colors cursor-pointer"
+          className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-btn border border-mint bg-transparent px-3 py-1.5 text-sm font-extrabold text-mint transition-colors hover:bg-tint"
         >
-          <FaPlus size={12} />
-          <MdEvent size={16} />
+          {t("add")}
+          <Plus className="h-4 w-4" strokeWidth={2.5} />
         </button>
       </div>
+
       {isInitialLoad && loading ? (
-        <div className="flex items-center justify-center gap-2 py-8">
-          <ClipLoader size={20} color="hsl(148 91% 45%)" />
-          <span>{t("loading") || "Loading..."}</span>
+        <div className="flex flex-1 items-center justify-center gap-2 py-8">
+          <ClipLoader size={20} color="#0E7A4A" />
+          <span className="text-muted">{t("loading")}</span>
         </div>
       ) : events?.length === 0 && !loading ? (
-        <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-          {t("noEvents")}
-        </p>
+        <div className="flex flex-1 items-center justify-center py-8">
+          <p className="text-center text-muted">{t("noEvents")}</p>
+        </div>
       ) : (
-        <div className="flex flex-col flex-1 md:min-h-[400px] min-h-0">
-          <div className="space-y-2 relative flex-1 min-h-0">
-            <div
-              className={
-                loading && !isInitialLoad
-                  ? "blur-sm opacity-60 pointer-events-none"
-                  : ""
-              }
-            >
-              {events?.map((event) => (
-                <div
-                  key={event.id}
-                  className="px-3 py-2 mt-2 bg-gray-100/50 dark:bg-gray-600/20 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-avocado-500/10 dark:hover:bg-avocado-500/20 hover:border-avocado-500/50 transition-all cursor-pointer"
-                >
-                  <h3 className="font-semibold text-gray-800 dark:text-gray-200">
-                    {event.title}
-                  </h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
-                    {format(parseDateString(event.eventDate), "PPP", {
-                      locale: ptBR,
-                    })}
-                  </p>
-                </div>
-              ))}
-            </div>
-            {loading && !isInitialLoad && (
-              <div className="absolute inset-0 flex items-center justify-center bg-pet-card/40 z-10 pointer-events-none">
-                <ClipLoader size={40} color="hsl(148 91% 45%)" />
-              </div>
+        <div className="flex flex-1 flex-col">
+          <div
+            className={cn(
+              "flex-1",
+              loading && !isInitialLoad && "opacity-60 pointer-events-none"
             )}
+          >
+            {events.map((event, i) => {
+              const cfg = TYPE[event.type] ?? TYPE.normal;
+              const Icon = cfg.icon;
+              const last = i === events.length - 1;
+              return (
+                <div key={event.id} className="flex gap-3">
+                  <div className="flex w-11 flex-col items-center">
+                    <span
+                      className={cn(
+                        "flex h-8 w-8 items-center justify-center rounded-full ring-2 ring-offset-2 ring-offset-surface",
+                        cfg.fill,
+                        cfg.ring
+                      )}
+                    >
+                      <Icon className="h-4 w-4" strokeWidth={2.5} />
+                    </span>
+                    {!last && <span className="my-1 w-0.5 flex-1 bg-hair" />}
+                  </div>
+                  <div className="min-w-0 pb-5">
+                    <p
+                      className={cn(
+                        "text-[11px] font-extrabold uppercase tracking-wide",
+                        cfg.text
+                      )}
+                    >
+                      {format(parseDateString(event.eventDate), "d MMM yyyy", {
+                        locale: dateLocale,
+                      }).toUpperCase()}
+                    </p>
+                    <p className="font-bold text-ink">{event.title}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
           {pagination && pagination.totalPages > 1 && (
             <div
-              className={`mt-auto pt-4 ${
-                loading ? "opacity-50 pointer-events-none" : ""
-              }`}
+              className={cn(
+                "mt-auto pt-2",
+                loading && "opacity-50 pointer-events-none"
+              )}
             >
               <Pagination
                 currentPage={currentPage}
                 totalPages={pagination.totalPages}
-                onPageChange={handlePageChange}
+                onPageChange={setCurrentPage}
               />
             </div>
-          )}
-          {(!pagination || pagination.totalPages <= 1) && (
-            <div className="mt-auto"></div>
           )}
         </div>
       )}

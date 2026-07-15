@@ -1,113 +1,206 @@
+"use client";
+
 import { differenceInYears, differenceInMonths } from "date-fns";
-import { Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { MdHealthAndSafety } from "react-icons/md";
-import { GiTombstone } from "react-icons/gi";
+import { Chip } from "@/components/ui/Chip";
+import { icons } from "@/lib/icons";
+import { cn } from "@/lib/utils";
+import type { PetApiResponse } from "@/services/pets.service";
 
-interface Pet {
-  id: string;
-  name: string;
-  dob: string;
-  weight: number;
-  type: string;
-  breed: string;
-  image?: string;
-  gender: string;
-  hasPetPlan: boolean;
-  hasFuneraryPlan: boolean;
-  petPlanName?: string;
+// Funerary plan is a single brand — if the pet has one, it's Pet Fenix.
+const FUNERAL_PLAN_NAME = "Pet Fenix";
+
+/**
+ * Per-pet health data layered on top of the API shape. `status` is derived on
+ * the pets page from the under-treatment list (healthy | treatment). FIV/FeLV
+ * flags and vaccine rollups are intentionally out of scope for now.
+ */
+export interface PetHealth {
+  status?: "healthy" | "treatment";
 }
+
+export type PetCardPet = PetApiResponse & PetHealth;
 
 interface PetCardProps {
-  pet: Pet;
-  onEdit: (pet: Pet) => void;
+  pet: PetCardPet;
+  onEdit: (pet: PetApiResponse) => void;
+  selected?: boolean;
 }
 
-export default function PetCard({ pet, onEdit }: PetCardProps) {
+// Status chip config — pink filled heart for healthy, orange for treatment.
+const STATUS = {
+  healthy: {
+    icon: icons.favorite,
+    labelKey: "status.healthy",
+    chip: "bg-pink-bg text-pink-fg",
+    iconCls: "fill-pink text-pink",
+  },
+  treatment: {
+    icon: icons.medical_services,
+    labelKey: "status.treatment",
+    chip: "bg-orange-bg text-orange-fg",
+    iconCls: "",
+  },
+} as const;
+
+export default function PetCard({ pet, onEdit, selected }: PetCardProps) {
   const router = useRouter();
   const t = useTranslations("petCard");
 
-  const calculateAge = (dob: string) => {
-    const birthDate = new Date(dob);
-    const years = differenceInYears(new Date(), birthDate);
-    const months = differenceInMonths(new Date(), birthDate) % 12;
-
-    if (years === 0) {
-      return `${months} ${t("months")}`;
-    }
-    return `${years} ${t("years")} ${months} ${t("months")}`;
+  const ageLabel = (dob: string) => {
+    const birth = new Date(dob);
+    const years = differenceInYears(new Date(), birth);
+    const months = differenceInMonths(new Date(), birth) % 12;
+    return years === 0
+      ? `${months}${t("monthShort")}`
+      : `${years}${t("yearShort")} ${months}${t("monthShort")}`;
   };
 
+  const speciesKey =
+    pet.type?.toUpperCase() === "CAT"
+      ? "cat"
+      : pet.type?.toUpperCase() === "DOG"
+      ? "dog"
+      : "other";
+  const isMale = pet.gender?.toUpperCase() === "MALE";
+
+  const PawIcon = icons.pets;
+  const EditIcon = icons.edit;
+  const SexIcon = isMale ? icons.male : icons.female;
+
+  const statusCfg = pet.status ? STATUS[pet.status] : null;
+  const StatusIcon = statusCfg?.icon;
+  const showPlans = pet.hasPetPlan || pet.hasFuneraryPlan;
+
   const handleCardClick = (e: React.MouseEvent) => {
-    // Prevent navigation if clicking the edit button
-    if ((e.target as HTMLElement).closest("button")) {
-      return;
-    }
+    if ((e.target as HTMLElement).closest("button")) return;
     router.push(`/pets/${pet.id}`);
   };
 
   return (
     <div
-      className="bg-pet-card rounded-lg p-3 relative cursor-pointer border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 hover:shadow-lg transition-all duration-200"
       onClick={handleCardClick}
+      className={cn(
+        "group cursor-pointer overflow-hidden rounded-card bg-surface shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-card-hover",
+        selected && "ring-2 ring-mint"
+      )}
     >
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onEdit(pet);
-        }}
-        className="absolute top-2 right-2 text-avocado-800 rounded-full bg-avocado-500 hover:bg-avocado-300 p-3 cursor-pointer"
-        aria-label={t("editPet")}
-      >
-        <Pencil className="w-4 h-4" />
-      </button>
-      {pet.image && (
-        <div className="mb-4">
+      {/* photo */}
+      <div className="relative h-[168px] bg-tint">
+        {pet.image ? (
           <Image
             src={pet.image}
-            alt={`${pet.name}'s photo`}
-            width={400}
-            height={192}
-            className="w-full h-48 object-cover rounded-t-lg"
+            alt={pet.name}
+            fill
+            sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
+            className="object-cover"
           />
-        </div>
-      )}
-      <h3 className="text-base font-semibold mb-2 pr-6 text-transform: uppercase dark:text-white">
-        {pet.name}
-      </h3>
-      <div className="bg-[#b0b9a2]/20 dark:bg-gray-700 w-full h-[2px] mb-2"></div>
-      <div className="flex justify-between items-start">
-        {/* Left side - Age and Weight */}
-        <div className="space-y-0.5">
-          <p className="text-sm">{pet.weight} kg</p>
-          <p className="text-sm">{calculateAge(pet.dob)}</p>
-        </div>
-        {/* Right side - Pet Plan and Funerary Plan */}
-        <div className="flex flex-col items-end space-y-1">
-          {pet.hasPetPlan && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-700 dark:text-gray-300">
-                {pet.petPlanName || t("petPlan")}
-              </span>
-              <div className="w-5 h-5 rounded-full bg-blue-400 dark:bg-blue-500 flex items-center justify-center">
-                <MdHealthAndSafety className="text-white text-md" />
-              </div>
-            </div>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <PawIcon className="h-12 w-12 text-faint" strokeWidth={1.75} />
+          </div>
+        )}
+
+        {/* edit FAB — mint, solid */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit(pet);
+          }}
+          aria-label={t("editPet")}
+          className="absolute right-2.5 top-2.5 flex h-[34px] w-[34px] items-center justify-center rounded-full bg-mint text-white shadow-md transition-colors hover:bg-leaf"
+        >
+          <EditIcon className="h-[17px] w-[17px]" strokeWidth={2.5} />
+        </button>
+      </div>
+
+      {/* body */}
+      <div className="px-[15px] pb-4 pt-3.5">
+        {/* name + status chip */}
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <h3 className="truncate font-display text-[19px] font-extrabold text-ink">
+            {pet.name}
+          </h3>
+          {statusCfg && StatusIcon && (
+            <span
+              className={cn(
+                "inline-flex shrink-0 items-center gap-1 rounded-chip px-2.5 py-1 text-[11px] font-extrabold",
+                statusCfg.chip
+              )}
+            >
+              <StatusIcon
+                className={cn("h-3.5 w-3.5", statusCfg.iconCls)}
+                strokeWidth={2.5}
+              />
+              {t(statusCfg.labelKey)}
+            </span>
           )}
-          {pet.hasFuneraryPlan && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-700 dark:text-gray-300">
-                Pet Fenix
-              </span>
-              <div className="w-5 h-5 rounded-full bg-gray-400 dark:bg-gray-500 flex items-center justify-center">
-                <GiTombstone className="text-white text-md" />
-              </div>
-            </div>
-          )}
         </div>
+
+        {/* meta chips */}
+        <div className="flex flex-wrap gap-1.5">
+          <Chip tone="meta" icon={PawIcon}>
+            {t(`species.${speciesKey}`)}
+          </Chip>
+          <Chip tone="meta" icon={SexIcon}>
+            {t(`sex.${isMale ? "male" : "female"}`)}
+          </Chip>
+          <Chip tone="meta" icon={icons.monitor_weight}>
+            {pet.weight} kg
+          </Chip>
+          <Chip tone="meta" icon={icons.cake}>
+            {ageLabel(pet.dob)}
+          </Chip>
+        </div>
+
+        {/* plans row — labeled chips sized to their text (like the status chips) */}
+        {showPlans && (
+          <div className="mt-3 flex flex-wrap gap-1.5 border-t border-hair pt-[11px]">
+            {pet.hasPetPlan && (
+              <PlanChip
+                icon={icons.health_and_safety}
+                label={pet.petPlanName || t("petPlan")}
+                tone="planHealth"
+              />
+            )}
+            {pet.hasFuneraryPlan && (
+              <PlanChip
+                icon={icons.local_florist}
+                label={FUNERAL_PLAN_NAME}
+                tone="planFun"
+              />
+            )}
+          </div>
+        )}
       </div>
     </div>
+  );
+}
+
+function PlanChip({
+  icon: Icon,
+  label,
+  tone,
+}: {
+  icon: (typeof icons)[string];
+  label: string;
+  tone: "planHealth" | "planFun";
+}) {
+  const cls =
+    tone === "planHealth"
+      ? "bg-plan-health-bg text-plan-health-fg"
+      : "bg-plan-fun-bg text-plan-fun-fg";
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-[10px] px-2.5 py-1.5 text-[11px] font-extrabold",
+        cls
+      )}
+    >
+      <Icon className="h-[15px] w-[15px]" strokeWidth={2.5} />
+      {label}
+    </span>
   );
 }

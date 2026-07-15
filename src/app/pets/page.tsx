@@ -26,6 +26,8 @@ function PetsPageContent() {
   const { data: session, status } = useSession();
   const searchParams = useSearchParams();
   const [pets, setPets] = useState<PetApiResponse[]>([]);
+  // Ids of pets currently under treatment → drives each card's health status.
+  const [treatmentIds, setTreatmentIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -47,13 +49,22 @@ function PetsPageContent() {
     }
 
     try {
-      const data = await getPetsClient(session.user.token, {
-        ...(filters.name && { name: filters.name }),
-        ...(filters.type && { type: filters.type }),
-        ...(filters.orderByAge && { orderByAge: filters.orderByAge }),
-        ...(filters.underTreatment && { underTreatment: true }),
-      });
+      const token = session.user.token;
+      // Fetch the visible list and (unless already filtered) the full set of
+      // under-treatment pets in parallel, so we can mark each card's status.
+      const [data, treatmentPets] = await Promise.all([
+        getPetsClient(token, {
+          ...(filters.name && { name: filters.name }),
+          ...(filters.type && { type: filters.type }),
+          ...(filters.orderByAge && { orderByAge: filters.orderByAge }),
+          ...(filters.underTreatment && { underTreatment: true }),
+        }),
+        filters.underTreatment
+          ? Promise.resolve(null)
+          : getPetsClient(token, { underTreatment: true }),
+      ]);
       setPets(data);
+      setTreatmentIds(new Set((treatmentPets ?? data).map((p) => p.id)));
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : t("errors.anErrorOccurred");
@@ -120,12 +131,14 @@ function PetsPageContent() {
   }
 
   return (
-    <div className="min-h-screen pt-8 md:px-8">
+    <div className="min-h-screen pt-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">{t("title")}</h1>
+        <h1 className="text-3xl font-display font-extrabold text-ink">
+          {t("title")}
+        </h1>
         <button
           onClick={handleAdd}
-          className="bg-avocado-500 hover:bg-avocado-300 text-gray-800 px-4 py-2 rounded-lg transition-colors cursor-pointer font-medium flex items-center"
+          className="bg-deep hover:bg-forest text-white px-4 py-2 rounded-btn transition-colors cursor-pointer font-extrabold flex items-center"
         >
           <div>{t("addPet")}</div>
           <MdPets className="ml-2" />
@@ -142,16 +155,23 @@ function PetsPageContent() {
           <p className="text-xl mb-4">{t("noPets.message")}</p>
           <button
             onClick={handleAdd}
-            className="bg-avocado-500 hover:bg-avocado-300 text-gray-800 px-4 py-2 rounded-lg transition-colors cursor-pointer font-medium flex items-center"
+            className="bg-deep hover:bg-forest text-white px-4 py-2 rounded-btn transition-colors cursor-pointer font-extrabold flex items-center"
           >
             <div>{t("noPets.addPet")}</div>
             <MdPets className="ml-2" />
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-[18px]">
           {pets.map((pet) => (
-            <PetCard key={pet.id} pet={pet} onEdit={handleEdit} />
+            <PetCard
+              key={pet.id}
+              pet={{
+                ...pet,
+                status: treatmentIds.has(pet.id) ? "treatment" : "healthy",
+              }}
+              onEdit={handleEdit}
+            />
           ))}
         </div>
       )}

@@ -78,15 +78,19 @@ export default function TreatmentSection({
   };
 
   return (
-    <div className="bg-pet-card rounded-lg p-6 border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 hover:shadow-lg transition-all duration-200 md:h-full flex flex-col">
+    <div className="rounded-card bg-surface p-6 shadow-card md:h-full flex flex-col">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-3">
-          <ImAidKit className="text-2xl text-avocado-500" />
-          <h2 className="text-2xl font-bold">{t("title")}</h2>
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-tint text-deep">
+            <ImAidKit className="text-2xl" />
+          </span>
+          <h2 className="text-2xl font-display font-extrabold text-ink">
+            {t("title")}
+          </h2>
         </div>
         <button
           onClick={onAddClick}
-          className="flex items-center justify-center gap-1 px-3 py-3 rounded-lg bg-avocado-500 hover:bg-avocado-300 text-gray-800 transition-colors cursor-pointer"
+          className="flex items-center justify-center gap-1 px-3 py-3 rounded-btn bg-mint hover:bg-leaf text-white transition-colors cursor-pointer"
         >
           <FaPlus size={12} />
           <MdLocalHospital size={16} />
@@ -94,11 +98,11 @@ export default function TreatmentSection({
       </div>
       {isInitialLoad && loading ? (
         <div className="flex items-center justify-center gap-2 py-8">
-          <ClipLoader size={20} color="hsl(148 91% 45%)" />
+          <ClipLoader size={20} color="#0E7A4A" />
           <span>{t("loading") || "Loading..."}</span>
         </div>
       ) : treatments?.length === 0 && !loading ? (
-        <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+        <p className="text-muted text-center py-4">
           {t("noRecords")}
         </p>
       ) : (
@@ -114,16 +118,16 @@ export default function TreatmentSection({
               {treatments?.map((treatment) => (
                 <div
                   key={treatment.id}
-                  className="mt-2 bg-gray-100/50 dark:bg-gray-600/20 p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-avocado-500/10 dark:hover:bg-avocado-500/20 hover:border-avocado-500/50 transition-all cursor-pointer"
+                  className="mt-2 bg-panel p-4 border border-hair rounded-2xl hover:bg-tint hover:border-mint transition-all cursor-pointer"
                 >
-                  <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+                  <h3 className="font-extrabold text-ink">
                     {treatment.cause}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-sm text-muted mt-1">
                     {treatment.description}
                   </p>
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500 dark:text-gray-500">
+                    <p className="text-sm text-muted">
                       {format(parseDateString(treatment.startDate), "PPP", {
                         locale: ptBR,
                       })}{" "}
@@ -135,10 +139,10 @@ export default function TreatmentSection({
                   </div>
                   {treatment.medications.length > 0 && (
                     <div className="mt-2">
-                      <h4 className="text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                      <h4 className="text-sm font-bold mb-1 text-muted">
                         {t("medications")}:
                       </h4>
-                      <ul className="list-disc list-inside text-sm text-gray-600 dark:text-gray-400">
+                      <ul className="list-disc list-inside text-sm text-muted">
                         {treatment.medications?.map((med) => (
                           <li key={med.id}>
                             {med.name} - {med.dosage} ({med.frequency})
@@ -151,8 +155,8 @@ export default function TreatmentSection({
               ))}
             </div>
             {loading && !isInitialLoad && (
-              <div className="absolute inset-0 flex items-center justify-center bg-pet-card/40 z-10 pointer-events-none">
-                <ClipLoader size={40} color="hsl(148 91% 45%)" />
+              <div className="absolute inset-0 flex items-center justify-center bg-surface/60 z-10 pointer-events-none">
+                <ClipLoader size={40} color="#0E7A4A" />
               </div>
             )}
           </div>

@@ -458,11 +458,11 @@ export default function RemindersSection({
     : [];
 
   return (
-    <div className="bg-pet-card rounded-lg p-6 border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 hover:shadow-lg transition-all duration-200 relative md:h-auto">
+    <div className="rounded-card bg-surface p-6 shadow-card relative md:h-auto">
       {/* Dark backdrop overlay when tooltip is open */}
       {selectedDate && (
         <div
-          className="absolute inset-0 bg-black/70 dark:bg-black/80 rounded-lg z-40 cursor-pointer"
+          className="absolute inset-0 bg-black/70 dark:bg-black/80 rounded-card z-40 cursor-pointer"
           onClick={() => {
             setSelectedDate(null);
             setTooltipPosition(null);
@@ -471,12 +471,16 @@ export default function RemindersSection({
       )}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <MdNotifications className="text-3xl text-avocado-500" />
-          <h2 className="text-2xl font-bold">{t("title")}</h2>
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-tint text-deep">
+            <MdNotifications className="text-2xl" />
+          </span>
+          <h2 className="text-2xl font-display font-extrabold text-ink">
+            {t("title")}
+          </h2>
           {displayMode === "list" &&
             pagination &&
             pagination.totalCount > 0 && (
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="text-sm text-muted">
                 ({pagination.totalCount})
               </span>
             )}
@@ -484,10 +488,10 @@ export default function RemindersSection({
         <div className="flex items-center gap-2">
           <button
             onClick={() => setDisplayMode("calendar")}
-            className={`px-3 py-1.5 rounded-md border transition-colors cursor-pointer ${
+            className={`px-3 py-1.5 rounded-ctrl border transition-colors cursor-pointer ${
               displayMode === "calendar"
-                ? "bg-avocado-500 text-gray-800 border-avocado-500"
-                : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                ? "bg-deep text-white border-deep"
+                : "bg-panel border-hair text-muted hover:bg-tint hover:text-deep"
             }`}
             title={t("displayMode.calendar")}
           >
@@ -495,10 +499,10 @@ export default function RemindersSection({
           </button>
           <button
             onClick={() => setDisplayMode("list")}
-            className={`px-3 py-1.5 rounded-md border transition-colors cursor-pointer ${
+            className={`px-3 py-1.5 rounded-ctrl border transition-colors cursor-pointer ${
               displayMode === "list"
-                ? "bg-avocado-500 text-gray-800 border-avocado-500"
-                : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                ? "bg-deep text-white border-deep"
+                : "bg-panel border-hair text-muted hover:bg-tint hover:text-deep"
             }`}
             title={t("displayMode.list")}
           >
@@ -511,13 +515,11 @@ export default function RemindersSection({
         <>
           {isInitialLoad && loading ? (
             <div className="flex items-center justify-center gap-2 py-8">
-              <ClipLoader size={20} color="hsl(148 91% 45%)" />
+              <ClipLoader size={20} color="#0E7A4A" />
               <span>{t("loading")}</span>
             </div>
           ) : reminders.length === 0 && !loading ? (
-            <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-              {t("noReminders")}
-            </p>
+            <p className="text-muted text-center py-8">{t("noReminders")}</p>
           ) : (
             <>
               <div className="relative">
@@ -532,24 +534,24 @@ export default function RemindersSection({
                     {reminders.map((reminder) => (
                       <div
                         key={reminder.id}
-                        className={`px-3 py-2 bg-gray-100/50 dark:bg-gray-600/20 border rounded-lg hover:bg-avocado-500/10 dark:hover:bg-avocado-500/20 hover:border-avocado-500/50 transition-all cursor-pointer ${
+                        className={`px-3 py-2 bg-panel border rounded-2xl hover:bg-tint hover:border-mint transition-all cursor-pointer ${
                           reminder.isCompleted
-                            ? "border-gray-200 dark:border-gray-700 opacity-60"
-                            : "border-gray-300 dark:border-gray-600"
+                            ? "border-hair opacity-60"
+                            : "border-hair"
                         }`}
                       >
                         <h3
-                          className={`font-medium text-base text-gray-800 dark:text-gray-200 truncate ${
+                          className={`font-extrabold text-base text-ink truncate ${
                             reminder.isCompleted ? "line-through" : ""
                           }`}
                         >
                           {reminder.title}
                         </h3>
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                          <div className="flex items-center gap-2 text-xs text-muted">
                             {reminder.pet && (
                               <>
-                                <span className="font-medium text-gray-600 dark:text-gray-300">
+                                <span className="font-bold text-ink">
                                   {reminder.pet.name}
                                 </span>
                                 <span>•</span>
@@ -576,7 +578,7 @@ export default function RemindersSection({
                               }}
                               onClick={(e) => e.stopPropagation()}
                               disabled={completingIds.has(reminder.id)}
-                              className="w-4 h-4 rounded border-gray-300 text-avocado-500 focus:ring-avocado-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="w-4 h-4 rounded border-hair accent-mint focus:ring-mint cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             />
                           </div>
                         </div>
@@ -585,8 +587,8 @@ export default function RemindersSection({
                   </div>
                 </div>
                 {loading && !isInitialLoad && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-pet-card/40 z-10 pointer-events-none">
-                    <ClipLoader size={40} color="hsl(148 91% 45%)" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-surface/60 z-10 pointer-events-none">
+                    <ClipLoader size={40} color="#0E7A4A" />
                   </div>
                 )}
               </div>
@@ -610,7 +612,7 @@ export default function RemindersSection({
         <>
           {isInitialLoad && loading ? (
             <div className="flex items-center justify-center gap-2 py-8">
-              <ClipLoader size={20} color="hsl(148 91% 45%)" />
+              <ClipLoader size={20} color="#0E7A4A" />
               <span>{t("loading")}</span>
             </div>
           ) : (
@@ -619,16 +621,16 @@ export default function RemindersSection({
               <div className="flex items-center justify-between mb-4">
                 <button
                   onClick={handlePreviousMonth}
-                  className="p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  className="p-2 rounded-ctrl border border-hair bg-panel text-muted hover:bg-tint hover:text-deep transition-colors cursor-pointer"
                 >
                   <MdChevronLeft className="w-5 h-5" />
                 </button>
-                <h3 className="text-lg font-semibold">
+                <h3 className="text-lg font-display font-extrabold text-ink capitalize">
                   {format(currentMonth, "MMMM yyyy", { locale: ptBR })}
                 </h3>
                 <button
                   onClick={handleNextMonth}
-                  className="p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  className="p-2 rounded-ctrl border border-hair bg-panel text-muted hover:bg-tint hover:text-deep transition-colors cursor-pointer"
                 >
                   <MdChevronRight className="w-5 h-5" />
                 </button>
@@ -640,7 +642,7 @@ export default function RemindersSection({
                   (day) => (
                     <div
                       key={day}
-                      className="text-center text-xs font-semibold text-gray-600 dark:text-gray-400 p-2"
+                      className="text-center text-xs font-extrabold text-muted p-2"
                     >
                       {day}
                     </div>
@@ -671,9 +673,9 @@ export default function RemindersSection({
                         className={classNames(
                           "w-full aspect-square md:h-16 rounded-xl border transition-all relative cursor-pointer flex flex-col items-center justify-center",
                           isToday
-                            ? "bg-avocado-500/20 border-avocado-500 font-semibold"
-                            : "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700",
-                          hasReminders && "ring-2 ring-avocado-500/50"
+                            ? "bg-mint/15 border-mint font-extrabold text-ink"
+                            : "bg-panel border-hair text-ink hover:bg-tint",
+                          hasReminders && "ring-2 ring-mint/50"
                         )}
                       >
                         {hasReminders ? (

@@ -3,8 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { MdPets, MdArrowForward } from "react-icons/md";
+import { MdArrowForward } from "react-icons/md";
 import { ImAidKit } from "react-icons/im";
+import { avatarColor } from "@/lib/avatarColor";
+import { cn } from "@/lib/utils";
 import type { PetUnderTreatment } from "@/services/treatments.service";
 
 interface PetsUnderTreatmentProps {
@@ -18,38 +20,34 @@ export default function PetsUnderTreatment({
 }: PetsUnderTreatmentProps) {
   const t = useTranslations("dashboard");
 
-  // The card previews up to `pets.length` (2 from the server); the rest are on
-  // the filtered pets page.
-  const hasMore = totalCount > pets.length;
-
   return (
-    <div className="bg-pet-card rounded-lg p-6 border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 hover:shadow-lg transition-all duration-200 flex flex-col">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <ImAidKit className="text-3xl text-avocado-500" />
-          <h2 className="text-2xl font-bold">{t("underTreatment.title")}</h2>
+    <div className="flex h-full flex-col rounded-card bg-surface p-6 shadow-card">
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-sky-bg text-sky-fg">
+            <ImAidKit className="text-2xl" />
+          </span>
+          <h2 className="truncate text-2xl font-display font-extrabold text-ink">
+            {t("underTreatment.title")}
+          </h2>
           {totalCount > 0 && (
-            <span className="flex items-center justify-center min-w-6 h-6 px-2 rounded-full bg-avocado-500/20 text-avocado-800 dark:text-avocado-300 text-sm font-semibold">
+            <span className="flex h-6 min-w-6 shrink-0 items-center justify-center rounded-full bg-panel px-2 text-sm font-extrabold text-muted">
               {totalCount}
             </span>
           )}
         </div>
-        {hasMore && (
-          <Link
-            href="/pets?underTreatment=true"
-            className="flex items-center gap-1 text-avocado-500 hover:text-avocado-300 transition-colors font-medium"
-          >
-            {t("viewAll")}
-            <MdArrowForward />
-          </Link>
-        )}
+        <Link
+          href="/pets?underTreatment=true"
+          className="flex shrink-0 items-center gap-1 whitespace-nowrap text-sm font-extrabold text-deep transition-all hover:gap-2"
+        >
+          {t("viewAll")}
+          <MdArrowForward />
+        </Link>
       </div>
 
       {pets.length === 0 ? (
-        <div className="flex items-center justify-center flex-1 py-8">
-          <p className="text-gray-500 dark:text-gray-400 text-center">
-            {t("underTreatment.empty")}
-          </p>
+        <div className="flex flex-1 items-center justify-center py-8">
+          <p className="text-center text-muted">{t("underTreatment.empty")}</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -57,32 +55,33 @@ export default function PetsUnderTreatment({
             <Link
               key={pet.id}
               href={`/pets/${pet.id}`}
-              className="flex items-center gap-3 bg-gray-100/50 dark:bg-gray-600/20 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-avocado-500/10 dark:hover:bg-avocado-500/20 hover:border-avocado-500/50 transition-all cursor-pointer"
+              className="flex items-center gap-3 rounded-2xl bg-panel p-2.5 transition-all hover:bg-tint"
             >
-              <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-pet-card dark:border-gray-700 flex-shrink-0">
+              <div className="relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-xl">
                 {pet.image ? (
                   <Image
                     src={pet.image}
                     alt={pet.name}
                     fill
-                    sizes="40px"
+                    sizes="44px"
                     className="object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
-                    <MdPets className="text-lg text-gray-400" />
+                  <div
+                    className={cn(
+                      "flex h-full w-full items-center justify-center font-display text-lg font-extrabold text-white",
+                      avatarColor(pet.id)
+                    )}
+                  >
+                    {pet.name.charAt(0).toUpperCase()}
                   </div>
                 )}
               </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-800 dark:text-gray-200 truncate">
-                  {pet.name}
-                </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                  {pet.cause}
-                </p>
+              <div className="min-w-0 flex-1">
+                <h3 className="truncate font-extrabold text-ink">{pet.name}</h3>
+                <p className="truncate text-xs text-muted">{pet.cause}</p>
               </div>
-              <span className="flex-shrink-0 text-xs font-medium px-2 py-0.5 rounded border bg-orange-50 text-orange-700 border-orange-300 dark:bg-orange-500/30 dark:text-orange-200 dark:border-orange-400">
+              <span className="flex-shrink-0 rounded-chip bg-sky-bg px-2.5 py-1 text-xs font-extrabold text-sky-fg">
                 {t("underTreatment.activeCount", {
                   count: pet.activeTreatmentCount,
                 })}

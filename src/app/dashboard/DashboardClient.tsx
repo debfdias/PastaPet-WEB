@@ -1,22 +1,23 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
+import { toast } from "react-toastify";
+import { startOfDay } from "date-fns";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
-import Image from "next/image";
-import { MdPets, MdArrowForward } from "react-icons/md";
+
+import DashboardHero from "@/components/DashboardHero";
+import QuickActions from "@/components/QuickActions";
+import PetsUnderTreatment from "@/components/PetsUnderTreatment";
+import UpcomingReminders from "@/components/UpcomingReminders";
+import LastEvents from "@/components/LastEvents";
 import PetModal from "@/components/PetModal";
 import EventModal from "@/components/EventModal";
 import ReminderModal from "@/components/ReminderModal";
-import LastEvents from "@/components/LastEvents";
-import RemindersSection from "@/components/RemindersSection";
-import QuickActions from "@/components/QuickActions";
-import PetsUnderTreatment from "@/components/PetsUnderTreatment";
-import { toast } from "react-toastify";
-import { useState, useEffect } from "react";
-import { getPetsClient } from "@/services/pets.service";
 
-import type { PetApiResponse } from "@/services/pets.service";
+import { getPetsClient, type PetApiResponse } from "@/services/pets.service";
+import { getReminders } from "@/services/reminders.service";
+import type { Reminder } from "@/types/reminder";
 import type { ActiveTreatmentsResponse } from "@/services/treatments.service";
 
 type Pet = PetApiResponse;
@@ -40,158 +41,121 @@ export default function DashboardClient({
   initialTreatmentPets,
 }: DashboardClientProps) {
   const router = useRouter();
-  const t = useTranslations("dashboard");
   const petsT = useTranslations("pets");
-  const pets = initialPets;
+  const token = session.user.token;
+
   const [isPetModalOpen, setIsPetModalOpen] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
-  const [allPets, setAllPets] = useState<Pet[]>(initialPets);
 
-  const handleAddPet = () => {
-    setIsPetModalOpen(true);
-  };
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [remindersLoading, setRemindersLoading] = useState(true);
+  const [treatmentIds, setTreatmentIds] = useState<Set<string>>(
+    new Set(initialTreatmentPets.pets.map((p) => p.id))
+  );
 
-  const handlePetSuccess = async () => {
-    // Refresh the page to get updated data from server
-    // The server component will re-fetch with the latest data
-    router.refresh();
-    toast.success(petsT("success.petAdded"));
-  };
-
-  // Fetch all pets when EventModal or ReminderModal opens
-  useEffect(() => {
-    if ((isEventModalOpen || isReminderModalOpen) && session.user?.token) {
-      getPetsClient(session.user.token)
-        .then((fetchedPets) => {
-          setAllPets(fetchedPets);
-        })
-        .catch((error) => {
-          console.error("Failed to fetch all pets:", error);
-        });
+  const refreshReminders = useCallback(async () => {
+    if (!token) return;
+    setRemindersLoading(true);
+    try {
+      // The API returns reminders from the start of the current month onward,
+      // ascending — so near-future ones can land on later pages. Page through
+      // all of them (like the calendar does) so nothing upcoming is missed.
+      const pageSize = 50;
+      const first = await getReminders(token, 1, pageSize);
+      const all = [...first.reminders];
+      const totalPages = first.pagination?.totalPages ?? 1;
+      for (let p = 2; p <= totalPages; p++) {
+        const data = await getReminders(token, p, pageSize);
+        all.push(...data.reminders);
+      }
+      setReminders(all);
+    } catch (e) {
+      console.error("Failed to fetch reminders:", e);
+    } finally {
+      setRemindersLoading(false);
     }
-  }, [isEventModalOpen, isReminderModalOpen, session.user?.token]);
+  }, [token]);
+
+  useEffect(() => {
+    refreshReminders();
+    // Full set of under-treatment pet ids → drives per-tile status + donut.
+    getPetsClient(token, { underTreatment: true })
+      .then((pets) => setTreatmentIds(new Set(pets.map((p) => p.id))))
+      .catch((e) => console.error("Failed to fetch treatment pets:", e));
+  }, [token, refreshReminders]);
+
+  // Derived counts for the hero.
+  const totalPets = initialPets.length;
+  const treatmentCount = treatmentIds.size || initialTreatmentPets.totalCount;
+  const healthyCount = Math.max(0, totalPets - treatmentCount);
+  const today = startOfDay(new Date()).getTime();
+  const attentionCount = reminders.filter(
+    (r) =>
+      !r.isCompleted &&
+      startOfDay(new Date(r.reminderDate)).getTime() <= today
+  ).length;
+
+  const handleAddPet = () => setIsPetModalOpen(true);
 
   return (
-    <div className="min-h-screen py-8">
-      {/* Welcome Section */}
-      <div className="mb-12">
-        <h1 className="text-4xl font-bold mb-2">
-          {t("welcome")}, {session.user?.fullName || session.user?.email}
-        </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400">
-          {t("subtitle")}
-        </p>
-      </div>
-
-      {/* Quick Actions */}
-      <QuickActions
-        onAddPet={handleAddPet}
-        onAddEvent={() => setIsEventModalOpen(true)}
-        onAddReminder={() => setIsReminderModalOpen(true)}
+    <div className="py-8 space-y-8">
+      <DashboardHero
+        userName={session.user?.fullName || session.user?.email}
+        petCount={totalPets}
+        treatmentCount={treatmentCount}
+        healthyCount={healthyCount}
+        attentionCount={attentionCount}
       />
 
-      {/* Main Sections Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* My Pets Card */}
-        <div className="bg-pet-card rounded-lg p-6 border-2 border-[#cbd1c2]/20 dark:border-pet-card/5 hover:border-avocado-500/50 hover:shadow-lg transition-all duration-200">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <MdPets className="text-3xl text-avocado-500" />
-              <h2 className="text-2xl font-bold">{t("myPets.title")}</h2>
-            </div>
-            <Link
-              href="/pets"
-              className="flex items-center gap-1 text-avocado-500 hover:text-avocado-300 transition-colors font-medium"
-            >
-              {t("viewAll")}
-              <MdArrowForward />
-            </Link>
-          </div>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            {t("petsDescription")}
-          </p>
-
-          {pets?.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-500 dark:text-gray-400 mb-4">
-                {t("noPets")}
-              </p>
-              <button
-                onClick={handleAddPet}
-                className="bg-avocado-500 hover:bg-avocado-300 text-gray-800 px-4 py-2 rounded-lg transition-colors cursor-pointer font-medium"
-              >
-                {petsT("addPet")}
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center -space-x-3">
-              {pets.map((pet) => (
-                <Link
-                  key={pet.id}
-                  href={`/pets/${pet.id}`}
-                  className="relative group z-0 hover:z-10 transition-all duration-200"
-                  title={pet.name}
-                >
-                  <div className="relative w-16 h-16 rounded-full overflow-hidden border-4 border-pet-card dark:border-gray-700 group-hover:border-avocado-500 transition-all duration-200 group-hover:scale-110 shadow-md">
-                    {pet.image ? (
-                      <Image
-                        src={pet.image}
-                        alt={pet.name}
-                        fill
-                        sizes="64px"
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
-                        <MdPets className="text-2xl text-gray-400" />
-                      </div>
-                    )}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Pets Under Treatment Card */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <QuickActions
+          onAddPet={handleAddPet}
+          onAddEvent={() => setIsEventModalOpen(true)}
+          onAddReminder={() => setIsReminderModalOpen(true)}
+        />
         <PetsUnderTreatment
           pets={initialTreatmentPets.pets}
           totalCount={initialTreatmentPets.totalCount}
         />
+        <UpcomingReminders
+          reminders={reminders}
+          token={token}
+          loading={remindersLoading}
+          onChange={refreshReminders}
+          daysAhead={1}
+        />
       </div>
 
-      {/* Reminders & Events Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 items-stretch">
-        <RemindersSection token={session.user.token} />
-        <LastEvents token={session.user.token} />
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <LastEvents token={token} />
+        </div>
       </div>
 
-      {/* Pet Modal */}
       <PetModal
         isOpen={isPetModalOpen}
         onClose={() => setIsPetModalOpen(false)}
-        onSuccess={handlePetSuccess}
-      />
-
-      {/* Event Modal */}
-      <EventModal
-        isOpen={isEventModalOpen}
-        onClose={() => setIsEventModalOpen(false)}
-        pets={allPets}
         onSuccess={() => {
           router.refresh();
+          toast.success(petsT("success.petAdded"));
         }}
       />
 
-      {/* Reminder Modal */}
+      <EventModal
+        isOpen={isEventModalOpen}
+        onClose={() => setIsEventModalOpen(false)}
+        pets={initialPets}
+        onSuccess={() => router.refresh()}
+      />
+
       <ReminderModal
         isOpen={isReminderModalOpen}
         onClose={() => setIsReminderModalOpen(false)}
-        pets={allPets}
+        pets={initialPets}
         onSuccess={() => {
+          refreshReminders();
           router.refresh();
-          window.dispatchEvent(new CustomEvent("refresh-reminders"));
         }}
       />
     </div>
