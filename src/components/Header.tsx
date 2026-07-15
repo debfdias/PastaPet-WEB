@@ -155,7 +155,7 @@ function Tab({
       <span
         className={cn(
           "whitespace-nowrap text-[13px] font-extrabold",
-          active ? "text-deep" : "text-faint"
+          active ? "text-mint" : "text-faint"
         )}
       >
         {label}

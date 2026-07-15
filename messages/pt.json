@@ -185,11 +185,11 @@
       "cat": "Gato",
       "other": "Outro"
     },
-    "clearFilter": "Limpar Filtro",
+    "clearFilter": "Limpar",
     "orderByAge": {
       "label": "Idade"
     },
-    "underTreatment": "Em Tratamento"
+    "underTreatment": "Tratar"
   },
   "pets": {
     "title": "Meus Pets",

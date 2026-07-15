@@ -125,23 +125,24 @@ export default function PetCard({ pet, onEdit, selected }: PetCardProps) {
           </h3>
           {statusCfg && StatusIcon && (
             <span
+              title={t(statusCfg.labelKey)}
+              aria-label={t(statusCfg.labelKey)}
               className={cn(
-                "inline-flex shrink-0 items-center gap-1 rounded-chip px-2.5 py-1 text-[11px] font-extrabold",
+                "flex h-7 w-7 shrink-0 items-center justify-center rounded-full",
                 statusCfg.chip
               )}
             >
               <StatusIcon
-                className={cn("h-3.5 w-3.5", statusCfg.iconCls)}
+                className={cn("h-4 w-4", statusCfg.iconCls)}
                 strokeWidth={2.5}
               />
-              {t(statusCfg.labelKey)}
             </span>
           )}
         </div>
 
-        {/* meta chips */}
+        {/* meta chips — content width, wrap */}
         <div className="flex flex-wrap gap-1.5">
-          <Chip tone="meta" icon={PawIcon}>
+          <Chip tone="meta" icon={PawIcon} className="max-md:hidden">
             {t(`species.${speciesKey}`)}
           </Chip>
           <Chip tone="meta" icon={SexIcon}>
@@ -155,9 +156,9 @@ export default function PetCard({ pet, onEdit, selected }: PetCardProps) {
           </Chip>
         </div>
 
-        {/* plans row — labeled chips sized to their text (like the status chips) */}
+        {/* plans — health plan shows its name, funerary is icon-only */}
         {showPlans && (
-          <div className="mt-3 flex flex-wrap gap-1.5 border-t border-hair pt-[11px]">
+          <div className="mt-3 flex items-center gap-1.5 border-t border-hair pt-[11px]">
             {pet.hasPetPlan && (
               <PlanChip
                 icon={icons.health_and_safety}
@@ -166,7 +167,7 @@ export default function PetCard({ pet, onEdit, selected }: PetCardProps) {
               />
             )}
             {pet.hasFuneraryPlan && (
-              <PlanChip
+              <PlanBadge
                 icon={icons.local_florist}
                 label={FUNERAL_PLAN_NAME}
                 tone="planFun"
@@ -179,6 +180,13 @@ export default function PetCard({ pet, onEdit, selected }: PetCardProps) {
   );
 }
 
+function planCls(tone: "planHealth" | "planFun") {
+  return tone === "planHealth"
+    ? "bg-plan-health-bg text-plan-health-fg"
+    : "bg-plan-fun-bg text-plan-fun-fg";
+}
+
+// Labeled chip (used for the health plan, whose name varies).
 function PlanChip({
   icon: Icon,
   label,
@@ -188,19 +196,39 @@ function PlanChip({
   label: string;
   tone: "planHealth" | "planFun";
 }) {
-  const cls =
-    tone === "planHealth"
-      ? "bg-plan-health-bg text-plan-health-fg"
-      : "bg-plan-fun-bg text-plan-fun-fg";
   return (
     <span
       className={cn(
         "inline-flex items-center gap-1.5 rounded-[10px] px-2.5 py-1.5 text-[11px] font-extrabold",
-        cls
+        planCls(tone)
       )}
     >
-      <Icon className="h-[15px] w-[15px]" strokeWidth={2.5} />
+      <Icon className="h-4 w-4" strokeWidth={2.5} />
       {label}
+    </span>
+  );
+}
+
+// Icon-only circular badge (used for the funerary plan — always Pet Fenix).
+function PlanBadge({
+  icon: Icon,
+  label,
+  tone,
+}: {
+  icon: (typeof icons)[string];
+  label: string;
+  tone: "planHealth" | "planFun";
+}) {
+  return (
+    <span
+      title={label}
+      aria-label={label}
+      className={cn(
+        "flex h-7 w-7 items-center justify-center rounded-full",
+        planCls(tone)
+      )}
+    >
+      <Icon className="h-4 w-4" strokeWidth={2.5} />
     </span>
   );
 }

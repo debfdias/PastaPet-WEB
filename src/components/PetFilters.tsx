@@ -128,7 +128,7 @@ export default function PetFilters({
         {/* sort by age */}
         <button
           onClick={handleAgeOrderClick}
-          className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-ctrl border border-hair bg-panel px-3.5 py-2.5 text-sm font-bold text-muted transition-colors hover:bg-tint hover:text-deep lg:flex-none"
+          className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-ctrl px-3.5 py-2.5 text-sm font-bold text-muted transition-colors hover:bg-tint hover:text-deep lg:flex-none"
         >
           <SortIcon className="h-[18px] w-[18px]" strokeWidth={2.5} />
           <span>{t("orderByAge.label")}</span>
@@ -145,10 +145,10 @@ export default function PetFilters({
           onClick={handleUnderTreatmentToggle}
           aria-pressed={underTreatment}
           className={cn(
-            "flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-ctrl border px-3.5 py-2.5 text-sm font-bold transition-colors lg:flex-none",
+            "flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-ctrl px-3.5 py-2.5 text-sm font-bold transition-colors lg:flex-none",
             underTreatment
-              ? "border-mint bg-mint text-white"
-              : "border-hair bg-panel text-muted hover:bg-tint hover:text-deep"
+              ? "bg-mint text-white"
+              : "text-muted hover:bg-tint hover:text-deep"
           )}
         >
           <TreatmentIcon className="h-[18px] w-[18px]" strokeWidth={2.5} />

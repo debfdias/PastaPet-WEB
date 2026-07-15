@@ -185,11 +185,11 @@
       "cat": "Cat",
       "other": "Other"
     },
-    "clearFilter": "Clear Filter",
+    "clearFilter": "Clear",
     "orderByAge": {
       "label": "Age"
     },
-    "underTreatment": "Under Treatment"
+    "underTreatment": "Treating"
   },
   "pets": {
     "title": "My Pets",

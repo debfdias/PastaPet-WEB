@@ -7,6 +7,7 @@ import PetCard from "@/components/PetCard";
 import PetModal from "@/components/PetModal";
 import PetFilters from "@/components/PetFilters";
 import { MdPets } from "react-icons/md";
+import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
 import {
@@ -136,13 +137,7 @@ function PetsPageContent() {
         <h1 className="text-3xl font-display font-extrabold text-ink">
           {t("title")}
         </h1>
-        <button
-          onClick={handleAdd}
-          className="bg-deep hover:bg-forest text-white px-4 py-2 rounded-btn transition-colors cursor-pointer font-extrabold flex items-center"
-        >
-          <div>{t("addPet")}</div>
-          <MdPets className="ml-2" />
-        </button>
+        <Button onClick={handleAdd}>{t("addPet")}</Button>
       </div>
 
       <PetFilters
