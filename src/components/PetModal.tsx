@@ -328,7 +328,7 @@ export default function PetModal({
                   {t("form.type")}
                 </label>
                 <Select
-                  key={`type-${pet?.id || "new"}-${watch("type")}`}
+                  key={`type-${pet?.id || "new"}`}
                   value={watch("type") || PetType.DOG}
                   onValueChange={(value) => {
                     setValue("type", value as PetType, {
@@ -339,7 +339,7 @@ export default function PetModal({
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent position="popper" className="z-[100]">
                     <SelectItem value={PetType.DOG}>{t("form.dog")}</SelectItem>
                     <SelectItem value={PetType.CAT}>{t("form.cat")}</SelectItem>
                     <SelectItem value={PetType.OTHER}>
@@ -371,7 +371,7 @@ export default function PetModal({
                   {t("form.gender")}
                 </label>
                 <Select
-                  key={`gender-${pet?.id || "new"}-${watch("gender")}`}
+                  key={`gender-${pet?.id || "new"}`}
                   value={watch("gender") || PetGender.FEMALE}
                   onValueChange={(value) => {
                     setValue("gender", value as PetGender, {
@@ -382,7 +382,7 @@ export default function PetModal({
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent position="popper" className="z-[100]">
                     <SelectItem value={PetGender.FEMALE}>
                       {t("form.female")}
                     </SelectItem>

@@ -11,6 +11,7 @@ import type { Treatment } from "@/services/treatments.service";
 
 interface ActiveTreatmentProps {
   treatments: Treatment[];
+  finishedTreatments?: Treatment[];
   loading?: boolean;
   parseDateString: (s: string) => Date;
   onAdd?: () => void;
@@ -18,6 +19,7 @@ interface ActiveTreatmentProps {
 
 export default function ActiveTreatment({
   treatments,
+  finishedTreatments = [],
   loading = false,
   parseDateString,
   onAdd,
@@ -36,7 +38,10 @@ export default function ActiveTreatment({
     );
   }
 
-  if (treatments.length === 0) {
+  const hasActive = treatments.length > 0;
+  const hasFinished = finishedTreatments.length > 0;
+
+  if (!hasActive && !hasFinished) {
     return (
       <div className="relative overflow-hidden rounded-card bg-surface p-6 pl-8 shadow-card">
         <div className="absolute left-0 top-0 h-full w-1.5 bg-hair" />
@@ -50,19 +55,89 @@ export default function ActiveTreatment({
 
   return (
     <div className="space-y-8">
-      {treatments.map((treatment) => (
-        <TreatmentCard
-          key={treatment.id}
-          treatment={treatment}
-          parseDateString={parseDateString}
-        />
-      ))}
+      {hasActive ? (
+        treatments.map((treatment) => (
+          <TreatmentCard
+            key={treatment.id}
+            treatment={treatment}
+            parseDateString={parseDateString}
+          />
+        ))
+      ) : (
+        <div className="relative overflow-hidden rounded-card bg-surface p-6 pl-8 shadow-card">
+          <div className="absolute left-0 top-0 h-full w-1.5 bg-hair" />
+          <p className="py-2 text-center text-muted">{t("noActive")}</p>
+        </div>
+      )}
+
+      {hasFinished && (
+        <div className="space-y-3">
+          <p className="text-sm font-extrabold uppercase tracking-wide text-muted">
+            {t("finished")}
+          </p>
+          {finishedTreatments.map((treatment) => (
+            <FinishedTreatmentCard
+              key={treatment.id}
+              treatment={treatment}
+              parseDateString={parseDateString}
+            />
+          ))}
+        </div>
+      )}
+
       {onAdd && (
         <Button onClick={onAdd} className="w-full">
           <Plus className="h-4 w-4" strokeWidth={2.5} />
           {t("addButton")}
         </Button>
       )}
+    </div>
+  );
+}
+
+function FinishedTreatmentCard({
+  treatment,
+  parseDateString,
+}: {
+  treatment: Treatment;
+  parseDateString: (s: string) => Date;
+}) {
+  const CalendarIcon = icons.calendar_month;
+
+  const start = parseDateString(treatment.startDate);
+  const end = treatment.endDate ? parseDateString(treatment.endDate) : null;
+
+  return (
+    <div className="relative overflow-hidden rounded-card bg-surface p-4 pl-6 shadow-card">
+      <div className="absolute left-0 top-0 h-full w-1.5 bg-faint" />
+
+      {/* title + period on one line */}
+      <div className="flex items-baseline justify-between gap-3">
+        <h3 className="truncate font-display text-lg font-extrabold text-ink">
+          {treatment.cause}
+        </h3>
+        <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted">
+          <CalendarIcon className="h-3.5 w-3.5" strokeWidth={2.5} />
+          {format(start, "dd/MM/yyyy")}
+          {end ? ` → ${format(end, "dd/MM/yyyy")}` : ""}
+        </span>
+      </div>
+
+      {/* cause + medications inline */}
+      <div className="mt-1.5 flex flex-wrap items-center gap-2">
+        {treatment.description && (
+          <span className="text-sm text-muted">{treatment.description}</span>
+        )}
+        {treatment.medications.map((med, i) => (
+          <span
+            key={med.id ?? i}
+            className="rounded-chip bg-panel px-2.5 py-1 text-xs font-bold text-muted"
+          >
+            {med.name}
+            {med.dosage ? ` · ${med.dosage}` : ""}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }

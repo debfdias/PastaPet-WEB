@@ -5,20 +5,30 @@
     "goToLogin": "Ir para Login"
   },
   "login": {
-    "title": "Bem-vindo de volta!",
+    "title": "Que bom te ver!",
+    "subtitle": "Entre para cuidar dos seus bichinhos.",
     "email": {
-      "label": "Endereço de e-mail",
+      "label": "E-mail",
       "placeholder": "Digite seu e-mail"
     },
     "password": {
       "label": "Senha",
-      "placeholder": "Digite sua senha"
+      "placeholder": "Digite sua senha",
+      "show": "Mostrar senha",
+      "hide": "Ocultar senha"
     },
-    "forgotPassword": "Esqueceu sua senha?",
+    "rememberMe": "Lembrar de mim",
+    "forgotPassword": "Esqueci a senha",
     "signIn": "Entrar",
     "loading": "Entrando...",
-    "noAccount": "Não tem uma conta?",
-    "signUp": "Cadastre-se",
+    "brand": {
+      "tagline": "A saúde dos seus pets em um lugar",
+      "headline": "A saúde dos seus pets, tudo em um lugar.",
+      "subtext": "Vacinas, tratamentos, exames e lembretes — organizados e fáceis de achar.",
+      "feature1": "Carteirinha de vacinas sempre à mão",
+      "feature2": "Lembretes de doses e retornos",
+      "feature3": "Feito com carinho para tutores"
+    },
     "errors": {
       "invalidCredentials": "Credenciais inválidas.",
       "somethingWentWrong": "Algo deu errado. Por favor, tente novamente."
@@ -301,6 +311,7 @@
       "active": "ativo",
       "day": "Dia",
       "noActive": "Nenhum tratamento ativo",
+      "finished": "Tratamentos finalizados",
       "loading": "Carregando tratamentos..."
     }
   },

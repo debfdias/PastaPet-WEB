@@ -297,6 +297,18 @@ export default function PetDetailsPage() {
     const e = tr.endDate ? parseDateString(tr.endDate) : null;
     return s <= now && (!e || e >= now);
   });
+  // Finished = has an end date already in the past. Most recent first, cap at 5.
+  const finishedTreatments = treatments
+    .filter((tr) => {
+      const e = tr.endDate ? parseDateString(tr.endDate) : null;
+      return e !== null && e < now;
+    })
+    .sort(
+      (a, b) =>
+        parseDateString(b.endDate).getTime() -
+        parseDateString(a.endDate).getTime()
+    )
+    .slice(0, 5);
 
   return (
     <div className="py-8">
@@ -325,6 +337,7 @@ export default function PetDetailsPage() {
         {/* Row 2: active treatment */}
         <ActiveTreatment
           treatments={activeTreatments}
+          finishedTreatments={finishedTreatments}
           loading={treatmentsLoading}
           parseDateString={parseDateString}
           onAdd={() => setIsTreatmentModalOpen(true)}

@@ -5,20 +5,30 @@
     "goToLogin": "Go to Login"
   },
   "login": {
-    "title": "Welcome back!",
+    "title": "Great to see you!",
+    "subtitle": "Sign in to take care of your pets.",
     "email": {
-      "label": "Email address",
+      "label": "Email",
       "placeholder": "Enter your email"
     },
     "password": {
       "label": "Password",
-      "placeholder": "Enter your password"
+      "placeholder": "Enter your password",
+      "show": "Show password",
+      "hide": "Hide password"
     },
-    "forgotPassword": "Forgot your password?",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password",
     "signIn": "Sign in",
     "loading": "Signing in...",
-    "noAccount": "Don't have an account?",
-    "signUp": "Sign up",
+    "brand": {
+      "tagline": "Your pets' health in one place",
+      "headline": "Your pets' health, all in one place.",
+      "subtext": "Vaccines, treatments, exams and reminders — organized and easy to find.",
+      "feature1": "Vaccine card always at hand",
+      "feature2": "Reminders for doses and follow-ups",
+      "feature3": "Made with love for pet parents"
+    },
     "errors": {
       "invalidCredentials": "Invalid credentials.",
       "somethingWentWrong": "Something went wrong. Please try again."
@@ -301,6 +311,7 @@
       "active": "active",
       "day": "Day",
       "noActive": "No active treatment",
+      "finished": "Finished treatments",
       "loading": "Loading treatments..."
     }
   },
