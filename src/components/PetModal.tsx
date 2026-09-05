@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useSession } from "next-auth/react";
 import { Pencil, Upload } from "lucide-react";
 import { uploadImage } from "@/lib/storage/client";
@@ -58,7 +58,7 @@ export default function PetModal({
     handleSubmit,
     reset,
     watch,
-    setValue,
+    control,
     formState: { errors },
   } = useForm<PetFormData>({
     defaultValues: {
@@ -339,26 +339,28 @@ export default function PetModal({
                 <label className="block text-sm font-bold text-ink mb-1">
                   {t("form.type")}
                 </label>
-                <Select
-                  key={`type-${pet?.id || "new"}`}
-                  value={watch("type") || PetType.DOG}
-                  onValueChange={(value) => {
-                    setValue("type", value as PetType, {
-                      shouldValidate: true,
-                    });
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent position="popper" className="z-[100]">
-                    <SelectItem value={PetType.DOG}>{t("form.dog")}</SelectItem>
-                    <SelectItem value={PetType.CAT}>{t("form.cat")}</SelectItem>
-                    <SelectItem value={PetType.OTHER}>
-                      {t("form.other")}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="type"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent position="popper" className="z-[100]">
+                        <SelectItem value={PetType.DOG}>
+                          {t("form.dog")}
+                        </SelectItem>
+                        <SelectItem value={PetType.CAT}>
+                          {t("form.cat")}
+                        </SelectItem>
+                        <SelectItem value={PetType.OTHER}>
+                          {t("form.other")}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
               <div>
                 <label className="block text-sm font-bold text-ink mb-1">
@@ -382,27 +384,25 @@ export default function PetModal({
                 <label className="block text-sm font-bold text-ink mb-1">
                   {t("form.gender")}
                 </label>
-                <Select
-                  key={`gender-${pet?.id || "new"}`}
-                  value={watch("gender") || PetGender.FEMALE}
-                  onValueChange={(value) => {
-                    setValue("gender", value as PetGender, {
-                      shouldValidate: true,
-                    });
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent position="popper" className="z-[100]">
-                    <SelectItem value={PetGender.FEMALE}>
-                      {t("form.female")}
-                    </SelectItem>
-                    <SelectItem value={PetGender.MALE}>
-                      {t("form.male")}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="gender"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent position="popper" className="z-[100]">
+                        <SelectItem value={PetGender.FEMALE}>
+                          {t("form.female")}
+                        </SelectItem>
+                        <SelectItem value={PetGender.MALE}>
+                          {t("form.male")}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
               {petType === PetType.CAT && (
                 <>
@@ -410,59 +410,61 @@ export default function PetModal({
                     <label className="block text-sm font-bold text-ink mb-1">
                       {t("form.fivStatus")}
                     </label>
-                    <Select
-                      key={`fiv-${pet?.id || "new"}`}
-                      value={watch("fivStatus") || FivFelvStatus.NOT_TESTED}
-                      onValueChange={(value) => {
-                        setValue("fivStatus", value as FivFelvStatus, {
-                          shouldValidate: true,
-                        });
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent position="popper" className="z-[100]">
-                        <SelectItem value={FivFelvStatus.NOT_TESTED}>
-                          {t("form.testStatus.notTested")}
-                        </SelectItem>
-                        <SelectItem value={FivFelvStatus.NEGATIVE}>
-                          {t("form.testStatus.negative")}
-                        </SelectItem>
-                        <SelectItem value={FivFelvStatus.POSITIVE}>
-                          {t("form.testStatus.positive")}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Controller
+                      name="fivStatus"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent position="popper" className="z-[100]">
+                            <SelectItem value={FivFelvStatus.NOT_TESTED}>
+                              {t("form.testStatus.notTested")}
+                            </SelectItem>
+                            <SelectItem value={FivFelvStatus.NEGATIVE}>
+                              {t("form.testStatus.negative")}
+                            </SelectItem>
+                            <SelectItem value={FivFelvStatus.POSITIVE}>
+                              {t("form.testStatus.positive")}
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-ink mb-1">
                       {t("form.felvStatus")}
                     </label>
-                    <Select
-                      key={`felv-${pet?.id || "new"}`}
-                      value={watch("felvStatus") || FivFelvStatus.NOT_TESTED}
-                      onValueChange={(value) => {
-                        setValue("felvStatus", value as FivFelvStatus, {
-                          shouldValidate: true,
-                        });
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent position="popper" className="z-[100]">
-                        <SelectItem value={FivFelvStatus.NOT_TESTED}>
-                          {t("form.testStatus.notTested")}
-                        </SelectItem>
-                        <SelectItem value={FivFelvStatus.NEGATIVE}>
-                          {t("form.testStatus.negative")}
-                        </SelectItem>
-                        <SelectItem value={FivFelvStatus.POSITIVE}>
-                          {t("form.testStatus.positive")}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Controller
+                      name="felvStatus"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent position="popper" className="z-[100]">
+                            <SelectItem value={FivFelvStatus.NOT_TESTED}>
+                              {t("form.testStatus.notTested")}
+                            </SelectItem>
+                            <SelectItem value={FivFelvStatus.NEGATIVE}>
+                              {t("form.testStatus.negative")}
+                            </SelectItem>
+                            <SelectItem value={FivFelvStatus.POSITIVE}>
+                              {t("form.testStatus.positive")}
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
                   </div>
                 </>
               )}
@@ -471,15 +473,19 @@ export default function PetModal({
                   <label className="text-sm font-medium">
                     {t("form.hasPetPlan")}
                   </label>
-                  <Switch.Root
-                    className="w-[42px] h-[25px] bg-hair rounded-full relative data-[state=checked]:bg-mint outline-none cursor-pointer"
-                    checked={hasPetPlan}
-                    onCheckedChange={(checked: boolean) => {
-                      setValue("hasPetPlan", checked);
-                    }}
-                  >
-                    <Switch.Thumb className="block w-[21px] h-[21px] bg-white rounded-full shadow-lg transition-transform duration-100 translate-x-0.5 will-change-transform data-[state=checked]:translate-x-[19px]" />
-                  </Switch.Root>
+                  <Controller
+                    name="hasPetPlan"
+                    control={control}
+                    render={({ field }) => (
+                      <Switch.Root
+                        className="w-[42px] h-[25px] bg-hair rounded-full relative data-[state=checked]:bg-mint outline-none cursor-pointer"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      >
+                        <Switch.Thumb className="block w-[21px] h-[21px] bg-white rounded-full shadow-lg transition-transform duration-100 translate-x-0.5 will-change-transform data-[state=checked]:translate-x-[19px]" />
+                      </Switch.Root>
+                    )}
+                  />
                 </div>
               </div>
               <div>
@@ -487,15 +493,19 @@ export default function PetModal({
                   <label className="text-sm font-medium">
                     {t("form.hasFuneraryPlan")}
                   </label>
-                  <Switch.Root
-                    className="w-[42px] h-[25px] bg-hair rounded-full relative data-[state=checked]:bg-mint outline-none cursor-pointer"
-                    checked={watch("hasFuneraryPlan")}
-                    onCheckedChange={(checked: boolean) => {
-                      setValue("hasFuneraryPlan", checked);
-                    }}
-                  >
-                    <Switch.Thumb className="block w-[21px] h-[21px] bg-white rounded-full shadow-lg transition-transform duration-100 translate-x-0.5 will-change-transform data-[state=checked]:translate-x-[19px]" />
-                  </Switch.Root>
+                  <Controller
+                    name="hasFuneraryPlan"
+                    control={control}
+                    render={({ field }) => (
+                      <Switch.Root
+                        className="w-[42px] h-[25px] bg-hair rounded-full relative data-[state=checked]:bg-mint outline-none cursor-pointer"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      >
+                        <Switch.Thumb className="block w-[21px] h-[21px] bg-white rounded-full shadow-lg transition-transform duration-100 translate-x-0.5 will-change-transform data-[state=checked]:translate-x-[19px]" />
+                      </Switch.Root>
+                    )}
+                  />
                 </div>
               </div>
               {hasPetPlan && (
