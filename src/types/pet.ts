@@ -9,6 +9,13 @@ export enum PetGender {
   MALE = "MALE",
 }
 
+// Result of the FIV/FeLV combo test (cats only). NOT_TESTED = no test on record.
+export enum FivFelvStatus {
+  NOT_TESTED = "NOT_TESTED",
+  NEGATIVE = "NEGATIVE",
+  POSITIVE = "POSITIVE",
+}
+
 export interface Pet {
   id: string;
   name: string;
@@ -21,6 +28,8 @@ export interface Pet {
   hasPetPlan: boolean;
   hasFuneraryPlan: boolean;
   petPlanName?: string;
+  fivStatus?: FivFelvStatus;
+  felvStatus?: FivFelvStatus;
 }
 
 export interface PetFormData {
@@ -34,6 +43,8 @@ export interface PetFormData {
   hasPetPlan: boolean;
   hasFuneraryPlan: boolean;
   petPlanName?: string;
+  fivStatus: FivFelvStatus;
+  felvStatus: FivFelvStatus;
 }
 
 

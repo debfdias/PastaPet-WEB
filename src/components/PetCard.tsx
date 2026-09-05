@@ -15,7 +15,8 @@ const FUNERAL_PLAN_NAME = "Pet Fenix";
 /**
  * Per-pet health data layered on top of the API shape. `status` is derived on
  * the pets page from the under-treatment list (healthy | treatment). FIV/FeLV
- * flags and vaccine rollups are intentionally out of scope for now.
+ * come from the pet record; only positive results are surfaced on the card as
+ * warning flags. Vaccine rollups are intentionally out of scope for now.
  */
 export interface PetHealth {
   status?: "healthy" | "treatment";
@@ -73,6 +74,10 @@ export default function PetCard({ pet, onEdit, selected }: PetCardProps) {
   const statusCfg = pet.status ? STATUS[pet.status] : null;
   const StatusIcon = statusCfg?.icon;
   const showPlans = pet.hasPetPlan || pet.hasFuneraryPlan;
+
+  const fivPositive = pet.fivStatus?.toUpperCase() === "POSITIVE";
+  const felvPositive = pet.felvStatus?.toUpperCase() === "POSITIVE";
+  const ScienceIcon = icons.science;
 
   const handleCardClick = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest("button")) return;
@@ -156,6 +161,17 @@ export default function PetCard({ pet, onEdit, selected }: PetCardProps) {
           </Chip>
         </div>
 
+        {/* health flags — only positive FIV/FeLV surfaced as a warning.
+            Transparent chip with a light red border for both. */}
+        {(fivPositive || felvPositive) && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {fivPositive && <FlagChip icon={ScienceIcon}>{t("flags.fiv")}</FlagChip>}
+            {felvPositive && (
+              <FlagChip icon={ScienceIcon}>{t("flags.felv")}</FlagChip>
+            )}
+          </div>
+        )}
+
         {/* plans — health plan shows its name, funerary is icon-only */}
         {showPlans && (
           <div className="mt-3 flex items-center gap-1.5 border-t border-hair pt-[11px]">
@@ -177,6 +193,22 @@ export default function PetCard({ pet, onEdit, selected }: PetCardProps) {
         )}
       </div>
     </div>
+  );
+}
+
+// Transparent warning chip with a light red border (FIV+/FeLV+).
+function FlagChip({
+  icon: Icon,
+  children,
+}: {
+  icon: (typeof icons)[string];
+  children: React.ReactNode;
+}) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-chip border border-coral bg-transparent px-[9px] py-1 text-[11px] font-extrabold text-coral-fg">
+      <Icon className="h-3.5 w-3.5" strokeWidth={2.5} />
+      {children}
+    </span>
   );
 }
 

@@ -26,6 +26,8 @@ interface Pet {
   petPlanName?: string | null;
   hasFuneraryPlan: boolean;
   funeraryPlanStartDate?: string | null;
+  fivStatus?: string | null;
+  felvStatus?: string | null;
 }
 
 interface PetInfoProps {
@@ -133,6 +135,20 @@ export default function PetInfo({
         </Chip>
       </div>
 
+      {/* FIV/FeLV testing — cats only, always shown so untested is visible */}
+      {pet.type?.toUpperCase() === "CAT" && (
+        <div className="mb-2 flex flex-wrap gap-1.5">
+          <FivFelvChip
+            label={t("petDetails.fivFelv.fiv")}
+            status={pet.fivStatus}
+          />
+          <FivFelvChip
+            label={t("petDetails.fivFelv.felv")}
+            status={pet.felvStatus}
+          />
+        </div>
+      )}
+
       {/* health flags */}
       {activeTreatmentCauses.length > 0 && (
         <div className="mb-3 flex flex-wrap gap-1.5">
@@ -236,6 +252,33 @@ export default function PetInfo({
         </div>
       )}
     </div>
+  );
+}
+
+// FIV/FeLV result chip — transparent with a light red border for both tests.
+function FivFelvChip({
+  label,
+  status,
+}: {
+  label: string;
+  status?: string | null;
+}) {
+  const t = useTranslations("petDetails.fivFelv");
+  const Icon = icons.science;
+  const normalized = (status || "NOT_TESTED").toUpperCase();
+
+  const statusText =
+    normalized === "POSITIVE"
+      ? t("positive")
+      : normalized === "NEGATIVE"
+      ? t("negative")
+      : t("notTested");
+
+  return (
+    <span className="inline-flex items-center gap-1 rounded-chip border border-coral bg-transparent px-[9px] py-1 text-[11px] font-extrabold text-coral-fg">
+      <Icon className="h-3.5 w-3.5" strokeWidth={2.5} />
+      {label}: {statusText}
+    </span>
   );
 }
 

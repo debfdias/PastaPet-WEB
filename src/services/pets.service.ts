@@ -1,4 +1,4 @@
-import { Pet, PetType, PetGender } from "@/types/pet";
+import { Pet, PetType, PetGender, FivFelvStatus } from "@/types/pet";
 import { httpClient } from "@/lib/httpClient";
 
 /**
@@ -17,6 +17,8 @@ export interface PetApiResponse {
   hasPetPlan: boolean;
   hasFuneraryPlan: boolean;
   petPlanName?: string;
+  fivStatus?: string;
+  felvStatus?: string;
 }
 
 /**
@@ -145,6 +147,8 @@ export async function createPet(
     hasPetPlan: boolean;
     hasFuneraryPlan: boolean;
     petPlanName?: string;
+    fivStatus?: string;
+    felvStatus?: string;
   }
 ): Promise<PetApiResponse> {
   return httpClient.post<PetApiResponse>(token, "/pets", data);
@@ -167,6 +171,8 @@ export async function updatePet(
     hasPetPlan: boolean;
     hasFuneraryPlan: boolean;
     petPlanName?: string;
+    fivStatus?: string;
+    felvStatus?: string;
   }
 ): Promise<PetApiResponse> {
   return httpClient.put<PetApiResponse>(token, `/pets/${petId}`, data);
@@ -181,5 +187,7 @@ export function convertPetApiResponseToPet(apiPet: PetApiResponse): Pet {
     ...apiPet,
     type: apiPet.type as PetType,
     gender: apiPet.gender as PetGender,
+    fivStatus: apiPet.fivStatus as FivFelvStatus | undefined,
+    felvStatus: apiPet.felvStatus as FivFelvStatus | undefined,
   };
 }

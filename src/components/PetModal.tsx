@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Pet, PetFormData, PetType, PetGender } from "@/types/pet";
+import { Pet, PetFormData, PetType, PetGender, FivFelvStatus } from "@/types/pet";
 import { createPet, updatePet } from "@/services/pets.service";
 
 interface PetModalProps {
@@ -72,9 +72,12 @@ export default function PetModal({
       hasPetPlan: false,
       hasFuneraryPlan: false,
       petPlanName: "",
+      fivStatus: FivFelvStatus.NOT_TESTED,
+      felvStatus: FivFelvStatus.NOT_TESTED,
     },
   });
   const hasPetPlan = watch("hasPetPlan");
+  const petType = watch("type");
 
   // Reset form when pet changes or modal opens/closes
   useEffect(() => {
@@ -91,6 +94,8 @@ export default function PetModal({
             hasPetPlan: pet.hasPetPlan,
             hasFuneraryPlan: pet.hasFuneraryPlan,
             petPlanName: pet.petPlanName || "",
+            fivStatus: pet.fivStatus || FivFelvStatus.NOT_TESTED,
+            felvStatus: pet.felvStatus || FivFelvStatus.NOT_TESTED,
           }
         : {
             name: "",
@@ -103,6 +108,8 @@ export default function PetModal({
             hasPetPlan: false,
             hasFuneraryPlan: false,
             petPlanName: "",
+            fivStatus: FivFelvStatus.NOT_TESTED,
+            felvStatus: FivFelvStatus.NOT_TESTED,
           };
       reset(formData, { keepDefaultValues: false });
       setSelectedImage(null);
@@ -154,6 +161,11 @@ export default function PetModal({
         hasPetPlan: data.hasPetPlan,
         hasFuneraryPlan: data.hasFuneraryPlan,
         petPlanName: data.petPlanName,
+        // FIV/FeLV is a cat-only concept — reset to NOT_TESTED for other species
+        fivStatus:
+          data.type === PetType.CAT ? data.fivStatus : FivFelvStatus.NOT_TESTED,
+        felvStatus:
+          data.type === PetType.CAT ? data.felvStatus : FivFelvStatus.NOT_TESTED,
       };
 
       if (pet) {
@@ -392,6 +404,68 @@ export default function PetModal({
                   </SelectContent>
                 </Select>
               </div>
+              {petType === PetType.CAT && (
+                <>
+                  <div>
+                    <label className="block text-sm font-bold text-ink mb-1">
+                      {t("form.fivStatus")}
+                    </label>
+                    <Select
+                      key={`fiv-${pet?.id || "new"}`}
+                      value={watch("fivStatus") || FivFelvStatus.NOT_TESTED}
+                      onValueChange={(value) => {
+                        setValue("fivStatus", value as FivFelvStatus, {
+                          shouldValidate: true,
+                        });
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent position="popper" className="z-[100]">
+                        <SelectItem value={FivFelvStatus.NOT_TESTED}>
+                          {t("form.testStatus.notTested")}
+                        </SelectItem>
+                        <SelectItem value={FivFelvStatus.NEGATIVE}>
+                          {t("form.testStatus.negative")}
+                        </SelectItem>
+                        <SelectItem value={FivFelvStatus.POSITIVE}>
+                          {t("form.testStatus.positive")}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-ink mb-1">
+                      {t("form.felvStatus")}
+                    </label>
+                    <Select
+                      key={`felv-${pet?.id || "new"}`}
+                      value={watch("felvStatus") || FivFelvStatus.NOT_TESTED}
+                      onValueChange={(value) => {
+                        setValue("felvStatus", value as FivFelvStatus, {
+                          shouldValidate: true,
+                        });
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent position="popper" className="z-[100]">
+                        <SelectItem value={FivFelvStatus.NOT_TESTED}>
+                          {t("form.testStatus.notTested")}
+                        </SelectItem>
+                        <SelectItem value={FivFelvStatus.NEGATIVE}>
+                          {t("form.testStatus.negative")}
+                        </SelectItem>
+                        <SelectItem value={FivFelvStatus.POSITIVE}>
+                          {t("form.testStatus.positive")}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
+              )}
               <div>
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-medium">

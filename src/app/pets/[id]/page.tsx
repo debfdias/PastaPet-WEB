@@ -17,7 +17,7 @@ import VaccineSection from "@/components/VaccineSection";
 import ExamSection from "@/components/ExamSection";
 import ActiveTreatment from "@/components/ActiveTreatment";
 import UpcomingReminders from "@/components/UpcomingReminders";
-import { PetGender, PetType } from "@/types/pet";
+import { PetGender, PetType, FivFelvStatus } from "@/types/pet";
 import { getPetByIdClient, type PetApiResponse } from "@/services/pets.service";
 import {
   getTreatmentsByPet,
@@ -427,6 +427,8 @@ export default function PetDetailsPage() {
           hasPetPlan: pet.hasPetPlan,
           hasFuneraryPlan: pet.hasFuneraryPlan,
           petPlanName: pet.petPlanName || undefined,
+          fivStatus: pet.fivStatus as FivFelvStatus | undefined,
+          felvStatus: pet.felvStatus as FivFelvStatus | undefined,
         }}
         onSuccess={handlePetSuccess}
       />

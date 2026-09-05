@@ -147,7 +147,14 @@
       "hasFuneraryPlan": "Funerary Plan",
       "enableFuneraryPlan": "Enable Funerary Plan",
       "petPlanName": "Pet Plan Name",
-      "petPlanNamePlaceholder": "Enter pet plan name"
+      "petPlanNamePlaceholder": "Enter pet plan name",
+      "fivStatus": "FIV",
+      "felvStatus": "FeLV",
+      "testStatus": {
+        "notTested": "Not tested",
+        "negative": "Negative",
+        "positive": "Positive"
+      }
     },
     "errors": {
       "authenticationRequired": "Authentication required",
@@ -313,6 +320,13 @@
       "noActive": "No active treatment",
       "finished": "Finished treatments",
       "loading": "Loading treatments..."
+    },
+    "fivFelv": {
+      "fiv": "FIV",
+      "felv": "FeLV",
+      "notTested": "Not tested",
+      "negative": "Negative",
+      "positive": "Positive"
     }
   },
   "userProfile": {
