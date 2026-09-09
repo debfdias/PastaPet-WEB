@@ -79,6 +79,34 @@ export default function PetModal({
   const hasPetPlan = watch("hasPetPlan");
   const petType = watch("type");
 
+  // Radix <SelectValue> derives its display text from the selected <SelectItem>,
+  // but those items live in a Portal that only mounts when the dropdown is open.
+  // On the closed/initial render (e.g. opening the modal to edit) there is no
+  // item mounted, so the trigger would show nothing. We render the label text
+  // explicitly from the current value instead of relying on the Portal items.
+  const typeLabel = (v?: string) =>
+    v === PetType.DOG
+      ? t("form.dog")
+      : v === PetType.CAT
+      ? t("form.cat")
+      : v === PetType.OTHER
+      ? t("form.other")
+      : "";
+  const genderLabel = (v?: string) =>
+    v === PetGender.MALE
+      ? t("form.male")
+      : v === PetGender.FEMALE
+      ? t("form.female")
+      : "";
+  const statusLabel = (v?: string) =>
+    v === FivFelvStatus.POSITIVE
+      ? t("form.testStatus.positive")
+      : v === FivFelvStatus.NEGATIVE
+      ? t("form.testStatus.negative")
+      : v === FivFelvStatus.NOT_TESTED
+      ? t("form.testStatus.notTested")
+      : "";
+
   // Reset form when pet changes or modal opens/closes
   useEffect(() => {
     if (isOpen) {
@@ -345,7 +373,7 @@ export default function PetModal({
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue>{typeLabel(field.value)}</SelectValue>
                       </SelectTrigger>
                       <SelectContent position="popper" className="z-[100]">
                         <SelectItem value={PetType.DOG}>
@@ -390,7 +418,7 @@ export default function PetModal({
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue>{genderLabel(field.value)}</SelectValue>
                       </SelectTrigger>
                       <SelectContent position="popper" className="z-[100]">
                         <SelectItem value={PetGender.FEMALE}>
@@ -419,7 +447,7 @@ export default function PetModal({
                           onValueChange={field.onChange}
                         >
                           <SelectTrigger>
-                            <SelectValue />
+                            <SelectValue>{statusLabel(field.value)}</SelectValue>
                           </SelectTrigger>
                           <SelectContent position="popper" className="z-[100]">
                             <SelectItem value={FivFelvStatus.NOT_TESTED}>
@@ -449,7 +477,7 @@ export default function PetModal({
                           onValueChange={field.onChange}
                         >
                           <SelectTrigger>
-                            <SelectValue />
+                            <SelectValue>{statusLabel(field.value)}</SelectValue>
                           </SelectTrigger>
                           <SelectContent position="popper" className="z-[100]">
                             <SelectItem value={FivFelvStatus.NOT_TESTED}>
