@@ -172,6 +172,7 @@ function PetsPageContent() {
       )}
 
       <PetModal
+        key={selectedPet?.id ?? "new"}
         isOpen={isModalOpen}
         onClose={handleModalClose}
         pet={selectedPet ? convertPetApiResponseToPet(selectedPet) : undefined}

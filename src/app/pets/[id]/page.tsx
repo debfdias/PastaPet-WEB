@@ -413,6 +413,7 @@ export default function PetDetailsPage() {
       />
 
       <PetModal
+        key={pet.id}
         isOpen={isPetModalOpen}
         onClose={handlePetModalClose}
         pet={{

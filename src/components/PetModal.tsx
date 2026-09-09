@@ -27,6 +27,42 @@ interface PetModalProps {
   onSuccess: () => void;
 }
 
+// Build the form values from a pet (edit) or empty defaults (create). Used both
+// as the initial useForm defaultValues AND by the reset effect, so the fields are
+// correct from the very first render instead of relying on reset timing.
+function buildFormData(pet?: Pet): PetFormData {
+  if (pet) {
+    return {
+      name: pet.name,
+      dob: pet.dob.split("T")[0],
+      weight: pet.weight,
+      type: pet.type,
+      breed: pet.breed,
+      gender: pet.gender,
+      image: pet.image,
+      hasPetPlan: pet.hasPetPlan,
+      hasFuneraryPlan: pet.hasFuneraryPlan,
+      petPlanName: pet.petPlanName || "",
+      fivStatus: pet.fivStatus || FivFelvStatus.NOT_TESTED,
+      felvStatus: pet.felvStatus || FivFelvStatus.NOT_TESTED,
+    };
+  }
+  return {
+    name: "",
+    dob: "",
+    weight: 0,
+    type: PetType.DOG,
+    breed: "",
+    gender: PetGender.FEMALE,
+    image: "",
+    hasPetPlan: false,
+    hasFuneraryPlan: false,
+    petPlanName: "",
+    fivStatus: FivFelvStatus.NOT_TESTED,
+    felvStatus: FivFelvStatus.NOT_TESTED,
+  };
+}
+
 async function convertBlobUrlToFile(blobUrl: string) {
   const response = await fetch(blobUrl);
   const blob = await response.blob();
@@ -61,20 +97,7 @@ export default function PetModal({
     control,
     formState: { errors },
   } = useForm<PetFormData>({
-    defaultValues: {
-      name: "",
-      dob: "",
-      weight: 0,
-      type: PetType.DOG,
-      breed: "",
-      gender: PetGender.FEMALE,
-      image: "",
-      hasPetPlan: false,
-      hasFuneraryPlan: false,
-      petPlanName: "",
-      fivStatus: FivFelvStatus.NOT_TESTED,
-      felvStatus: FivFelvStatus.NOT_TESTED,
-    },
+    defaultValues: buildFormData(pet),
   });
   const hasPetPlan = watch("hasPetPlan");
   const petType = watch("type");
@@ -107,43 +130,17 @@ export default function PetModal({
       ? t("form.testStatus.notTested")
       : "";
 
-  // Reset form when pet changes or modal opens/closes
+  // Reset form when pet changes or modal opens/closes. Depends on pet?.id (not the
+  // pet object, which is a fresh reference every parent render) to avoid resetting
+  // the form mid-interaction.
   useEffect(() => {
     if (isOpen) {
-      const formData: PetFormData = pet
-        ? {
-            name: pet.name,
-            dob: pet.dob.split("T")[0],
-            weight: pet.weight,
-            type: pet.type,
-            breed: pet.breed,
-            gender: pet.gender,
-            image: pet.image,
-            hasPetPlan: pet.hasPetPlan,
-            hasFuneraryPlan: pet.hasFuneraryPlan,
-            petPlanName: pet.petPlanName || "",
-            fivStatus: pet.fivStatus || FivFelvStatus.NOT_TESTED,
-            felvStatus: pet.felvStatus || FivFelvStatus.NOT_TESTED,
-          }
-        : {
-            name: "",
-            dob: "",
-            weight: 0,
-            type: PetType.DOG,
-            breed: "",
-            gender: PetGender.FEMALE,
-            image: "",
-            hasPetPlan: false,
-            hasFuneraryPlan: false,
-            petPlanName: "",
-            fivStatus: FivFelvStatus.NOT_TESTED,
-            felvStatus: FivFelvStatus.NOT_TESTED,
-          };
-      reset(formData, { keepDefaultValues: false });
+      reset(buildFormData(pet), { keepDefaultValues: false });
       setSelectedImage(null);
       setPreviewUrl(pet?.image || null);
     }
-  }, [isOpen, pet, reset]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, pet?.id, reset]);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
