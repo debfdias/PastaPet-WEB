@@ -14,14 +14,18 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { Exam, ExamFormData } from "@/types/exam";
 import { createExam, updateExam } from "@/services/exams.service";
+import PdfErrorBoundary from "@/components/PdfErrorBoundary";
 
 // Dynamically import react-pdf components only on client side
 const Document = dynamic(
   async () => {
     const mod = await import("react-pdf");
-    // Set up PDF.js worker for Next.js
+    // Serve the worker from our own origin. A cross-origin ES-module worker
+    // (e.g. from unpkg) fails to initialize on mobile Safari and, with no
+    // error boundary, white-screens the app. The file is copied into /public
+    // from pdfjs-dist's legacy build via the postinstall script.
     if (typeof window !== "undefined") {
-      mod.pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${mod.pdfjs.version}/build/pdf.worker.min.mjs`;
+      mod.pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
     }
     return { default: mod.Document };
   },
@@ -328,6 +332,16 @@ export default function ExamModal({
                 <label className="flex flex-col items-center justify-center w-full h-full border-2 border-hair border-dashed rounded-ctrl cursor-pointer bg-panel hover:bg-tint transition-colors duration-200 relative">
                   {previewUrl && isPdf ? (
                     <div className="w-full h-full overflow-auto p-2">
+                      <PdfErrorBoundary
+                        fallback={
+                          <div className="flex flex-col items-center justify-center h-full">
+                            <FaFilePdf className="w-12 h-12 mb-2 text-coral" />
+                            <p className="text-sm text-muted text-center px-2">
+                              {t("examModal.errors.failedToLoadPdf")}
+                            </p>
+                          </div>
+                        }
+                      >
                       <Document
                         key={previewUrl}
                         file={previewUrl}
@@ -361,6 +375,7 @@ export default function ExamModal({
                           renderAnnotationLayer={false}
                         />
                       </Document>
+                      </PdfErrorBoundary>
                       {numPages && numPages > 1 && (
                         <div className="flex items-center justify-center gap-2 mt-2">
                           <button
