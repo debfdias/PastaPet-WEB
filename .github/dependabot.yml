@@ -1,0 +1,20 @@
+version: 2
+updates:
+  # Application dependencies (pnpm uses the npm ecosystem). Minor + patch are
+  # grouped into one weekly PR to cut noise; majors come as individual PRs.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Keep the GitHub Actions used in CI up to date too.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
