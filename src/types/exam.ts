@@ -3,7 +3,7 @@ export interface Exam {
   title: string;
   cause: string;
   administeredBy: string;
-  fileUrl?: string;
+  fileUrls?: string[];
   resultSummary: string;
   examDate?: string;
   createdAt?: string;
@@ -13,7 +13,6 @@ export interface ExamFormData {
   title: string;
   cause: string;
   administeredBy: string;
-  fileUrl: string;
   resultSummary: string;
   examDate: string;
 }

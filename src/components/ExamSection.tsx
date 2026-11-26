@@ -155,17 +155,22 @@ export default function ExamSection({
                         )}
                       </div>
                     </div>
-                    {exam.fileUrl && (
-                      <a
-                        href={exam.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="flex-shrink-0 text-deep hover:text-forest transition-colors"
-                        title={t("viewFile")}
-                      >
-                        <FaFilePdf className="w-5 h-5" />
-                      </a>
+                    {exam.fileUrls && exam.fileUrls.length > 0 && (
+                      <div className="flex flex-shrink-0 items-center gap-2">
+                        {exam.fileUrls.map((url, index) => (
+                          <a
+                            key={`${url}-${index}`}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-deep hover:text-forest transition-colors"
+                            title={t("viewFile")}
+                          >
+                            <FaFilePdf className="w-5 h-5" />
+                          </a>
+                        ))}
+                      </div>
                     )}
                   </div>
                 );

@@ -4,43 +4,40 @@ import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useSession } from "next-auth/react";
 import { CgCloseR } from "react-icons/cg";
-import { Microscope, Upload } from "lucide-react";
+import { Microscope, Upload, X } from "lucide-react";
 import { FaFilePdf } from "react-icons/fa6";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { uploadFile } from "@/lib/storage/client";
 import Image from "next/image";
-import dynamic from "next/dynamic";
 import { Exam, ExamFormData } from "@/types/exam";
 import { createExam, updateExam } from "@/services/exams.service";
-import PdfErrorBoundary from "@/components/PdfErrorBoundary";
 
-// Dynamically import react-pdf components only on client side
-const Document = dynamic(
-  async () => {
-    const mod = await import("react-pdf");
-    // Serve the worker from our own origin. A cross-origin ES-module worker
-    // (e.g. from unpkg) fails to initialize on mobile Safari and, with no
-    // error boundary, white-screens the app. The file is copied into /public
-    // from pdfjs-dist's legacy build via the postinstall script.
-    if (typeof window !== "undefined") {
-      mod.pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
-    }
-    return { default: mod.Document };
-  },
-  {
-    ssr: false,
-  }
-);
+// A single file attached to an exam. New files (just picked by the user) carry
+// the raw `File` so we can upload it on submit; existing files only have a URL.
+type ExamFileItem = {
+  id: string;
+  url: string; // blob: URL for new files, remote URL for existing ones
+  name: string;
+  isImage: boolean;
+  isPdf: boolean;
+  file?: File;
+};
 
-const Page = dynamic(() => import("react-pdf").then((mod) => mod.Page), {
-  ssr: false,
+const stripQuery = (s: string) => s.split("?")[0].toLowerCase();
+const isPdfSource = (s: string) => stripQuery(s).endsWith(".pdf");
+const isImageSource = (s: string) =>
+  /\.(png|jpe?g|gif|webp|heic|heif|bmp|svg)$/.test(stripQuery(s));
+
+// Build a file item from a remote URL (editing an existing exam).
+const itemFromUrl = (url: string): ExamFileItem => ({
+  id: url,
+  url,
+  name: decodeURIComponent(url.split("/").pop() || "file"),
+  isImage: isImageSource(url),
+  isPdf: isPdfSource(url),
 });
-
-// Import CSS - these are safe in client components
-import "react-pdf/dist/Page/AnnotationLayer.css";
-import "react-pdf/dist/Page/TextLayer.css";
 
 interface ExamModalProps {
   isOpen: boolean;
@@ -60,12 +57,7 @@ export default function ExamModal({
   const t = useTranslations();
   const { data: session } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<string | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isPdf, setIsPdf] = useState(false);
-  const [numPages, setNumPages] = useState<number | null>(null);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [selectedFileName, setSelectedFileName] = useState("");
+  const [files, setFiles] = useState<ExamFileItem[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -78,7 +70,6 @@ export default function ExamModal({
       title: "",
       cause: "",
       administeredBy: "",
-      fileUrl: "",
       resultSummary: "",
       examDate: "",
     },
@@ -92,69 +83,52 @@ export default function ExamModal({
           title: exam.title || "",
           cause: exam.cause || "",
           administeredBy: exam.administeredBy || "",
-          fileUrl: exam.fileUrl || "",
           resultSummary: exam.resultSummary || "",
           examDate: (exam.examDate || exam.createdAt || "").slice(0, 10),
         });
-        if (exam.fileUrl) {
-          setPreviewUrl(exam.fileUrl);
-          setIsPdf(
-            exam.fileUrl.toLowerCase().endsWith(".pdf") ||
-              exam.fileUrl.includes("application/pdf")
-          );
-        } else {
-          setPreviewUrl(null);
-          setIsPdf(false);
-        }
-        setSelectedFile(null);
-        setSelectedFileName("");
-        setPageNumber(1);
-        setNumPages(null);
+        setFiles((exam.fileUrls || []).map(itemFromUrl));
       } else {
         // Reset form data when creating new exam
         reset({
           title: "",
           cause: "",
           administeredBy: "",
-          fileUrl: "",
           resultSummary: "",
           examDate: new Date().toISOString().slice(0, 10),
         });
-        setSelectedFile(null);
-        setPreviewUrl(null);
-        setSelectedFileName("");
-        setIsPdf(false);
-        setPageNumber(1);
-        setNumPages(null);
+        setFiles([]);
       }
     }
   }, [isOpen, exam, reset]);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      const fileUrl = URL.createObjectURL(file);
-      setSelectedFile(fileUrl);
-      const isPdfFile =
-        file.type === "application/pdf" ||
-        file.name.toLowerCase().endsWith(".pdf");
-      setIsPdf(isPdfFile);
-      if (file.type.startsWith("image/")) {
-        setPreviewUrl(fileUrl);
-      } else if (isPdfFile) {
-        setPreviewUrl(fileUrl);
-      } else {
-        setPreviewUrl(null);
-      }
-      setSelectedFileName(file.name);
-      setPageNumber(1);
-      setNumPages(null);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files;
+    if (selected && selected.length > 0) {
+      const newItems: ExamFileItem[] = Array.from(selected).map((file) => {
+        const url = URL.createObjectURL(file);
+        return {
+          id: url,
+          url,
+          name: file.name,
+          isImage: file.type.startsWith("image/") || isImageSource(file.name),
+          isPdf: file.type === "application/pdf" || isPdfSource(file.name),
+          file,
+        };
+      });
+      setFiles((prev) => [...prev, ...newItems]);
       e.target.value = "";
     }
   };
 
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
+  const removeFile = (id: string) => {
+    setFiles((prev) => {
+      const target = prev.find((item) => item.id === id);
+      if (target?.file) {
+        // Release the object URL we created for the local preview
+        URL.revokeObjectURL(target.url);
+      }
+      return prev.filter((item) => item.id !== id);
+    });
   };
 
   const onSubmit = async (data: ExamFormData) => {
@@ -164,30 +138,18 @@ export default function ExamModal({
     setIsSubmitting(true);
 
     try {
-      let fileUrl = data.fileUrl;
-
-      if (selectedFile) {
-        const file = await fetch(selectedFile)
-          .then((r) => r.blob())
-          .then((blob) => {
-            const fileName = Math.random().toString(36).slice(2, 9);
-            const mimeType = blob.type || "application/octet-stream";
-            return new File([blob], `${fileName}.${mimeType.split("/")[1]}`, {
-              type: mimeType,
-            });
+      // Upload any newly added files; keep existing ones as-is. Order preserved.
+      const fileUrls = await Promise.all(
+        files.map(async (item) => {
+          if (!item.file) return item.url;
+          const { fileUrl, error } = await uploadFile({
+            file: item.file,
+            bucket: "pets-files",
           });
-
-        const { fileUrl: uploadedUrl, error } = await uploadFile({
-          file,
-          bucket: "pets-files",
-        });
-
-        if (error) {
-          console.error(error);
-          return;
-        }
-        fileUrl = uploadedUrl;
-      }
+          if (error) throw new Error(error);
+          return fileUrl;
+        })
+      );
 
       const isEditing = !!exam;
 
@@ -196,7 +158,7 @@ export default function ExamModal({
           title: data.title,
           cause: data.cause,
           ...(data.administeredBy && { administeredBy: data.administeredBy }),
-          ...(fileUrl && { fileUrl }),
+          fileUrls,
           ...(data.resultSummary && { resultSummary: data.resultSummary }),
           ...(data.examDate && { examDate: data.examDate }),
         });
@@ -206,7 +168,7 @@ export default function ExamModal({
           title: data.title,
           cause: data.cause,
           administeredBy: data.administeredBy,
-          fileUrl,
+          fileUrls,
           resultSummary: data.resultSummary,
           ...(data.examDate && { examDate: data.examDate }),
         });
@@ -328,126 +290,81 @@ export default function ExamModal({
               <label className="block text-sm font-bold text-ink mb-1">
                 {t("examModal.form.fileUrl.label")}
               </label>
-              <div className="flex items-center justify-center w-full h-[231px]">
-                <label className="flex flex-col items-center justify-center w-full h-full border-2 border-hair border-dashed rounded-ctrl cursor-pointer bg-panel hover:bg-tint transition-colors duration-200 relative">
-                  {previewUrl && isPdf ? (
-                    <div className="w-full h-full overflow-auto p-2">
-                      <PdfErrorBoundary
-                        fallback={
-                          <div className="flex flex-col items-center justify-center h-full">
-                            <FaFilePdf className="w-12 h-12 mb-2 text-coral" />
-                            <p className="text-sm text-muted text-center px-2">
-                              {t("examModal.errors.failedToLoadPdf")}
-                            </p>
-                          </div>
-                        }
+              <div className="w-full min-h-[231px] border-2 border-hair border-dashed rounded-ctrl bg-panel p-3">
+                {files.length > 0 ? (
+                  <div className="grid grid-cols-3 gap-2">
+                    {files.map((item) => (
+                      <div
+                        key={item.id}
+                        className="relative aspect-square rounded-ctrl border border-hair bg-surface overflow-hidden"
                       >
-                      <Document
-                        key={previewUrl}
-                        file={previewUrl}
-                        onLoadSuccess={onDocumentLoadSuccess}
-                        onLoadError={(err) =>
-                          console.error("PDF load error:", err)
-                        }
-                        onSourceError={(err) =>
-                          console.error("PDF source error:", err)
-                        }
-                        loading={
-                          <div className="flex items-center justify-center h-full">
-                            <p className="text-sm text-muted">
-                              {t("common.loading")}
-                            </p>
-                          </div>
-                        }
-                        error={
-                          <div className="flex flex-col items-center justify-center h-full">
-                            <FaFilePdf className="w-12 h-12 mb-2 text-coral" />
-                            <p className="text-sm text-muted text-center px-2">
-                              {t("examModal.errors.failedToLoadPdf")}
-                            </p>
-                          </div>
-                        }
-                      >
-                        <Page
-                          pageNumber={pageNumber}
-                          width={280}
-                          renderTextLayer={false}
-                          renderAnnotationLayer={false}
-                        />
-                      </Document>
-                      </PdfErrorBoundary>
-                      {numPages && numPages > 1 && (
-                        <div className="flex items-center justify-center gap-2 mt-2">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setPageNumber((prev) => Math.max(1, prev - 1));
-                            }}
-                            disabled={pageNumber <= 1}
-                            className="px-2 py-1 text-xs bg-panel rounded disabled:opacity-50 cursor-pointer"
-                          >
-                            Previous
-                          </button>
-                          <span className="text-xs text-muted">
-                            {pageNumber} / {numPages}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setPageNumber((prev) =>
-                                Math.min(numPages, prev + 1)
-                              );
-                            }}
-                            disabled={pageNumber >= numPages}
-                            className="px-2 py-1 text-xs bg-panel rounded disabled:opacity-50 cursor-pointer"
-                          >
-                            Next
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ) : previewUrl && !isPdf ? (
-                    <Image
-                      src={previewUrl}
-                      alt="Exam file preview"
-                      width={300}
-                      height={200}
-                      className="w-full h-full object-contain rounded-lg p-2"
-                    />
-                  ) : selectedFile ? (
-                    <div className="flex flex-col items-center justify-center">
-                      {selectedFileName?.toLowerCase().endsWith(".pdf") ? (
-                        <FaFilePdf className="w-12 h-12 mb-2 text-coral" />
-                      ) : (
-                        <Upload className="w-8 h-8 mb-2 text-muted" />
-                      )}
-                      <p className="mb-2 text-sm text-muted text-center px-2">
-                        {selectedFileName || t("examModal.form.fileSelected")}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center">
-                      <Upload className="w-8 h-8 mb-2 text-muted" />
-                      <p className="mb-2 text-sm text-muted">
-                        <span className="font-semibold">
-                          {t("examModal.form.fileUrl.clickToUpload")}
-                        </span>
-                      </p>
-                      <p className="text-xs text-muted">
-                        {t("examModal.form.fileUrl.fileTypes")}
-                      </p>
-                    </div>
-                  )}
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept=".pdf,image/*"
-                    onChange={handleFileChange}
-                    ref={fileInputRef}
-                  />
-                </label>
+                        <button
+                          type="button"
+                          onClick={() => removeFile(item.id)}
+                          aria-label="Remove file"
+                          title="Remove file"
+                          className="absolute top-1 right-1 z-10 rounded-full bg-black/60 p-0.5 text-white hover:bg-black/80 cursor-pointer"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex h-full w-full items-center justify-center"
+                        >
+                          {item.isImage ? (
+                            <Image
+                              src={item.url}
+                              alt={item.name}
+                              width={120}
+                              height={120}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex flex-col items-center justify-center p-2 text-center">
+                              <FaFilePdf className="w-8 h-8 mb-1 text-coral" />
+                              <span className="text-[10px] text-muted break-all line-clamp-2">
+                                {item.name}
+                              </span>
+                            </div>
+                          )}
+                        </a>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex aspect-square flex-col items-center justify-center rounded-ctrl border-2 border-dashed border-hair text-muted hover:bg-tint transition-colors cursor-pointer"
+                    >
+                      <Upload className="w-6 h-6" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex min-h-[205px] w-full flex-col items-center justify-center rounded-ctrl hover:bg-tint transition-colors cursor-pointer"
+                  >
+                    <Upload className="w-8 h-8 mb-2 text-muted" />
+                    <p className="mb-2 text-sm text-muted">
+                      <span className="font-semibold">
+                        {t("examModal.form.fileUrl.clickToUpload")}
+                      </span>
+                    </p>
+                    <p className="text-xs text-muted">
+                      {t("examModal.form.fileUrl.fileTypes")}
+                    </p>
+                  </button>
+                )}
+                <input
+                  type="file"
+                  multiple
+                  className="hidden"
+                  accept=".pdf,image/*"
+                  onChange={handleFileChange}
+                  ref={fileInputRef}
+                />
               </div>
             </div>
           </div>

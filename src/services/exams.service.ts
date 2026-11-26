@@ -6,7 +6,7 @@ export interface Exam {
   title: string;
   cause: string;
   administeredBy: string;
-  fileUrl?: string;
+  fileUrls?: string[];
   resultSummary: string;
   examDate?: string;
   treatmentId?: string;
@@ -50,7 +50,7 @@ export async function createExam(
     title: string;
     cause: string;
     administeredBy: string;
-    fileUrl: string;
+    fileUrls: string[];
     resultSummary: string;
     examDate?: string;
   }
@@ -68,7 +68,7 @@ export async function updateExam(
     title: string;
     cause: string;
     administeredBy?: string;
-    fileUrl?: string;
+    fileUrls?: string[];
     resultSummary?: string;
     examDate?: string;
   }

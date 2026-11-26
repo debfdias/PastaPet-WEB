@@ -86,7 +86,7 @@ interface Exam {
   title: string;
   cause: string;
   administeredBy: string;
-  fileUrl?: string;
+  fileUrls?: string[];
   resultSummary: string;
   treatmentId?: string;
   examDate?: string;
