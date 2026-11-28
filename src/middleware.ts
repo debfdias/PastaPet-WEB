@@ -10,7 +10,15 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
   const isAuthPage = pathname.startsWith("/login");
-  const publicPaths = ["/", "/login", "/forgot-password", "/reset-password"];
+  // "/report/" (trailing slash) keeps the public shared report open without
+  // also unprotecting "/reports".
+  const publicPaths = [
+    "/",
+    "/login",
+    "/forgot-password",
+    "/reset-password",
+    "/report/",
+  ];
   const isPublicRoute = publicPaths.some((route) =>
     pathname.startsWith(route)
   );

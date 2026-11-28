@@ -1,11 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Instagram, MessageCircle, Mail, PawPrint } from "lucide-react";
 
 export function Footer() {
+  const pathname = usePathname();
   const t = useTranslations("footer");
+
+  // The public shared report is a standalone document — no app chrome.
+  // (Trailing slash so it matches /report/<token> but not /reports.)
+  if (pathname.startsWith("/report/")) return null;
 
   const linkCls =
     "flex items-center gap-2 text-sm text-white/70 transition-colors hover:text-mint";

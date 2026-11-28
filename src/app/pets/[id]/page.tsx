@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
+import { FileBarChart } from "lucide-react";
 import { differenceInMonths, differenceInDays } from "date-fns";
 import EventModal from "@/components/EventModal";
 import VaccineModal from "@/components/VaccineModal";
@@ -313,6 +315,16 @@ export default function PetDetailsPage() {
   return (
     <div className="py-8">
       <div className="space-y-8">
+        <div className="flex justify-end">
+          <Link
+            href={`/reports/${pet.id}`}
+            className="inline-flex items-center gap-2 rounded-btn border border-hair bg-surface px-4 py-2 text-sm font-extrabold text-ink transition-colors hover:bg-tint"
+          >
+            <FileBarChart className="h-4 w-4" />
+            {t("reports.viewReport")}
+          </Link>
+        </div>
+
         {/* Row 1: hero + reminders */}
         <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2">
           <PetInfo
