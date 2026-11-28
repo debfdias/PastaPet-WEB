@@ -659,7 +659,9 @@
       "symptomsByType": "Sintomas por tipo",
       "kg": "kg",
       "noWeightData": "Sem histórico de peso ainda",
-      "noSymptomData": "Nenhum sintoma registrado ainda"
+      "noSymptomData": "Nenhum sintoma registrado ainda",
+      "eventsByType": "Eventos por tipo",
+      "noEventData": "Nenhum evento registrado ainda"
     },
     "sections": {
       "treatments": "Tratamentos",
@@ -673,7 +675,9 @@
       "noVaccines": "Nenhuma vacina registrada.",
       "dueBy": "Próxima dose",
       "symptoms": "Sintomas",
-      "noSymptoms": "Nenhum sintoma registrado."
+      "noSymptoms": "Nenhum sintoma registrado.",
+      "events": "Eventos",
+      "noEvents": "Nenhum evento registrado."
     },
     "symptomTypes": {
       "VOMITING": "Vômito",
@@ -694,6 +698,12 @@
     },
     "viewReport": "Ver relatório",
     "searchPlaceholder": "Buscar pelo nome do pet",
-    "noMatches": "Nenhum pet corresponde à busca."
+    "noMatches": "Nenhum pet corresponde à busca.",
+    "eventTypes": {
+      "normal": "Normal",
+      "medical": "Médico",
+      "grooming": "Cuidados",
+      "training": "Treinamento"
+    }
   }
 }

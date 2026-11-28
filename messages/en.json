@@ -659,7 +659,9 @@
       "symptomsByType": "Symptoms by type",
       "kg": "kg",
       "noWeightData": "No weight history yet",
-      "noSymptomData": "No symptoms logged yet"
+      "noSymptomData": "No symptoms logged yet",
+      "eventsByType": "Events by type",
+      "noEventData": "No events logged yet"
     },
     "sections": {
       "treatments": "Treatments",
@@ -673,7 +675,9 @@
       "noVaccines": "No vaccines recorded.",
       "dueBy": "Next dose",
       "symptoms": "Symptoms",
-      "noSymptoms": "No symptoms recorded."
+      "noSymptoms": "No symptoms recorded.",
+      "events": "Events",
+      "noEvents": "No events recorded."
     },
     "symptomTypes": {
       "VOMITING": "Vomiting",
@@ -694,6 +698,12 @@
     },
     "viewReport": "View report",
     "searchPlaceholder": "Search by pet name",
-    "noMatches": "No pets match your search."
+    "noMatches": "No pets match your search.",
+    "eventTypes": {
+      "normal": "Normal",
+      "medical": "Medical",
+      "grooming": "Grooming",
+      "training": "Training"
+    }
   }
 }

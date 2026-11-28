@@ -4,7 +4,14 @@ import { ReactNode } from "react";
 import Image from "next/image";
 import { format, parseISO, differenceInMonths } from "date-fns";
 import { useTranslations } from "next-intl";
-import { PawPrint, Syringe, Stethoscope, Pill, Activity } from "lucide-react";
+import {
+  PawPrint,
+  Syringe,
+  Stethoscope,
+  Pill,
+  Activity,
+  CalendarDays,
+} from "lucide-react";
 import { FaFilePdf } from "react-icons/fa6";
 import { PetReport } from "@/types/report";
 import {
@@ -12,6 +19,7 @@ import {
   WeightChart,
   SymptomFrequencyChart,
   SymptomDistributionChart,
+  EventTypeChart,
 } from "./ReportCharts";
 
 function fmt(date?: string | null) {
@@ -33,9 +41,11 @@ export default function ReportView({
   footerNote?: string;
 }) {
   const t = useTranslations("reports");
-  const { pet, weightEntries, symptoms, treatments, exams, vaccines } = report;
+  const { pet, weightEntries, symptoms, events, treatments, exams, vaccines } =
+    report;
 
   const symptomLabel = (type: string) => t(`symptomTypes.${type}`);
+  const eventLabel = (type: string) => t(`eventTypes.${type}`);
   const activeTreatments = treatments.filter((tr) => !tr.endDate).length;
 
   const months = differenceInMonths(new Date(), parseISO(pet.dob));
@@ -138,15 +148,20 @@ export default function ReportView({
             emptyLabel={t("charts.noSymptomData")}
           />
         </ChartCard>
-        <div className="lg:col-span-2">
-          <ChartCard title={t("charts.symptomsByType")}>
-            <SymptomDistributionChart
-              symptoms={symptoms}
-              labelFor={symptomLabel}
-              emptyLabel={t("charts.noSymptomData")}
-            />
-          </ChartCard>
-        </div>
+        <ChartCard title={t("charts.symptomsByType")}>
+          <SymptomDistributionChart
+            symptoms={symptoms}
+            labelFor={symptomLabel}
+            emptyLabel={t("charts.noSymptomData")}
+          />
+        </ChartCard>
+        <ChartCard title={t("charts.eventsByType")}>
+          <EventTypeChart
+            events={events}
+            labelFor={eventLabel}
+            emptyLabel={t("charts.noEventData")}
+          />
+        </ChartCard>
       </div>
 
       {/* Treatments */}
@@ -276,6 +291,33 @@ export default function ReportView({
                 </span>
                 {s.notes && <p className="text-sm text-muted">{s.notes}</p>}
               </div>
+            </div>
+          ))
+        )}
+      </Section>
+
+      {/* Events */}
+      <Section
+        icon={<CalendarDays className="h-4 w-4" />}
+        title={t("sections.events")}
+      >
+        {events.length === 0 ? (
+          <Empty label={t("sections.noEvents")} />
+        ) : (
+          events.map((ev) => (
+            <div
+              key={ev.id}
+              className="flex items-center justify-between gap-2 border-b border-hair py-3 last:border-0"
+            >
+              <div className="min-w-0">
+                <p className="truncate font-bold text-ink">{ev.title}</p>
+                <span className="mt-1 inline-block rounded-chip bg-panel px-2 py-0.5 text-xs text-muted">
+                  {eventLabel(ev.type)}
+                </span>
+              </div>
+              <span className="flex-shrink-0 text-xs text-faint">
+                {fmt(ev.eventDate)}
+              </span>
             </div>
           ))
         )}

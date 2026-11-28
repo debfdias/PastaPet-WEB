@@ -171,23 +171,12 @@ export function SymptomFrequencyChart({
   );
 }
 
-export function SymptomDistributionChart({
-  symptoms,
-  labelFor,
-  emptyLabel,
+// Horizontal bar chart of category counts, one color per bar.
+function HorizontalBars({
+  data,
 }: {
-  symptoms: Symptom[];
-  labelFor: (type: string) => string;
-  emptyLabel: string;
+  data: { label: string; count: number }[];
 }) {
-  if (!symptoms.length) return <Empty label={emptyLabel} />;
-  const counts: Record<string, number> = {};
-  symptoms.forEach((s) => {
-    counts[s.type] = (counts[s.type] || 0) + 1;
-  });
-  const data = Object.entries(counts)
-    .map(([type, count]) => ({ label: labelFor(type), count }))
-    .sort((a, b) => b.count - a.count);
   return (
     <div style={{ width: "100%", height: Math.max(220, data.length * 36) }}>
       <ResponsiveContainer>
@@ -229,4 +218,43 @@ export function SymptomDistributionChart({
       </ResponsiveContainer>
     </div>
   );
+}
+
+function countByType(
+  items: { type: string }[],
+  labelFor: (type: string) => string
+) {
+  const counts: Record<string, number> = {};
+  items.forEach((i) => {
+    counts[i.type] = (counts[i.type] || 0) + 1;
+  });
+  return Object.entries(counts)
+    .map(([type, count]) => ({ label: labelFor(type), count }))
+    .sort((a, b) => b.count - a.count);
+}
+
+export function SymptomDistributionChart({
+  symptoms,
+  labelFor,
+  emptyLabel,
+}: {
+  symptoms: Symptom[];
+  labelFor: (type: string) => string;
+  emptyLabel: string;
+}) {
+  if (!symptoms.length) return <Empty label={emptyLabel} />;
+  return <HorizontalBars data={countByType(symptoms, labelFor)} />;
+}
+
+export function EventTypeChart({
+  events,
+  labelFor,
+  emptyLabel,
+}: {
+  events: { type: string }[];
+  labelFor: (type: string) => string;
+  emptyLabel: string;
+}) {
+  if (!events.length) return <Empty label={emptyLabel} />;
+  return <HorizontalBars data={countByType(events, labelFor)} />;
 }

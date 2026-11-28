@@ -122,10 +122,18 @@ export interface ReportNote {
   createdAt: string;
 }
 
+export interface ReportEvent {
+  id: string;
+  title: string;
+  type: string;
+  eventDate: string;
+}
+
 export interface PetReport {
   pet: ReportPet;
   weightEntries: WeightEntry[];
   symptoms: Symptom[];
+  events: ReportEvent[];
   treatments: ReportTreatment[];
   exams: ReportExam[];
   vaccines: ReportVaccine[];
