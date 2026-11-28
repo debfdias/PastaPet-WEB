@@ -68,13 +68,23 @@ export default function ShareButton({ petId }: { petId: string }) {
       <Button variant="outline" onClick={() => setOpen((o) => !o)}>
         <Share2 className="h-4 w-4" />
         {t("share")}
+        {token && (
+          <span
+            className="ml-1 h-2 w-2 rounded-full bg-mint"
+            aria-hidden="true"
+          />
+        )}
       </Button>
       {open && (
         <div className="absolute right-0 z-20 mt-2 w-80 rounded-card border border-hair bg-surface p-4 shadow-card">
           <p className="mb-2 text-sm font-bold text-ink">{t("shareTitle")}</p>
           <p className="mb-3 text-xs text-muted">{t("shareDescription")}</p>
           {token ? (
-            <div className="space-y-2">
+            <div className="space-y-3">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-leaf">
+                <span className="h-2 w-2 rounded-full bg-mint" />
+                {t("linkActive")}
+              </div>
               <div className="flex items-center gap-2">
                 <input
                   readOnly
@@ -96,7 +106,7 @@ export default function ShareButton({ petId }: { petId: string }) {
               <button
                 onClick={revoke}
                 disabled={loading}
-                className="text-xs text-coral-fg hover:underline"
+                className="w-full rounded-ctrl border border-hair px-3 py-2 text-sm font-bold text-coral-fg transition-colors hover:bg-coral-bg disabled:opacity-50"
               >
                 {t("revoke")}
               </button>

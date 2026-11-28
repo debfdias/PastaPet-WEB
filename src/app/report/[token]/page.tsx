@@ -24,6 +24,19 @@ export default function PublicReportPage() {
       .finally(() => setLoading(false));
   }, [token]);
 
+  // A shared report is a document — force a consistent light theme so it looks
+  // the same for everyone it's shared with (and matches the printed PDF),
+  // regardless of the viewer's device theme.
+  useEffect(() => {
+    const html = document.documentElement;
+    const prev = html.getAttribute("data-theme");
+    html.setAttribute("data-theme", "light");
+    return () => {
+      if (prev) html.setAttribute("data-theme", prev);
+      else html.removeAttribute("data-theme");
+    };
+  }, []);
+
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
