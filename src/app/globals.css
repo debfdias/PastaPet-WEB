@@ -175,3 +175,17 @@
     height: 0;
   }
 }
+
+/* Print: strip site chrome so "Save as PDF" yields a clean report. */
+@media print {
+  header,
+  footer {
+    display: none !important;
+  }
+  .print\:hidden {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+}

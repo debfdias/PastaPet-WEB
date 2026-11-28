@@ -598,5 +598,99 @@
       "failedToFetch": "Falha ao buscar pets",
       "anErrorOccurred": "Ocorreu um erro"
     }
+  },
+  "reports": {
+    "title": "Relatórios",
+    "subtitle": "Relatórios de saúde dos seus pets",
+    "noPets": "Nenhum pet ainda.",
+    "backToReports": "Voltar aos relatórios",
+    "notFound": "Relatório não encontrado.",
+    "notFoundPublic": "Este relatório está indisponível ou o link foi revogado.",
+    "addSymptom": "Adicionar sintoma",
+    "addWeight": "Adicionar peso",
+    "share": "Compartilhar",
+    "shareTitle": "Link compartilhável",
+    "shareDescription": "Qualquer pessoa com este link pode ver o relatório de saúde deste pet. Sem login.",
+    "copyLink": "Copiar link",
+    "revoke": "Revogar link",
+    "generateLink": "Gerar link",
+    "linkRevoked": "Link revogado",
+    "downloadPdf": "Baixar PDF",
+    "age": "Idade",
+    "ageYears": "a",
+    "ageMonths": "m",
+    "weight": "Peso",
+    "measuredAt": "Data",
+    "observedAt": "Data observada",
+    "notes": "Observações",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "symptomType": "Sintoma",
+    "severityLabel": "Gravidade",
+    "symptomAdded": "Sintoma adicionado",
+    "weightAdded": "Peso registrado",
+    "invalidWeight": "Informe um peso válido",
+    "errorGeneric": "Algo deu errado",
+    "sharedReportFooter": "Gerado pelo Pasta Pet",
+    "species": {
+      "DOG": "Cachorro",
+      "CAT": "Gato",
+      "OTHER": "Outro"
+    },
+    "gender": {
+      "MALE": "Macho",
+      "FEMALE": "Fêmea"
+    },
+    "fivFelv": {
+      "NOT_TESTED": "Não testado",
+      "NEGATIVE": "Negativo",
+      "POSITIVE": "Positivo"
+    },
+    "stats": {
+      "treatments": "Tratamentos",
+      "activeTreatments": "Ativos",
+      "exams": "Exames",
+      "vaccines": "Vacinas",
+      "symptoms": "Sintomas"
+    },
+    "charts": {
+      "weightOverTime": "Peso ao longo do tempo",
+      "symptomsOverTime": "Sintomas ao longo do tempo",
+      "symptomsByType": "Sintomas por tipo",
+      "kg": "kg",
+      "noWeightData": "Sem histórico de peso ainda",
+      "noSymptomData": "Nenhum sintoma registrado ainda"
+    },
+    "sections": {
+      "treatments": "Tratamentos",
+      "noTreatments": "Nenhum tratamento registrado.",
+      "ongoing": "Em andamento",
+      "ended": "Finalizado",
+      "exams": "Exames",
+      "noExams": "Nenhum exame registrado.",
+      "viewFile": "Ver arquivo",
+      "vaccines": "Vacinas",
+      "noVaccines": "Nenhuma vacina registrada.",
+      "dueBy": "Próxima dose",
+      "symptoms": "Sintomas",
+      "noSymptoms": "Nenhum sintoma registrado."
+    },
+    "symptomTypes": {
+      "VOMITING": "Vômito",
+      "DIARRHEA": "Diarreia",
+      "APPETITE_LOSS": "Falta de apetite",
+      "LETHARGY": "Letargia",
+      "COUGHING": "Tosse",
+      "SNEEZING": "Espirros",
+      "ITCHING": "Coceira",
+      "LIMPING": "Mancando",
+      "SEIZURE": "Convulsão",
+      "OTHER": "Outro"
+    },
+    "severity": {
+      "LOW": "Baixa",
+      "MEDIUM": "Média",
+      "HIGH": "Alta"
+    }
   }
 }
