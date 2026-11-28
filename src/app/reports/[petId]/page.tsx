@@ -71,7 +71,7 @@ export default function PetReportPage() {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2 print:hidden">
         <button
           onClick={() => router.push("/reports")}
-          className="inline-flex items-center gap-1 text-sm text-muted hover:text-ink"
+          className="inline-flex cursor-pointer items-center gap-1 text-sm text-muted hover:text-ink"
         >
           <ArrowLeft className="h-4 w-4" />
           {t("backToReports")}

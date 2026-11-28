@@ -86,6 +86,18 @@
     --color-text-secondary: hsl(148 91% 22%);
     --color-header2: hsl(96 71.6% 67%);
     --color-header: hsl(148 91% 45%);
+
+    /* Full Mint light palette, so a `data-theme="light"` subtree (e.g. the
+       public report) fully resets even when an ancestor is in dark mode. */
+    --color-canvas:  #EEF6F0;
+    --color-panel:   #F1F8F4;
+    --color-surface: #FFFFFF;
+    --color-ink:     #123329;
+    --color-muted:   #5E7A6E;
+    --color-faint:   #86A093;
+    --color-hair:    #E1EDE6;
+    --color-tint:    #DCF4E7;
+    --color-tint2:   #C4ECD6;
   }
   [data-theme="dark"] {
     --color-pet-card: oklch(27.8% 0.033 256);

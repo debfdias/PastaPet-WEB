@@ -24,47 +24,48 @@ export default function PublicReportPage() {
       .finally(() => setLoading(false));
   }, [token]);
 
-  // A shared report is a document — force a consistent light theme so it looks
-  // the same for everyone it's shared with (and matches the printed PDF),
-  // regardless of the viewer's device theme.
-  useEffect(() => {
-    const html = document.documentElement;
-    const prev = html.getAttribute("data-theme");
-    html.setAttribute("data-theme", "light");
-    return () => {
-      if (prev) html.setAttribute("data-theme", prev);
-      else html.removeAttribute("data-theme");
-    };
-  }, []);
+  // A shared report is a document: force a consistent light theme (full-bleed)
+  // so it looks the same for everyone, regardless of their device theme, and
+  // matches the printed PDF.
+  const wrapperClass =
+    "-mx-4 min-h-screen bg-canvas px-4 py-8 text-ink md:-mx-12 md:px-12";
 
+  let content;
   if (loading) {
-    return (
+    content = (
       <div className="flex min-h-[60vh] items-center justify-center">
         <ClipLoader size={40} color="#0E7A4A" />
       </div>
     );
-  }
-
-  if (!report) {
-    return (
+  } else if (!report) {
+    content = (
       <div className="py-20 text-center text-muted">{t("notFoundPublic")}</div>
+    );
+  } else {
+    content = (
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-4 flex items-center justify-between print:hidden">
+          <span className="flex items-center gap-2 font-display text-lg font-extrabold text-ink">
+            <PawPrint className="h-5 w-5 text-deep" />
+            Pasta Pet
+          </span>
+          <Button
+            variant="outline"
+            onClick={() => printReport(report.pet.name)}
+          >
+            <Printer className="h-4 w-4" />
+            {t("downloadPdf")}
+          </Button>
+        </div>
+
+        <ReportView report={report} footerNote={t("sharedReportFooter")} />
+      </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-6xl py-8">
-      <div className="mb-4 flex items-center justify-between print:hidden">
-        <span className="flex items-center gap-2 font-display text-lg font-extrabold text-ink">
-          <PawPrint className="h-5 w-5 text-deep" />
-          Pasta Pet
-        </span>
-        <Button variant="outline" onClick={() => printReport(report.pet.name)}>
-          <Printer className="h-4 w-4" />
-          {t("downloadPdf")}
-        </Button>
-      </div>
-
-      <ReportView report={report} footerNote={t("sharedReportFooter")} />
+    <div data-theme="light" className={wrapperClass}>
+      {content}
     </div>
   );
 }
