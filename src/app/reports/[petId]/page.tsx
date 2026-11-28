@@ -11,7 +11,8 @@ import ReportView from "@/components/reports/ReportView";
 import ShareButton from "@/components/reports/ShareButton";
 import SymptomModal from "@/components/SymptomModal";
 import WeightModal from "@/components/WeightModal";
-import { getPetReport } from "@/services/reports.service";
+import { getPetReport, getCachedReport } from "@/services/reports.service";
+import { printReport } from "@/lib/printReport";
 import { PetReport } from "@/types/report";
 
 export default function PetReportPage() {
@@ -19,19 +20,21 @@ export default function PetReportPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const t = useTranslations("reports");
-  const [report, setReport] = useState<PetReport | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Seed from cache so returning to this page (e.g. after opening an exam
+  // file) is instant and doesn't flash a loading spinner.
+  const cached = getCachedReport(petId);
+  const [report, setReport] = useState<PetReport | null>(cached ?? null);
+  const [loading, setLoading] = useState(!cached);
   const [symptomOpen, setSymptomOpen] = useState(false);
   const [weightOpen, setWeightOpen] = useState(false);
 
   const load = useCallback(async () => {
     if (!session?.user?.token) return;
-    setLoading(true);
     try {
       const data = await getPetReport(session.user.token, petId);
       setReport(data);
     } catch {
-      setReport(null);
+      if (!getCachedReport(petId)) setReport(null);
     } finally {
       setLoading(false);
     }
@@ -50,15 +53,13 @@ export default function PetReportPage() {
   }
 
   if (!report) {
-    return (
-      <div className="py-20 text-center text-muted">{t("notFound")}</div>
-    );
+    return <div className="py-20 text-center text-muted">{t("notFound")}</div>;
   }
 
   const actions = (
     <>
       <ShareButton petId={petId} />
-      <Button variant="outline" onClick={() => window.print()}>
+      <Button variant="outline" onClick={() => printReport(report.pet.name)}>
         <Printer className="h-4 w-4" />
         {t("downloadPdf")}
       </Button>
@@ -66,7 +67,7 @@ export default function PetReportPage() {
   );
 
   return (
-    <div className="mx-auto max-w-5xl py-6">
+    <div className="mx-auto max-w-6xl py-8">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2 print:hidden">
         <button
           onClick={() => router.push("/reports")}

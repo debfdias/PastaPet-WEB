@@ -648,7 +648,7 @@
     },
     "stats": {
       "treatments": "Treatments",
-      "activeTreatments": "Active",
+      "activeTreatments": "Active treatments",
       "exams": "Exams",
       "vaccines": "Vaccines",
       "symptoms": "Symptoms"
@@ -691,6 +691,9 @@
       "LOW": "Low",
       "MEDIUM": "Medium",
       "HIGH": "High"
-    }
+    },
+    "viewReport": "View report",
+    "searchPlaceholder": "Search by pet name",
+    "noMatches": "No pets match your search."
   }
 }

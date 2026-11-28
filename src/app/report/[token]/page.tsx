@@ -8,6 +8,7 @@ import { ClipLoader } from "react-spinners";
 import { Button } from "@/components/ui/button";
 import ReportView from "@/components/reports/ReportView";
 import { getPublicReport } from "@/services/reports.service";
+import { printReport } from "@/lib/printReport";
 import { PetReport } from "@/types/report";
 
 export default function PublicReportPage() {
@@ -38,13 +39,13 @@ export default function PublicReportPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl py-6">
+    <div className="mx-auto max-w-6xl py-8">
       <div className="mb-4 flex items-center justify-between print:hidden">
         <span className="flex items-center gap-2 font-display text-lg font-extrabold text-ink">
           <PawPrint className="h-5 w-5 text-deep" />
           Pasta Pet
         </span>
-        <Button variant="outline" onClick={() => window.print()}>
+        <Button variant="outline" onClick={() => printReport(report.pet.name)}>
           <Printer className="h-4 w-4" />
           {t("downloadPdf")}
         </Button>

@@ -1,11 +1,24 @@
 import { httpClient } from "@/lib/httpClient";
 import { PetReport, ReportShare } from "@/types/report";
 
+// In-memory cache so navigating back to a report (e.g. after opening an exam
+// file) shows it instantly instead of re-fetching with a loading spinner.
+const reportCache = new Map<string, PetReport>();
+
+export function getCachedReport(petId: string): PetReport | undefined {
+  return reportCache.get(petId);
+}
+
 export async function getPetReport(
   token: string,
   petId: string
 ): Promise<PetReport> {
-  return httpClient.get<PetReport>(token, `/reports/pet/${petId}`);
+  const report = await httpClient.get<PetReport>(
+    token,
+    `/reports/pet/${petId}`
+  );
+  reportCache.set(petId, report);
+  return report;
 }
 
 export async function getShareLink(

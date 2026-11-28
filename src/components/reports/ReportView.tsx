@@ -102,7 +102,7 @@ export default function ReportView({
           </div>
         </div>
         {actions && (
-          <div className="flex flex-shrink-0 flex-col gap-2 sm:items-end print:hidden">
+          <div className="flex flex-shrink-0 flex-row flex-wrap gap-2 sm:items-start sm:justify-end print:hidden">
             {actions}
           </div>
         )}
